@@ -26,54 +26,40 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
             return 0x00000704;
         
         case gestalt_LineInput:
-            if ((val >= 0 && val < 32) || val == '\177') {
-                /* Control characters never appear in line input. */
+            if (val >= 32 && val < 127)
+                return TRUE;
+            else
                 return FALSE;
-            }
-            if (val >= 32 && val < 256) {
-                return char_typable_table[val];
-            }
-            return FALSE;
                 
         case gestalt_CharInput: 
-            if (val >= 0 && val < 256) {
-                return char_typable_table[val];
+            if (val >= 32 && val < 127)
+                return TRUE;
+            else if (val == keycode_Return)
+                return TRUE;
+            else {
+                /* We're doing UTF-8 input, so we can input any Unicode
+                   character. Except control characters. */
+                return (val >= 160 && val < 0x200000);
             }
-            if (val <= 0xFFFFFFFF && val > (0xFFFFFFFF - keycode_MAXVAL)) {
-                /* Special key code. We conservatively declare that only the
-                    arrow keys, return, del/backspace, and escape can be
-                    typed. Function keys might work, but we can't be
-                    sure they're there. */
-                if (val == keycode_Left || val == keycode_Right
-                    || val == keycode_Up || val == keycode_Down
-                    || val == keycode_Return || val == keycode_Delete
-                    || val == keycode_Escape)
-                    return TRUE;
-                else
-                    return FALSE;
-            }
-            return FALSE;
         
         case gestalt_CharOutput: 
-            if (char_printable_table[(unsigned char)val]) {
+            if (val >= 32 && val < 127) {
                 if (arr && arrlen >= 1)
                     arr[0] = 1;
                 return gestalt_CharOutput_ExactPrint;
             }
             else {
-                char *altstr = gli_ascii_equivalent((unsigned char)val);
-                ix = strlen(altstr);
+                /* cheaply, we don't do any translation of printed
+                    characters, so the output is always one character 
+                    even if it's wrong. */
                 if (arr && arrlen >= 1)
-                    arr[0] = ix;
-                if (ix == 4 && altstr[0] == '\\') {
-                    /* It's a four-character octal code, "\177". */
+                    arr[0] = 1;
+                /* We're doing UTF-8 output, so we can print any Unicode
+                   character. Except control characters. */
+                if (val >= 160 && val < 0x200000)
+                    return gestalt_CharOutput_ExactPrint;
+                else
                     return gestalt_CharOutput_CannotPrint;
-                }
-                else {
-                    /* It's some string from char_A0_FF_to_ascii() in
-                        gtmisc.c. */
-                    return gestalt_CharOutput_ApproxPrint;
-                }
             }
             
         case gestalt_MouseInput: 

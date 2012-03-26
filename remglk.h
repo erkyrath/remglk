@@ -124,23 +124,6 @@ struct glk_fileref_struct {
     fileref_t *next, *prev; /* in the big linked list of filerefs */
 };
 
-/* Arguments to keybindings */
-
-#define gcmd_Left (1)
-#define gcmd_Right (2)
-#define gcmd_Up (3)
-#define gcmd_Down (4)
-#define gcmd_LeftEnd (5)
-#define gcmd_RightEnd (6)
-#define gcmd_UpEnd (7)
-#define gcmd_DownEnd (8)
-#define gcmd_UpPage (9)
-#define gcmd_DownPage (10)
-#define gcmd_Delete (11)
-#define gcmd_DeleteNext (12)
-#define gcmd_KillInput (13)
-#define gcmd_KillLine (14)
-
 /* A few global variables */
 
 extern window_t *gli_rootwin;
@@ -164,9 +147,6 @@ typedef glui32 gli_decomp_block_t[2]; /* count, position */
    If the count is zero, there is no decomposition. */
 
 
-extern unsigned char char_printable_table[256];
-extern unsigned char char_typable_table[256];
-
 extern gidispatch_rock_t (*gli_register_obj)(void *obj, glui32 objclass);
 extern void (*gli_unregister_obj)(void *obj, glui32 objclass, gidispatch_rock_t objrock);
 extern gidispatch_rock_t (*gli_register_arr)(void *array, glui32 len, char *typecode);
@@ -185,7 +165,6 @@ extern int pref_prompt_defaults;
 /* Declarations of library internal functions. */
 
 extern void gli_initialize_misc(void);
-extern char *gli_ascii_equivalent(unsigned char ch);
 
 extern void gli_msgline_warning(char *msg);
 extern void gli_msgline(char *msg);
