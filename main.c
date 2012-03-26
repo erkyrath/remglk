@@ -171,10 +171,6 @@ int main(int argc, char *argv[])
         }
         else if (extract_value(argc, argv, "defprompt", ex_Bool, &ix, &val, pref_prompt_defaults))
             pref_prompt_defaults = val;
-#ifdef OPT_TIMED_INPUT
-        else if (extract_value(argc, argv, "precise", ex_Bool, &ix, &val, pref_precise_timing))
-            pref_precise_timing = val;
-#endif /* !OPT_TIMED_INPUT */
         else {
             printf("%s: unknown option: %s\n", argv[0], argv[ix]);
             errflag = TRUE;
@@ -209,9 +205,6 @@ int main(int argc, char *argv[])
         printf("  -revgrid BOOL: reverse text in grid (status) windows (default 'no')\n");
         printf("  -border BOOL: force borders/no borders between windows\n");
         printf("  -defprompt BOOL: provide defaults for file prompts (default 'yes')\n");
-#ifdef OPT_TIMED_INPUT
-        printf("  -precise BOOL: more precise timing for timed input (burns more CPU time) (default 'no')\n");
-#endif /* !OPT_TIMED_INPUT */
         printf("  -version: display Glk library version\n");
         printf("  -help: display this list\n");
         printf("NUM values can be any number. BOOL values can be 'yes' or 'no', or no value to toggle.\n");
@@ -223,10 +216,8 @@ int main(int argc, char *argv[])
         printf("For more information, see http://eblong.com/zarf/glk/\n");
         return 1;
     }
-    
-    /* We now start up curses. From now on, the program must exit through
-        glk_exit(), so that endwin() is called. */
-    gli_setup_curses();
+
+    /* ### set up I/O thingies? */
     
     /* Initialize things. */
     gli_initialize_misc();

@@ -164,20 +164,8 @@ typedef glui32 gli_decomp_block_t[2]; /* count, position */
    If the count is zero, there is no decomposition. */
 
 
-#ifdef OPT_USE_SIGNALS
-    extern int just_resumed;
-    extern int just_killed;
-#ifdef OPT_WINCHANGED_SIGNAL
-        extern int screen_size_changed;
-#endif /* OPT_WINCHANGED_SIGNAL */
-#endif /* OPT_USE_SIGNALS */
-
 extern unsigned char char_printable_table[256];
 extern unsigned char char_typable_table[256];
-#ifndef OPT_NATIVE_LATIN_1
-extern unsigned char char_from_native_table[256];
-extern unsigned char char_to_native_table[256];
-#endif /* OPT_NATIVE_LATIN_1 */
 
 extern gidispatch_rock_t (*gli_register_obj)(void *obj, glui32 objclass);
 extern void (*gli_unregister_obj)(void *obj, glui32 objclass, gidispatch_rock_t objrock);
@@ -217,7 +205,6 @@ extern void gli_input_guess_focus(void);
 extern glui32 gli_input_from_native(int key);
 
 extern void gli_initialize_windows(void);
-extern void gli_setup_curses(void);
 extern void gli_fast_exit(void);
 extern window_t *gli_new_window(glui32 type, glui32 rock);
 extern void gli_delete_window(window_t *win);

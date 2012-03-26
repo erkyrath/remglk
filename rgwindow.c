@@ -1056,26 +1056,6 @@ void glk_cancel_mouse_event(window_t *win)
 
 void gli_window_put_char(window_t *win, char ch)
 {
-    /* Character set conversion is necessary here, since we're printing to
-        native (curses.h) output routines. */
-    
-    if (!char_printable_table[(unsigned char)ch]) {
-        char *altstr = gli_ascii_equivalent(ch);
-        /* altstr is now a sensible ASCII equivalent, or else an octal
-            code like "\177". Call gli_window_put_char() recursively to
-            print it. This is safe, if funky, because altstr contains
-            only characters in the range 0x20..0x7E. */
-        while (*altstr) {
-            gli_window_put_char(win, *altstr);
-            altstr++;
-        }
-        return;
-    }
-    
-#ifndef OPT_NATIVE_LATIN_1  
-    ch = char_to_native_table[(unsigned char)ch];
-#endif /* OPT_NATIVE_LATIN_1 */
-
     switch (win->type) {
         case wintype_TextBuffer:
             win_textbuffer_putchar(win, ch);

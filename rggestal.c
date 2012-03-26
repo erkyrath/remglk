@@ -80,11 +80,7 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
             return FALSE;
             
         case gestalt_Timer: 
-#ifdef OPT_TIMED_INPUT
             return TRUE;
-#else /* !OPT_TIMED_INPUT */
-            return FALSE;
-#endif /* OPT_TIMED_INPUT */
 
         case gestalt_Graphics:
         case gestalt_GraphicsTransparency:
@@ -94,18 +90,10 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
             return FALSE;
             
         case gestalt_Unicode:
-#ifdef GLK_MODULE_UNICODE
             return TRUE;
-#else
-            return FALSE;
-#endif /* GLK_MODULE_UNICODE */
             
         case gestalt_UnicodeNorm:
-#ifdef GLK_MODULE_UNICODE_NORM
             return TRUE;
-#else
-            return FALSE;
-#endif /* GLK_MODULE_UNICODE_NORM */
             
         case gestalt_Sound:
         case gestalt_SoundVolume:
