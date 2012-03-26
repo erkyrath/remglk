@@ -17,10 +17,8 @@ int pref_printversion = FALSE;
 int pref_screenwidth = 0;
 int pref_screenheight = 0;
 int pref_messageline = TRUE;
-int pref_reverse_textgrids = FALSE;
 int pref_override_window_borders = FALSE;
 int pref_window_borders = FALSE;
-int pref_precise_timing = FALSE;
 int pref_historylen = 20;
 int pref_prompt_defaults = TRUE;
 
@@ -163,8 +161,6 @@ int main(int argc, char *argv[])
             pref_screenheight = val;
         else if (extract_value(argc, argv, "ml", ex_Bool, &ix, &val, pref_messageline))
             pref_messageline = val;
-        else if (extract_value(argc, argv, "revgrid", ex_Bool, &ix, &val, pref_reverse_textgrids))
-            pref_reverse_textgrids = val;
         else if (extract_value(argc, argv, "border", ex_Bool, &ix, &val, pref_window_borders)) {
             pref_window_borders = val;
             pref_override_window_borders = TRUE;
