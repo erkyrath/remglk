@@ -14,7 +14,9 @@ typedef enum RawType_enum {
     rawtyp_Str = 2,
     rawtyp_List = 3,
     rawtyp_Struct = 4,
-    rawtyp_Symbol = 5,
+    rawtyp_True = 5,
+    rawtyp_False = 6,
+    rawtyp_Null = 7,
 } RawType;
 
 typedef struct data_raw_struct data_raw_t;
@@ -23,8 +25,8 @@ struct data_raw_struct {
     RawType type;
     char *key;
 
-    glui32 number;
-    char *str;
+    glsi32 number;
+    glui32 *str;
     data_raw_t **list;
     int count;
     int allocsize;
@@ -35,6 +37,8 @@ static data_raw_t *data_raw_blockread_sub(char *termchar);
 
 static char *stringbuf = NULL;
 static int stringbuf_size = 0;
+static glui32 *ustringbuf = NULL;
+static int ustringbuf_size = 0;
 
 void gli_initialize_datainput()
 {
@@ -42,6 +46,25 @@ void gli_initialize_datainput()
     stringbuf = malloc(stringbuf_size * sizeof(char));
     if (!stringbuf)
         gli_fatal_error("data: Unable to allocate memory for string buffer");
+
+    ustringbuf_size = 64;
+    ustringbuf = malloc(ustringbuf_size * sizeof(glui32));
+    if (!ustringbuf)
+        gli_fatal_error("data: Unable to allocate memory for string buffer");
+}
+
+static int parse_hex_digit(char ch)
+{
+    if (ch == EOF)
+        gli_fatal_error("data: Unexpected end of input");
+    if (ch >= '0' && ch <= '9')
+        return ch - '0';
+    if (ch >= 'A' && ch <= 'F')
+        return ch + 10 - 'A';
+    if (ch >= 'a' && ch <= 'f')
+        return ch + 10 - 'a';
+    gli_fatal_error("data: Not a hex digit");
+    return 0;
 }
 
 static void ensure_stringbuf_size(int val)
@@ -49,9 +72,19 @@ static void ensure_stringbuf_size(int val)
     if (val <= stringbuf_size)
         return;
     stringbuf_size = val*2;
-    stringbuf = realloc(stringbuf, stringbuf_size *sizeof(char));
+    stringbuf = realloc(stringbuf, stringbuf_size * sizeof(char));
     if (!stringbuf)
-        gli_fatal_error("data: Unable to allocate memory for string buffer");
+        gli_fatal_error("data: Unable to allocate memory for ustring buffer");
+}
+
+static void ensure_ustringbuf_size(int val)
+{
+    if (val <= ustringbuf_size)
+        return;
+    ustringbuf_size = val*2;
+    ustringbuf = realloc(ustringbuf, ustringbuf_size * sizeof(glui32));
+    if (!ustringbuf)
+        gli_fatal_error("data: Unable to allocate memory for ustring buffer");
 }
 
 static data_raw_t *data_raw_alloc(RawType type)
@@ -107,7 +140,6 @@ static void data_raw_ensure_size(data_raw_t *dat, int size)
 
 static void data_raw_dump(data_raw_t *dat)
 {
-    char *cx;
     int ix;
 
     if (!dat) {
@@ -119,20 +151,33 @@ static void data_raw_dump(data_raw_t *dat)
         case rawtyp_Int:
             printf("%ld", (long)dat->number);
             return;
-        case rawtyp_Symbol:
-            printf("%s", dat->str);
+        case rawtyp_True:
+            printf("true");
+            return;
+        case rawtyp_False:
+            printf("false");
+            return;
+        case rawtyp_Null:
+            printf("null");
             return;
         case rawtyp_Str:
-            printf("'");
-            for (cx=dat->str; *cx; cx++) {
-                if (*cx == '\'')
-                    printf("\\'");
-                else if (*cx < 32)
-                    printf("\\x%2x", *cx);
+            printf("\"");
+            for (ix=0; ix<dat->count; ix++) {
+                glui32 ch = dat->str[ix];
+                if (ch == '\"')
+                    printf("\\\"");
+                else if (ch == '\\')
+                    printf("\\\\");
+                else if (ch == '\n')
+                    printf("\\n");
+                else if (ch == '\t')
+                    printf("\\t");
+                else if (ch < 32)
+                    printf("\\u%04X", ch);
                 else
-                    printf("%c", *cx);
+                    gli_putchar_utf8(ch, stdout);
             }
-            printf("'");
+            printf("\"");
             return;
         case rawtyp_List:
             printf("[ ");
@@ -170,8 +215,6 @@ static data_raw_t *data_raw_blockread()
     data_raw_t *dat = data_raw_blockread_sub(&termchar);
     if (!dat)
         gli_fatal_error("data: Unexpected end of data object");
-    if (dat->type == rawtyp_Symbol)
-        gli_fatal_error("data: Unexpected symbol in data");
 
     return dat;
 }
@@ -192,6 +235,7 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
     }
 
     if (ch >= '0' && ch <= '9') {
+        /* This accepts "01", which it really shouldn't, but whatever */
         data_raw_t *dat = data_raw_alloc(rawtyp_Int);
         while (ch >= '0' && ch <= '9') {
             dat->number = 10 * dat->number + (ch-'0');
@@ -203,8 +247,105 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
         return dat;
     }
 
-    if (isalpha(ch) || ch == '_') {
-        data_raw_t *dat = data_raw_alloc(rawtyp_Symbol);
+    if (ch == '-') {
+        data_raw_t *dat = data_raw_alloc(rawtyp_Int);
+        ch = getchar();
+        if (!(ch >= '0' && ch <= '9'))
+            gli_fatal_error("data: minus must be followed by number");
+
+        while (ch >= '0' && ch <= '9') {
+            dat->number = 10 * dat->number + (ch-'0');
+            ch = getchar();
+        }
+        dat->number = -dat->number;
+
+        if (ch != EOF)
+            ungetc(ch, stdin);
+        return dat;
+    }
+
+    if (ch == '"') {
+        data_raw_t *dat = data_raw_alloc(rawtyp_Str);
+
+        int ix;
+        int ucount = 0;
+        int count = 0;
+        while ((ch = getchar()) != '"') {
+            if (ch == EOF)
+                gli_fatal_error("data: Unterminated string");
+            if (ch >= 0 && ch < 32)
+                gli_fatal_error("data: Control character in string");
+            if (ch == '\\') {
+                ensure_ustringbuf_size(ucount + 2*count + 1);
+                ucount += gli_parse_utf8((unsigned char *)stringbuf, count, ustringbuf+ucount, 2*count);
+                count = 0;
+                ch = getchar();
+                if (ch == EOF)
+                    gli_fatal_error("data: Unterminated backslash escape");
+                if (ch == 'u') {
+                    glui32 val = 0;
+                    ch = getchar();
+                    val = 16*val + parse_hex_digit(ch);
+                    ch = getchar();
+                    val = 16*val + parse_hex_digit(ch);
+                    ch = getchar();
+                    val = 16*val + parse_hex_digit(ch);
+                    ch = getchar();
+                    val = 16*val + parse_hex_digit(ch);
+                    ustringbuf[ucount++] = val;
+                    continue;
+                }
+                ensure_stringbuf_size(count+1);
+                switch (ch) {
+                    case '"':
+                        stringbuf[count++] = '"';
+                        break;
+                    case '/':
+                        stringbuf[count++] = '/';
+                        break;
+                    case '\\':
+                        stringbuf[count++] = '\\';
+                        break;
+                    case 'b':
+                        stringbuf[count++] = '\b';
+                        break;
+                    case 'f':
+                        stringbuf[count++] = '\f';
+                        break;
+                    case 'n':
+                        stringbuf[count++] = '\n';
+                        break;
+                    case 'r':
+                        stringbuf[count++] = '\r';
+                        break;
+                    case 't':
+                        stringbuf[count++] = '\t';
+                        break;
+                    default:
+                        gli_fatal_error("data: Unknown backslash code");
+                }
+            }
+            else {
+                ensure_stringbuf_size(count+1);
+                stringbuf[count++] = ch;
+            }
+        }
+
+        ensure_ustringbuf_size(ucount + 2*count);
+        ucount += gli_parse_utf8((unsigned char *)stringbuf, count, ustringbuf+ucount, 2*count);
+
+        dat->count = ucount;
+        dat->str = malloc(ucount * sizeof(glui32));
+        for (ix=0; ix<ucount; ix++) {
+            dat->str[ix] = ustringbuf[ix];
+        }
+
+        return dat;
+    }
+
+    if (isalpha(ch)) {
+        data_raw_t *dat = NULL;
+
         int count = 0;
         while (isalnum(ch) || ch == '_') {
             ensure_stringbuf_size(count+1);
@@ -214,7 +355,15 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
 
         ensure_stringbuf_size(count+1);
         stringbuf[count++] = '\0';
-        dat->str = strdup(stringbuf);
+
+        if (!strcmp(stringbuf, "true"))
+            dat = data_raw_alloc(rawtyp_True);
+        else if (!strcmp(stringbuf, "false"))
+            dat = data_raw_alloc(rawtyp_False);
+        else if (!strcmp(stringbuf, "null"))
+            dat = data_raw_alloc(rawtyp_Null);
+        else
+            gli_fatal_error("data: Unrecognized symbol");
 
         if (ch != EOF)
             ungetc(ch, stdin);
@@ -224,24 +373,28 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
     if (ch == '[') {
         data_raw_t *dat = data_raw_alloc(rawtyp_List);
         int count = 0;
+        int commapending = FALSE;
         char term = '\0';
         while (TRUE) {
             data_raw_t *subdat = data_raw_blockread_sub(&term);
             if (!subdat) {
-                if (term == ']')
+                if (term == ']') {
+                    if (commapending)
+                        gli_fatal_error("data: Array should not end with comma");
                     break;
+                }
                 gli_fatal_error("data: Mismatched end of array");
             }
-            if (subdat->type == rawtyp_Symbol)
-                gli_fatal_error("data: Unexpected symbol in data");
             data_raw_ensure_size(dat, count+1);
             dat->list[count++] = subdat;
+            commapending = FALSE;
 
             while (isspace(ch = getchar())) { };
             if (ch == ']')
                 break;
             if (ch != ',')
                 gli_fatal_error("data: Expected comma in list");
+            commapending = TRUE;
         }
         dat->count = count;
         return dat;
