@@ -220,7 +220,6 @@ static void updatetext(window_textgrid_t *dwin, int drawall)
             continue;
         
         /* draw one line. */
-        move(orgy+jx, orgx+ln->dirtybeg);
         
         ix=ln->dirtybeg;
         while (ix<ln->dirtyend) {
@@ -478,6 +477,7 @@ static void import_input_line(tgline_t *ln, int offset, void *buf,
 }
 
 /* Clone in rgwin_buf.c */
+/*### unicode argument?*/
 static void export_input_line(void *buf, int unicode, long len, char *chars)
 {
     int ix;
@@ -485,7 +485,7 @@ static void export_input_line(void *buf, int unicode, long len, char *chars)
     if (!unicode) {
         for (ix=0; ix<len; ix++) {
             int val = chars[ix];
-            glui32 kval = gli_input_from_native(val & 0xFF);
+            glui32 kval = (val & 0xFF);
             if (!(kval >= 0 && kval < 256))
                 kval = '?';
             ((unsigned char *)buf)[ix] = kval;
@@ -494,7 +494,7 @@ static void export_input_line(void *buf, int unicode, long len, char *chars)
     else {
         for (ix=0; ix<len; ix++) {
             int val = chars[ix];
-            glui32 kval = gli_input_from_native(val & 0xFF);
+            glui32 kval = (val & 0xFF);
             ((glui32 *)buf)[ix] = kval;
         }
     }

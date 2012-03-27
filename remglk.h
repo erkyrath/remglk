@@ -29,6 +29,9 @@
 #define gli_strict_warning(msg)   \
     (gli_msgline_warning(msg)) 
 
+#define gli_fatal_error(msg)   \
+    (gli_msgline_error(msg))
+
 /* Some useful type declarations. */
 
 typedef struct grect_struct {
@@ -167,6 +170,7 @@ extern int pref_prompt_defaults;
 extern void gli_initialize_misc(void);
 
 extern void gli_msgline_warning(char *msg);
+extern void gli_msgline_error(char *msg);
 extern void gli_msgline(char *msg);
 extern void gli_msgline_redraw(void);
 
@@ -175,11 +179,6 @@ extern int gli_msgin_getchar(char *prompt, int hilite);
 
 extern void gli_initialize_events(void);
 extern void gli_event_store(glui32 type, window_t *win, glui32 val1, glui32 val2);
-extern void gli_set_halfdelay(void);
-
-extern void gli_input_handle_key(int key);
-extern void gli_input_guess_focus(void);
-extern glui32 gli_input_from_native(int key);
 
 extern void gli_initialize_windows(void);
 extern void gli_fast_exit(void);
@@ -191,8 +190,6 @@ extern void gli_window_redraw(window_t *win);
 extern void gli_windows_redraw(void);
 extern void gli_windows_update(void);
 extern void gli_windows_size_change(void);
-extern void gli_windows_place_cursor(void);
-extern void gli_windows_set_paging(int forcetoend);
 extern void gli_windows_trim_buffers(void);
 extern void gli_window_put_char(window_t *win, char ch);
 extern void gli_windows_unechostream(stream_t *str);

@@ -793,13 +793,6 @@ void gli_windows_redraw()
     }
     else {
         /* There are no windows at all. */
-        clear();
-        ix = (content_box.left+content_box.right) / 2 - 7;
-        if (ix < 0)
-            ix = 0;
-        jx = (content_box.top+content_box.bottom) / 2;
-        move(jx, ix);
-        addstr("Please wait...");
     }
 }
 
@@ -810,45 +803,8 @@ void gli_windows_size_change()
         gli_window_rearrange(gli_rootwin, &content_box);
     }
     gli_windows_redraw();
-    gli_msgline_redraw();
     
     gli_event_store(evtype_Arrange, NULL, 0, 0);
-}
-
-void gli_windows_place_cursor()
-{
-    if (gli_rootwin && gli_focuswin) {
-        int xpos, ypos;
-        xpos = 0;
-        ypos = 0;
-        switch (gli_focuswin->type) {
-            case wintype_TextGrid: 
-                win_textgrid_place_cursor(gli_focuswin, &xpos, &ypos);
-                break;
-            case wintype_TextBuffer: 
-                win_textbuffer_place_cursor(gli_focuswin, &xpos, &ypos);
-                break;
-            default:
-                break;
-        }
-        move(gli_focuswin->bbox.top + ypos, gli_focuswin->bbox.left + xpos);
-    }
-    else {
-        move(content_box.bottom-1, content_box.right-1);
-    }
-}
-
-void gli_windows_set_paging(int forcetoend)
-{
-    window_t *win;
-    
-    for (win=gli_windowlist; win; win=win->next) {
-        switch (win->type) {
-            case wintype_TextBuffer:
-                win_textbuffer_set_paging(win, forcetoend);
-                break;
-        }
-    }
 }
 
 void gli_windows_trim_buffers()
@@ -1102,18 +1058,6 @@ void glk_window_move_cursor(window_t *win, glui32 xpos, glui32 ypos)
         default:
             gli_strict_warning("window_move_cursor: not a TextGrid window");
             break;
-    }
-}
-
-void gli_print_spaces(int len)
-{
-    while (len >= NUMSPACES) {
-        addstr(spacebuffer);
-        len -= NUMSPACES;
-    }
-    
-    if (len > 0) {
-        addstr(&(spacebuffer[NUMSPACES - len]));
     }
 }
 

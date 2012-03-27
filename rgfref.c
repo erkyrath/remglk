@@ -246,7 +246,7 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
         val = 0;
     }
     
-    ix = gli_msgin_getline(prbuf, buf, 255, &val);
+    ix = NULL; /*### fetch somehow */
     if (!ix) {
         /* The player cancelled input. */
         return NULL;
@@ -289,6 +289,7 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
         strcat(newbuf, suffix);
     }
     
+    /*### no overwrite check? 
     if (fmode != filemode_Read) {
         if (!stat(newbuf, &sbuf) && S_ISREG(sbuf.st_mode)) {
             sprintf(prbuf, "Overwrite \"%s\"? [y/n] ", cx);
@@ -303,6 +304,7 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
             }
         }
     }
+    ###*/
 
     strcpy(lastbuf, cx);
 

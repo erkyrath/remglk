@@ -54,12 +54,8 @@ void gli_initialize_misc()
 
 void glk_exit()
 {   
-    gli_msgin_getchar("Hit any key to exit.", TRUE);
-
     gli_streams_close_all();
 
-    endwin();
-    putchar('\n');
     exit(0);
 }
 

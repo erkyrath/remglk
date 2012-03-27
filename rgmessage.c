@@ -28,6 +28,14 @@ void gli_msgline_warning(char *msg)
     gli_msgline(buf);
 }
 
+void gli_msgline_error(char *msg)
+{
+    fprintf(stderr, "%s\n", msg); /*###*/
+
+    exit(1); /* ### or something */
+}
+
+/* ### get rid of this */
 void gli_msgline(char *msg)
 {
     int len;
@@ -55,6 +63,5 @@ void gli_msgline(char *msg)
     strcpy(msgbuf, msg);
     msgbuflen = len;
     
-    gli_msgline_redraw();
 }
 

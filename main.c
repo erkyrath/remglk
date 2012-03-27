@@ -214,6 +214,7 @@ int main(int argc, char *argv[])
     }
 
     /* ### set up I/O thingies? */
+    gli_initialize_datainput();
     
     /* Initialize things. */
     gli_initialize_misc();

@@ -10,6 +10,7 @@
 
 #include "glk.h"
 #include "remglk.h"
+#include "rgdata.h"
 
 /* A pointer to the place where the pending glk_select() will store its
     event. When not inside a glk_select() call, this will be NULL. */
@@ -22,8 +23,6 @@ static glui32 timing_msec; /* The current timed-event request, exactly as
 void gli_initialize_events()
 {
     timing_msec = 0;
-
-    gli_set_halfdelay();
 }
 
 void glk_select(event_t *event)
@@ -31,11 +30,10 @@ void glk_select(event_t *event)
     curevent = event;
     gli_event_clearevent(curevent);
     
-    gli_windows_update();
-    gli_windows_set_paging(FALSE);
-    gli_input_guess_focus();
+    /*### gli_windows_update(); ###*/
     
     while (curevent->type == evtype_None) {
+        data_input_t *data = data_input_read();
         /* ### */
     }
     
@@ -61,7 +59,6 @@ void glk_select_poll(event_t *event)
     while (firsttime) {
         firsttime = FALSE;
 
-        gli_windows_place_cursor();
     }
 
     curevent = NULL;

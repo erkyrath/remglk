@@ -184,29 +184,10 @@ void win_pair_redraw(window_t *win)
 
     if (dwin->vertical) {
         if (dwin->splitwidth) {
-            for (ix=win->bbox.top; ix<win->bbox.bottom; ix++) {
-                mvaddch(ix, dwin->splitpos, '|');
-            }
-            if (win->bbox.top-1 >= 0) {
-                mvaddch(win->bbox.top-1, dwin->splitpos, '+');
-            }
-            if (win->bbox.bottom < content_box.bottom) {
-                mvaddch(win->bbox.bottom, dwin->splitpos, '+');
-            }
         }
     }
     else {
         if (dwin->splitwidth) {
-            move(dwin->splitpos, win->bbox.left);
-            for (ix=win->bbox.left; ix<win->bbox.right; ix++) {
-                addch('-');
-            }
-            if (win->bbox.left-1 >= 0) {
-                mvaddch(dwin->splitpos, win->bbox.left-1, '+');
-            }
-            if (win->bbox.right < content_box.right) {
-                mvaddch(dwin->splitpos, win->bbox.right, '+');
-            }
         }
     }
     
