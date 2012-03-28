@@ -27,6 +27,7 @@ struct data_input_struct {
     glui32 window;
     glui32 charvalue;
     glui32 *linevalue;
+    glui32 linelen;
     glui32 terminator;
     data_metrics_t *metrics;
 };

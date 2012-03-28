@@ -230,6 +230,56 @@ static data_raw_t *data_raw_blockread()
     return dat;
 }
 
+static glsi32 data_raw_int_value(data_raw_t *dat)
+{
+    if (dat->type != rawtyp_Int)
+        gli_fatal_error("data: Need int");
+
+    return dat->number;
+}
+
+static int data_raw_string_is(data_raw_t *dat, char *key)
+{
+    char *cx;
+    int pos;
+
+    if (dat->type != rawtyp_Str)
+        gli_fatal_error("data: Need str");
+
+    for (pos=0, cx=key; *cx && pos<dat->count; pos++, cx++) {
+        if (dat->str[pos] != (glui32)(*cx))
+            break;
+    }
+
+    if (*cx == '\0' && pos == dat->count)
+        return TRUE;
+    else
+        return FALSE;
+}
+
+static data_raw_t *data_raw_struct_field(data_raw_t *dat, char *key)
+{
+    int ix;
+    char *cx;
+    int pos;
+
+    if (dat->type != rawtyp_Struct)
+        gli_fatal_error("data: Need struct");
+
+    for (ix=0; ix<dat->count; ix++) {
+        data_raw_t *subdat = dat->list[ix];
+        for (pos=0, cx=key; *cx && pos<subdat->keylen; pos++, cx++) {
+            if (subdat->key[pos] != (glui32)(*cx))
+                break;
+        }
+        if (*cx == '\0' && pos == subdat->keylen) {
+            return subdat;
+        }
+    }
+
+    return NULL;
+}
+
 static data_raw_t *data_raw_blockread_sub(char *termchar)
 {
     int ch;
@@ -469,6 +519,176 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
     return NULL;
 }
 
+static data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
+{
+    data_raw_t *dat;
+
+    data_metrics_t *metrics = (data_metrics_t *)malloc(sizeof(data_metrics_t));
+    metrics->width = 0;
+    metrics->height = 0;
+    metrics->outspacingx = 0;
+    metrics->outspacingy = 0;
+    metrics->inspacingx = 0;
+    metrics->inspacingy = 0;
+    metrics->gridcharwidth = 1;
+    metrics->gridcharheight = 1;
+    metrics->gridmarginx = 0;
+    metrics->gridmarginy = 0;
+    metrics->buffercharwidth = 1;
+    metrics->buffercharheight = 1;
+    metrics->buffermarginx = 0;
+    metrics->buffermarginy = 0;
+
+    if (rawdata->type != rawtyp_Struct)
+        gli_fatal_error("data: Need struct");
+
+    dat = data_raw_struct_field(rawdata, "width");
+    if (!dat)
+        gli_fatal_error("data: Metrics require width");
+    metrics->width = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "height");
+    if (!dat)
+        gli_fatal_error("data: Metrics require height");
+    metrics->height = data_raw_int_value(dat);
+
+    dat = data_raw_struct_field(rawdata, "charwidth");
+    if (dat) {
+        glsi32 val = data_raw_int_value(dat);
+        metrics->gridcharwidth = val;
+        metrics->buffercharwidth = val;
+    }
+    dat = data_raw_struct_field(rawdata, "charheight");
+    if (dat) {
+        glsi32 val = data_raw_int_value(dat);
+        metrics->gridcharheight = val;
+        metrics->buffercharheight = val;
+    }
+
+    dat = data_raw_struct_field(rawdata, "gridcharwidth");
+    if (dat)
+        metrics->gridcharwidth = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "gridcharheight");
+    if (dat)
+        metrics->gridcharheight = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "buffercharwidth");
+    if (dat)
+        metrics->buffercharwidth = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "buffercharheight");
+    if (dat)
+        metrics->buffercharheight = data_raw_int_value(dat);
+
+    dat = data_raw_struct_field(rawdata, "margin");
+    if (dat) {
+        glsi32 val = data_raw_int_value(dat);
+        metrics->gridmarginx = val;
+        metrics->gridmarginy = val;
+        metrics->buffermarginx = val;
+        metrics->buffermarginy = val;
+    }
+
+    dat = data_raw_struct_field(rawdata, "gridmargin");
+    if (dat) {
+        glsi32 val = data_raw_int_value(dat);
+        metrics->gridmarginx = val;
+        metrics->gridmarginy = val;
+    }
+
+    dat = data_raw_struct_field(rawdata, "buffermargin");
+    if (dat) {
+        glsi32 val = data_raw_int_value(dat);
+        metrics->buffermarginx = val;
+        metrics->buffermarginy = val;
+    }
+
+    dat = data_raw_struct_field(rawdata, "marginx");
+    if (dat) {
+        glsi32 val = data_raw_int_value(dat);
+        metrics->gridmarginx = val;
+        metrics->buffermarginx = val;
+    }
+
+    dat = data_raw_struct_field(rawdata, "marginy");
+    if (dat) {
+        glsi32 val = data_raw_int_value(dat);
+        metrics->gridmarginy = val;
+        metrics->buffermarginy = val;
+    }
+
+    dat = data_raw_struct_field(rawdata, "gridmarginx");
+    if (dat) 
+        metrics->gridmarginx = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "gridmarginy");
+    if (dat) 
+        metrics->gridmarginy = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "buffermarginx");
+    if (dat) 
+        metrics->buffermarginx = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "buffermarginy");
+    if (dat) 
+        metrics->buffermarginy = data_raw_int_value(dat);
+
+    dat = data_raw_struct_field(rawdata, "spacing");
+    if (dat) {
+        glsi32 val = data_raw_int_value(dat);
+        metrics->inspacingx = val;
+        metrics->inspacingy = val;
+        metrics->outspacingx = val;
+        metrics->outspacingy = val;
+    }
+
+    dat = data_raw_struct_field(rawdata, "inspacing");
+    if (dat) {
+        glsi32 val = data_raw_int_value(dat);
+        metrics->inspacingx = val;
+        metrics->inspacingy = val;
+    }
+
+    dat = data_raw_struct_field(rawdata, "outspacing");
+    if (dat) {
+        glsi32 val = data_raw_int_value(dat);
+        metrics->outspacingx = val;
+        metrics->outspacingy = val;
+    }
+
+    dat = data_raw_struct_field(rawdata, "spacingx");
+    if (dat) {
+        glsi32 val = data_raw_int_value(dat);
+        metrics->inspacingx = val;
+        metrics->outspacingx = val;
+    }
+
+    dat = data_raw_struct_field(rawdata, "spacingy");
+    if (dat) {
+        glsi32 val = data_raw_int_value(dat);
+        metrics->inspacingy = val;
+        metrics->outspacingy = val;
+    }
+
+    dat = data_raw_struct_field(rawdata, "inspacingx");
+    if (dat)
+        metrics->inspacingx = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "inspacingy");
+    if (dat)
+        metrics->inspacingy = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "outspacingx");
+    if (dat)
+        metrics->outspacingx = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "outspacingy");
+    if (dat)
+        metrics->outspacingy = data_raw_int_value(dat);
+
+    if (metrics->gridcharwidth <= 0 || metrics->gridcharheight <= 0
+        || metrics->buffercharwidth <= 0 || metrics->buffercharheight <= 0)
+        gli_fatal_error("Metrics character size must be positive");
+
+    return metrics;
+}
+
+void data_metrics_free(data_metrics_t *metrics)
+{
+    free(metrics);
+}
+
 void data_metrics_print(data_metrics_t *metrics)
 {
     /* This displays very verbosely, and not in JSON-readable format.
@@ -503,12 +723,43 @@ void data_input_print(data_input_t *data)
 
 data_input_t *data_input_read()
 {
+    data_raw_t *dat;
+
     data_raw_t *rawdata = data_raw_blockread();
-    data_raw_print(rawdata); printf("\n"); /*###*/
 
     if (rawdata->type != rawtyp_Struct)
         gli_fatal_error("data: Input struct not a struct");
 
-    gli_fatal_error("###");
-    return NULL; /*###*/
+    dat = data_raw_struct_field(rawdata, "type");
+    if (!dat)
+        gli_fatal_error("data: Input struct has no type");
+
+    data_input_t *input = (data_input_t *)malloc(sizeof(data_input_t));
+    input->dtag = dtag_Unknown;
+    input->gen = 0;
+    input->window = 0;
+    input->charvalue = 0;
+    input->linevalue = NULL;
+    input->linelen = 0;
+    input->terminator = 0;
+    input->metrics = NULL;
+
+    if (data_raw_string_is(dat, "init")) {
+        input->dtag = dtag_Init;
+
+        dat = data_raw_struct_field(rawdata, "gen");
+        if (dat)
+            input->gen = data_raw_int_value(dat);
+
+        dat = data_raw_struct_field(rawdata, "metrics");
+        if (!dat)
+            gli_fatal_error("data: Input struct has no metrics");
+
+        input->metrics = data_metrics_parse(dat);
+    }
+    else {
+        gli_fatal_error("data: Input struct has unknown type");
+    }
+
+    return input;
 }

@@ -219,8 +219,9 @@ int main(int argc, char *argv[])
 
     if (1) { /*### unless we skip this */
         data_input_t *data = data_input_read();
-        data_input_print(data); /*###*/
-
+        if (data->dtag != dtag_Init)
+            gli_fatal_error("First input event must be 'init'");
+        /* ### Do something with metrics */
     }
     
     /* Initialize things. */
