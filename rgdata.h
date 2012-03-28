@@ -9,7 +9,6 @@ typedef enum DTag_enum {
 } DTag;
 
 typedef struct data_input_struct data_input_t;
-typedef struct data_metrics_struct data_metrics_t;
 
 struct data_metrics_struct {
     glui32 width, height;
@@ -36,6 +35,7 @@ extern void gli_initialize_datainput(void);
 
 extern data_metrics_t *data_metrics_alloc(int width, int height);
 extern void data_metrics_free(data_metrics_t *metrics);
+extern void data_metrics_print(data_metrics_t *metrics);
 
 extern data_input_t *data_input_read(void);
 extern void data_input_free(data_input_t *data);

@@ -9,6 +9,7 @@
 
 #include "glk.h"
 #include "remglk.h"
+#include "rgdata.h"
 #include "rgwin_pair.h"
 #include "rgwin_blank.h"
 #include "rgwin_grid.h"
@@ -27,8 +28,10 @@ window_t *gli_focuswin = NULL; /* The window selected by the player.
     gli_currentstr in gtstream.c. In fact, the program doesn't know
     about gli_focuswin at all.) */
 
+/* The current screen metrics. */
+static data_metrics_t metrics;
 /* This is the screen region which is enclosed by the root window. */
-grect_t content_box;
+static grect_t content_box;
 /* Flag: Has the window arrangement changed at all? */
 static int geometry_changed;
 
@@ -37,7 +40,7 @@ void (*gli_interrupt_handler)(void) = NULL;
 static void compute_content_box(void);
 
 /* Set up the window system. This is called from main(). */
-void gli_initialize_windows()
+void gli_initialize_windows(data_metrics_t *newmetrics)
 {
     int ix;
     
@@ -49,6 +52,8 @@ void gli_initialize_windows()
         spacebuffer[ix] = ' ';
     spacebuffer[NUMSPACES] = '\0';
     
+    metrics = *newmetrics;
+
     /* Figure out the screen size. */
     compute_content_box();
 
@@ -76,9 +81,10 @@ static void compute_content_box()
         layout code uses content_box. */
     int width, height;
 
-    /* ### */    
-    width = pref_screenwidth;
-    height = pref_screenheight;
+    data_metrics_print(&metrics); /*###*/
+
+    width = metrics.width;
+    height = metrics.height;
     
     content_box.left = 0;
     content_box.top = 0;

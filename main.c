@@ -15,11 +15,12 @@
 
 /* Declarations of preferences flags. */
 int pref_printversion = FALSE;
-int pref_screenwidth = 0;
-int pref_screenheight = 0;
+int pref_fixedmetrics = FALSE;
+int pref_screenwidth = 80;
+int pref_screenheight = 50;
 int pref_messageline = TRUE;
-int pref_override_window_borders = FALSE;
-int pref_window_borders = FALSE;
+int pref_override_window_borders = FALSE; /*### delete */
+int pref_window_borders = FALSE; /*### delete */
 int pref_historylen = 20; /*### definitely delete */
 int pref_prompt_defaults = TRUE; /*### probably delete */
 
@@ -152,13 +153,17 @@ int main(int argc, char *argv[])
             pref_historylen = val;
         else if (extract_value(argc, argv, "hl", ex_Int, &ix, &val, 20))
             pref_historylen = val;
+        else if (extract_value(argc, argv, "fixmetrics", ex_Bool, &ix, &val, FALSE))
+            pref_fixedmetrics = val;
+        else if (extract_value(argc, argv, "fm", ex_Bool, &ix, &val, FALSE))
+            pref_fixedmetrics = val;
         else if (extract_value(argc, argv, "width", ex_Int, &ix, &val, 80))
             pref_screenwidth = val;
         else if (extract_value(argc, argv, "w", ex_Int, &ix, &val, 80))
             pref_screenwidth = val;
-        else if (extract_value(argc, argv, "height", ex_Int, &ix, &val, 24))
+        else if (extract_value(argc, argv, "height", ex_Int, &ix, &val, 50))
             pref_screenheight = val;
-        else if (extract_value(argc, argv, "h", ex_Int, &ix, &val, 24))
+        else if (extract_value(argc, argv, "h", ex_Int, &ix, &val, 50))
             pref_screenheight = val;
         else if (extract_value(argc, argv, "ml", ex_Bool, &ix, &val, pref_messageline))
             pref_messageline = val;
@@ -195,8 +200,9 @@ int main(int argc, char *argv[])
             }
         }
         printf("library options:\n");
-        printf("  -width NUM: manual screen width (if not specified, will try to measure)\n");
-        printf("  -height NUM: manual screen height (ditto)\n");
+        printf("  -fixmetrics BOOL: define screen size manually (default 'no')\n");
+        printf("  -width NUM: manual screen width (default 80)\n");
+        printf("  -height NUM: manual screen height (default 50)\n");
         printf("  -ml BOOL: use message line (default 'yes')\n");
         printf("  -historylen NUM: length of command history (default 20)\n");
         printf("  -revgrid BOOL: reverse text in grid (status) windows (default 'no')\n");
@@ -214,21 +220,25 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    /* ### set up I/O thingies? */
     gli_initialize_datainput();
 
-    if (1) { /*### unless we skip this */
+    data_metrics_t *metrics = data_metrics_alloc(pref_screenwidth, pref_screenheight);
+    if (!pref_fixedmetrics) {
         data_input_t *data = data_input_read();
         if (data->dtag != dtag_Init)
             gli_fatal_error("First input event must be 'init'");
-        /* ### Do something with metrics */
+        /* Copy them into the permanent structure */
+        *metrics = *data->metrics;
+        data_input_free(data);
     }
     
     /* Initialize things. */
     gli_initialize_misc();
-    gli_initialize_windows();
+    gli_initialize_windows(metrics);
     gli_initialize_events();
-    
+
+    data_metrics_free(metrics);
+
     inittime = TRUE;
     if (!glkunix_startup_code(&startdata)) {
         glk_exit();

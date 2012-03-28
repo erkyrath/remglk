@@ -9,7 +9,7 @@
 
 #include "gi_dispa.h"
 
-#define LIBRARY_VERSION "0.9"
+#define LIBRARY_VERSION "0.1"
 
 /* We define our own TRUE and FALSE and NULL, because ANSI
     is a strange world. */
@@ -38,6 +38,8 @@ typedef struct grect_struct {
     int left, top;
     int right, bottom;
 } grect_t;
+
+typedef struct data_metrics_struct data_metrics_t;
 
 typedef struct glk_window_struct window_t;
 typedef struct glk_stream_struct stream_t;
@@ -131,7 +133,6 @@ struct glk_fileref_struct {
 
 extern window_t *gli_rootwin;
 extern window_t *gli_focuswin;
-extern grect_t content_box;
 extern void (*gli_interrupt_handler)(void);
 
 /* The following typedefs are copied from cheapglk.h. They support the
@@ -184,7 +185,7 @@ extern glui32 gli_parse_utf8(unsigned char *buf, glui32 buflen,
 extern void gli_initialize_events(void);
 extern void gli_event_store(glui32 type, window_t *win, glui32 val1, glui32 val2);
 
-extern void gli_initialize_windows(void);
+extern void gli_initialize_windows(data_metrics_t *metrics);
 extern void gli_fast_exit(void);
 extern window_t *gli_new_window(glui32 type, glui32 rock);
 extern void gli_delete_window(window_t *win);

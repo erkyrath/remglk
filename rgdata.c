@@ -572,6 +572,8 @@ data_metrics_t *data_metrics_alloc(int width, int height)
 
 void data_metrics_free(data_metrics_t *metrics)
 {
+    metrics->width = 0;
+    metrics->height = 0;
     free(metrics);
 }
 
