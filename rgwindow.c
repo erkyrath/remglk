@@ -29,6 +29,8 @@ window_t *gli_focuswin = NULL; /* The window selected by the player.
 
 /* This is the screen region which is enclosed by the root window. */
 grect_t content_box;
+/* Flag: Has the window arrangement changed at all? */
+static int geometry_changed;
 
 void (*gli_interrupt_handler)(void) = NULL;
 
@@ -50,8 +52,7 @@ void gli_initialize_windows()
     /* Figure out the screen size. */
     compute_content_box();
 
-    /* Draw the initial setup (no windows) */
-    gli_windows_redraw();
+    geometry_changed = TRUE;
 }
 
 /* Get out fast. This is used by the ctrl-C interrupt handler, under Unix. 
@@ -237,8 +238,6 @@ winid_t glk_window_open(winid_t splitwin, glui32 method, glui32 size,
     if (!splitwin) {
         gli_rootwin = newwin;
         gli_window_rearrange(newwin, &box);
-        /* redraw everything, which is just the new first window */
-        gli_windows_redraw();
     }
     else {
         /* create pairwin, with newwin as the key */
@@ -265,8 +264,6 @@ winid_t glk_window_open(winid_t splitwin, glui32 method, glui32 size,
         }
         
         gli_window_rearrange(pairwin, &box);
-        /* redraw the new pairwin and all its contents */
-        gli_window_redraw(pairwin);
     }
     
     return newwin;
@@ -345,7 +342,7 @@ void glk_window_close(window_t *win, stream_result_t *result)
         /* have to jigger parent */
         grect_t box;
         window_t *pairwin, *sibwin, *grandparwin, *wx;
-        window_pair_t *dpairwin, *dgrandparwin, *dwx;
+        window_pair_t *dpairwin, *dgrandparwin;
         int keydamage_flag;
         
         pairwin = win->parent;
@@ -411,11 +408,9 @@ void glk_window_close(window_t *win, stream_result_t *result)
         if (keydamage_flag) {
             box = content_box;
             gli_window_rearrange(gli_rootwin, &box);
-            gli_windows_redraw();
         }
         else {
             gli_window_rearrange(sibwin, &box);
-            gli_window_redraw(sibwin);
         }
     }
 }
@@ -529,7 +524,6 @@ void glk_window_set_arrangement(window_t *win, glui32 method, glui32 size,
     dwin->backward = (dwin->dir == winmethod_Left || dwin->dir == winmethod_Above);
     
     gli_window_rearrange(win, &box);
-    gli_window_redraw(win);
 }
 
 winid_t glk_window_iterate(winid_t win, glui32 *rock)
@@ -729,6 +723,8 @@ void gli_windows_unechostream(stream_t *str)
 
 void gli_window_rearrange(window_t *win, grect_t *box)
 {
+    geometry_changed = TRUE;
+
     switch (win->type) {
         case wintype_Blank:
             win_blank_rearrange(win, box);
@@ -761,48 +757,12 @@ void gli_windows_update()
     }
 }
 
-void gli_window_redraw(window_t *win)
-{
-    if (win->bbox.left >= win->bbox.right 
-        || win->bbox.top >= win->bbox.bottom)
-        return;
-    
-    switch (win->type) {
-        case wintype_Blank:
-            win_blank_redraw(win);
-            break;
-        case wintype_Pair:
-            win_pair_redraw(win);
-            break;
-        case wintype_TextGrid:
-            win_textgrid_redraw(win);
-            break;
-        case wintype_TextBuffer:
-            win_textbuffer_redraw(win);
-            break;
-    }
-}
-
-void gli_windows_redraw()
-{
-    int ix, jx;
-    
-    if (gli_rootwin) {
-        /* We could draw a border around content_box, if we wanted. */
-        gli_window_redraw(gli_rootwin);
-    }
-    else {
-        /* There are no windows at all. */
-    }
-}
-
 void gli_windows_size_change()
 {
     compute_content_box();
     if (gli_rootwin) {
         gli_window_rearrange(gli_rootwin, &content_box);
     }
-    gli_windows_redraw();
     
     gli_event_store(evtype_Arrange, NULL, 0, 0);
 }
