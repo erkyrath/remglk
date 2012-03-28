@@ -18,9 +18,6 @@ int pref_printversion = FALSE;
 int pref_fixedmetrics = FALSE;
 int pref_screenwidth = 80;
 int pref_screenheight = 50;
-int pref_messageline = TRUE;
-int pref_override_window_borders = FALSE; /*### delete */
-int pref_window_borders = FALSE; /*### delete */
 int pref_historylen = 20; /*### definitely delete */
 int pref_prompt_defaults = TRUE; /*### probably delete */
 
@@ -165,12 +162,6 @@ int main(int argc, char *argv[])
             pref_screenheight = val;
         else if (extract_value(argc, argv, "h", ex_Int, &ix, &val, 50))
             pref_screenheight = val;
-        else if (extract_value(argc, argv, "ml", ex_Bool, &ix, &val, pref_messageline))
-            pref_messageline = val;
-        else if (extract_value(argc, argv, "border", ex_Bool, &ix, &val, pref_window_borders)) {
-            pref_window_borders = val;
-            pref_override_window_borders = TRUE;
-        }
         else if (extract_value(argc, argv, "defprompt", ex_Bool, &ix, &val, pref_prompt_defaults))
             pref_prompt_defaults = val;
         else {
@@ -203,7 +194,6 @@ int main(int argc, char *argv[])
         printf("  -fixmetrics BOOL: define screen size manually (default 'no')\n");
         printf("  -width NUM: manual screen width (default 80)\n");
         printf("  -height NUM: manual screen height (default 50)\n");
-        printf("  -ml BOOL: use message line (default 'yes')\n");
         printf("  -historylen NUM: length of command history (default 20)\n");
         printf("  -revgrid BOOL: reverse text in grid (status) windows (default 'no')\n");
         printf("  -border BOOL: force borders/no borders between windows\n");
