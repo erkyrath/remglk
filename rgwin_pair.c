@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include "glk.h"
 #include "remglk.h"
+#include "rgdata.h"
 #include "rgwin_pair.h"
 
 window_pair_t *win_pair_create(window_t *win, glui32 method, window_t *key, 
@@ -46,6 +47,7 @@ void win_pair_destroy(window_pair_t *dwin)
 void win_pair_rearrange(window_t *win, grect_t *box)
 {
     window_pair_t *dwin = win->data;
+    data_metrics_t *metrics = gli_window_current_metrics();
     grect_t box1, box2;
     int min, diff, split, splitwid, max;
     window_t *key;
@@ -64,19 +66,15 @@ void win_pair_rearrange(window_t *win, grect_t *box)
     }
     diff = max-min;
     
-    /* We now figure split. The window attributes control this, unless
-       the pref_override_window_borders option is set. */
-    if (pref_override_window_borders) {
-        if (pref_window_borders)
-            splitwid = 1;
+    /* We now figure split. */
+    if (dwin->hasborder) {
+        if (dwin->vertical)
+            splitwid = metrics->inspacingx;
         else
-            splitwid = 0;
+            splitwid = metrics->inspacingy;
     }
     else {
-        if (dwin->hasborder)
-            splitwid = 1;
-        else
-            splitwid = 0;
+        splitwid = 0;
     }
     
     switch (dwin->division) {

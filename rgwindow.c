@@ -30,14 +30,12 @@ window_t *gli_focuswin = NULL; /* The window selected by the player.
 
 /* The current screen metrics. */
 static data_metrics_t metrics;
-/* This is the screen region which is enclosed by the root window. */
-static grect_t content_box;
 /* Flag: Has the window arrangement changed at all? */
 static int geometry_changed;
 
 void (*gli_interrupt_handler)(void) = NULL;
 
-static void compute_content_box(void);
+static void compute_content_box(grect_t *box);
 
 /* Set up the window system. This is called from main(). */
 void gli_initialize_windows(data_metrics_t *newmetrics)
@@ -53,9 +51,7 @@ void gli_initialize_windows(data_metrics_t *newmetrics)
     spacebuffer[NUMSPACES] = '\0';
     
     metrics = *newmetrics;
-
-    /* Figure out the screen size. */
-    compute_content_box();
+    data_metrics_print(&metrics); /*###*/
 
     geometry_changed = TRUE;
 }
@@ -73,26 +69,17 @@ void gli_fast_exit()
     exit(0);
 }
 
-static void compute_content_box()
+data_metrics_t *gli_window_current_metrics()
 {
-    /* Set content_box to the entire screen, although one could also
-        leave a border for messages or decoration. This is the only
-        place where COLS and LINES are checked. All the rest of the
-        layout code uses content_box. */
-    int width, height;
+    return &metrics;
+}
 
-    data_metrics_print(&metrics); /*###*/
-
-    width = metrics.width;
-    height = metrics.height;
-    
-    content_box.left = 0;
-    content_box.top = 0;
-    content_box.right = width;
-    content_box.bottom = height;
-    
-    if (pref_messageline && height > 0)
-        content_box.bottom--; /* allow a message line */
+static void compute_content_box(grect_t *box)
+{
+    box->left = metrics.outspacingx;
+    box->top = metrics.outspacingy;
+    box->right = metrics.width - metrics.outspacingx;
+    box->bottom = metrics.height - metrics.outspacingy;
 }
 
 window_t *gli_new_window(glui32 type, glui32 rock)
@@ -177,7 +164,7 @@ winid_t glk_window_open(winid_t splitwin, glui32 method, glui32 size,
         /* ignore method and size now */
         oldparent = NULL;
         
-        box = content_box;
+        compute_content_box(&box);
     }
     else {
     
@@ -411,7 +398,7 @@ void glk_window_close(window_t *win, stream_result_t *result)
         }
         
         if (keydamage_flag) {
-            box = content_box;
+            compute_content_box(&box);
             gli_window_rearrange(gli_rootwin, &box);
         }
         else {
@@ -764,9 +751,10 @@ void gli_windows_update()
 
 void gli_windows_size_change()
 {
-    compute_content_box();
     if (gli_rootwin) {
-        gli_window_rearrange(gli_rootwin, &content_box);
+        grect_t box;
+        compute_content_box(&box);
+        gli_window_rearrange(gli_rootwin, &box);
     }
     
     gli_event_store(evtype_Arrange, NULL, 0, 0);

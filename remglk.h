@@ -39,6 +39,10 @@ typedef struct grect_struct {
     int right, bottom;
 } grect_t;
 
+#define grect_set_from_size(boxref, wid, hgt)   \
+    ((boxref)->left = 0, (boxref)->top = 0,     \
+     (boxref)->right = (wid), (boxref)->bottom = (hgt))
+
 typedef struct data_metrics_struct data_metrics_t;
 
 typedef struct glk_window_struct window_t;
@@ -160,9 +164,6 @@ extern void (*gli_unregister_arr)(void *array, glui32 len, char *typecode,
 extern int pref_printversion;
 extern int pref_screenwidth;
 extern int pref_screenheight;
-extern int pref_messageline;
-extern int pref_override_window_borders;
-extern int pref_window_borders;
 extern int pref_historylen;
 extern int pref_prompt_defaults;
 
@@ -191,8 +192,7 @@ extern window_t *gli_new_window(glui32 type, glui32 rock);
 extern void gli_delete_window(window_t *win);
 extern window_t *gli_window_iterate_treeorder(window_t *win);
 extern void gli_window_rearrange(window_t *win, grect_t *box);
-extern void gli_window_redraw(window_t *win);
-extern void gli_windows_redraw(void);
+extern data_metrics_t *gli_window_current_metrics(void);
 extern void gli_windows_update(void);
 extern void gli_windows_size_change(void);
 extern void gli_windows_trim_buffers(void);
