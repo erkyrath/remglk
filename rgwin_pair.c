@@ -172,26 +172,3 @@ void win_pair_rearrange(window_t *win, grect_t *box)
     gli_window_rearrange(ch2, &box2);
 }
 
-void win_pair_redraw(window_t *win)
-{
-    int ix;
-    window_pair_t *dwin;
-    
-    if (!win)
-        return;
-        
-    dwin = win->data;
-
-    if (dwin->vertical) {
-        if (dwin->splitwidth) {
-        }
-    }
-    else {
-        if (dwin->splitwidth) {
-        }
-    }
-    
-    gli_window_redraw(dwin->child1);
-    gli_window_redraw(dwin->child2);
-}
-

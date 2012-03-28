@@ -34,8 +34,3 @@ void win_blank_rearrange(window_t *win, grect_t *box)
     dwin->owner->bbox = *box;
 }
 
-void win_blank_redraw(window_t *win)
-{
-    /*###*/
-}
-

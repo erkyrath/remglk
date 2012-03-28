@@ -549,13 +549,11 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
     return NULL;
 }
 
-static data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
+data_metrics_t *data_metrics_alloc(int width, int height)
 {
-    data_raw_t *dat;
-
     data_metrics_t *metrics = (data_metrics_t *)malloc(sizeof(data_metrics_t));
-    metrics->width = 0;
-    metrics->height = 0;
+    metrics->width = width;
+    metrics->height = height;
     metrics->outspacingx = 0;
     metrics->outspacingy = 0;
     metrics->inspacingx = 0;
@@ -568,6 +566,19 @@ static data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
     metrics->buffercharheight = 1;
     metrics->buffermarginx = 0;
     metrics->buffermarginy = 0;
+
+    return metrics;
+}
+
+void data_metrics_free(data_metrics_t *metrics)
+{
+    free(metrics);
+}
+
+static data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
+{
+    data_raw_t *dat;
+    data_metrics_t *metrics = data_metrics_alloc(0, 0);
 
     if (rawdata->type != rawtyp_Struct)
         gli_fatal_error("data: Need struct");
@@ -712,11 +723,6 @@ static data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
         gli_fatal_error("Metrics character size must be positive");
 
     return metrics;
-}
-
-void data_metrics_free(data_metrics_t *metrics)
-{
-    free(metrics);
 }
 
 void data_metrics_print(data_metrics_t *metrics)

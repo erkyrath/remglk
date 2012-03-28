@@ -332,11 +332,10 @@ void glk_window_close(window_t *win, stream_result_t *result)
         gli_rootwin = 0;
         
         /* begin (simpler) closation */
+        geometry_changed = TRUE;
         
         gli_stream_fill_result(win->str, result);
         gli_window_close(win, TRUE); 
-        /* redraw everything */
-        gli_windows_redraw();
     }
     else {
         /* have to jigger parent */

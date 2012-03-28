@@ -597,13 +597,6 @@ static void updatetext(window_textbuffer_t *dwin)
     }
 }
 
-void win_textbuffer_redraw(window_t *win)
-{
-    window_textbuffer_t *dwin = win->data;
-    dwin->drawall = TRUE;
-    updatetext(dwin);
-}
-
 void win_textbuffer_update(window_t *win)
 {
     window_textbuffer_t *dwin = win->data;

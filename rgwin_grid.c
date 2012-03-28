@@ -234,17 +234,6 @@ static void updatetext(window_textgrid_t *dwin, int drawall)
     dwin->dirtyend = -1;
 }
 
-void win_textgrid_redraw(window_t *win)
-{
-    int jx, ix;
-    window_textgrid_t *dwin = win->data;
-
-    if (!dwin->lines)
-        return;
-    
-    updatetext(dwin, TRUE);
-}
-
 void win_textgrid_update(window_t *win)
 {
     int jx, ix;
