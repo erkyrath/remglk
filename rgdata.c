@@ -238,6 +238,36 @@ static glsi32 data_raw_int_value(data_raw_t *dat)
     return dat->number;
 }
 
+static glui32 *data_raw_str_dup(data_raw_t *dat)
+{
+    glui32 *str;
+
+    if (dat->type != rawtyp_Str)
+        gli_fatal_error("data: Need str");
+
+    if (dat->count == 0) {
+        /* Allocate a tiny block, because I never trusted malloc(0) */
+        str = (glui32 *)malloc(1 * sizeof(glui32));
+        str[0] = 0;
+        return str;
+    }
+
+    str = (glui32 *)malloc(dat->count * sizeof(glui32));
+    memcpy(str, dat->str, dat->count * sizeof(glui32));
+    return str;
+}
+
+static glui32 data_raw_str_char(data_raw_t *dat)
+{
+    if (dat->type != rawtyp_Str)
+        gli_fatal_error("data: Need str");
+
+    if (dat->count == 0) 
+        gli_fatal_error("data: Need nonempty string");
+
+    return dat->str[0];
+}
+
 static int data_raw_string_is(data_raw_t *dat, char *key)
 {
     char *cx;
@@ -705,6 +735,20 @@ void data_metrics_print(data_metrics_t *metrics)
     printf("}\n");   
 }
 
+void data_input_free(data_input_t *data)
+{
+    data->dtag = dtag_Unknown;
+    if (data->linevalue) {
+        free(data->linevalue);
+        data->linevalue = NULL;
+    }
+    if (data->metrics) {
+        data_metrics_free(data->metrics);
+        data->metrics = NULL;
+    }
+    free(data);
+}
+
 void data_input_print(data_input_t *data)
 {
     switch (data->dtag) {
@@ -753,13 +797,70 @@ data_input_t *data_input_read()
 
         dat = data_raw_struct_field(rawdata, "metrics");
         if (!dat)
-            gli_fatal_error("data: Input struct has no metrics");
+            gli_fatal_error("data: Init input struct has no metrics");
 
         input->metrics = data_metrics_parse(dat);
+    }
+    else if (data_raw_string_is(dat, "arrange")) {
+        input->dtag = dtag_Arrange;
+
+        dat = data_raw_struct_field(rawdata, "gen");
+        if (!dat)
+            gli_fatal_error("data: Arrange input struct has no gen");
+        input->gen = data_raw_int_value(dat);
+
+        dat = data_raw_struct_field(rawdata, "metrics");
+        if (!dat)
+            gli_fatal_error("data: Arrange input struct has no metrics");
+
+        input->metrics = data_metrics_parse(dat);
+    }
+    else if (data_raw_string_is(dat, "line")) {
+        input->dtag = dtag_Line;
+
+        dat = data_raw_struct_field(rawdata, "gen");
+        if (!dat)
+            gli_fatal_error("data: Line input struct has no gen");
+        input->gen = data_raw_int_value(dat);
+
+        dat = data_raw_struct_field(rawdata, "window");
+        if (!dat)
+            gli_fatal_error("data: Line input struct has no window");
+        input->window = data_raw_int_value(dat);
+
+        dat = data_raw_struct_field(rawdata, "value");
+        if (!dat)
+            gli_fatal_error("data: Line input struct has no value");
+        input->linevalue = data_raw_str_dup(dat);
+        input->linelen = dat->count;
+
+        dat = data_raw_struct_field(rawdata, "terminator");
+        if (dat)
+            input->terminator = data_raw_str_char(dat);
+    }
+    else if (data_raw_string_is(dat, "char")) {
+        input->dtag = dtag_Char;
+
+        dat = data_raw_struct_field(rawdata, "gen");
+        if (!dat)
+            gli_fatal_error("data: Char input struct has no gen");
+        input->gen = data_raw_int_value(dat);
+
+        dat = data_raw_struct_field(rawdata, "window");
+        if (!dat)
+            gli_fatal_error("data: Char input struct has no window");
+        input->window = data_raw_int_value(dat);
+
+        dat = data_raw_struct_field(rawdata, "value");
+        if (!dat)
+            gli_fatal_error("data: Char input struct has no value");
+        input->charvalue = data_raw_str_char(dat);
     }
     else {
         gli_fatal_error("data: Input struct has unknown type");
     }
+
+    /*### partials support */
 
     return input;
 }

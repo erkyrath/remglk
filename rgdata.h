@@ -34,5 +34,6 @@ struct data_input_struct {
 
 extern void gli_initialize_datainput(void);
 extern data_input_t *data_input_read(void);
+extern void data_input_free(data_input_t *data);
 extern void data_input_print(data_input_t *data);
 
