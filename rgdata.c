@@ -23,7 +23,8 @@ typedef struct data_raw_struct data_raw_t;
 
 struct data_raw_struct {
     RawType type;
-    char *key;
+    glui32 *key;
+    int keylen;
 
     glsi32 number;
     glui32 *str;
@@ -87,6 +88,29 @@ static void ensure_ustringbuf_size(int val)
         gli_fatal_error("data: Unable to allocate memory for ustring buffer");
 }
 
+static void print_string_json_utf8(glui32 *buf, glui32 len, FILE *fl)
+{
+    int ix;
+
+    fprintf(fl, "\"");
+    for (ix=0; ix<len; ix++) {
+        glui32 ch = buf[ix];
+        if (ch == '\"')
+            fprintf(fl, "\\\"");
+        else if (ch == '\\')
+            fprintf(fl, "\\\\");
+        else if (ch == '\n')
+            fprintf(fl, "\\n");
+        else if (ch == '\t')
+            fprintf(fl, "\\t");
+        else if (ch < 32)
+            fprintf(fl, "\\u%04X", ch);
+        else
+            gli_putchar_utf8(ch, fl);
+    }
+    fprintf(fl, "\"");
+}
+
 static data_raw_t *data_raw_alloc(RawType type)
 {
     data_raw_t *dat = malloc(sizeof(data_raw_t));
@@ -95,6 +119,7 @@ static data_raw_t *data_raw_alloc(RawType type)
 
     dat->type = type;
     dat->key = NULL;
+    dat->keylen = 0;
     dat->number = 0;
     dat->str = NULL;
     dat->list = NULL;
@@ -161,23 +186,7 @@ void data_raw_print(data_raw_t *dat)
             printf("null");
             return;
         case rawtyp_Str:
-            printf("\"");
-            for (ix=0; ix<dat->count; ix++) {
-                glui32 ch = dat->str[ix];
-                if (ch == '\"')
-                    printf("\\\"");
-                else if (ch == '\\')
-                    printf("\\\\");
-                else if (ch == '\n')
-                    printf("\\n");
-                else if (ch == '\t')
-                    printf("\\t");
-                else if (ch < 32)
-                    printf("\\u%04X", ch);
-                else
-                    gli_putchar_utf8(ch, stdout);
-            }
-            printf("\"");
+            print_string_json_utf8(dat->str, dat->count, stdout);
             return;
         case rawtyp_List:
             printf("[ ");
@@ -193,8 +202,10 @@ void data_raw_print(data_raw_t *dat)
         case rawtyp_Struct:
             printf("{ ");
             for (ix=0; ix<dat->count; ix++) {
-                printf("%s: ", dat->key);
-                data_raw_print(dat->list[ix]);
+                data_raw_t *subdat = dat->list[ix];
+                print_string_json_utf8(subdat->key, subdat->keylen, stdout);
+                printf(": ");
+                data_raw_print(subdat);
                 if (ix != dat->count-1)
                     printf(", ");
                 else
@@ -375,15 +386,16 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
         int count = 0;
         int commapending = FALSE;
         char term = '\0';
+
         while (TRUE) {
             data_raw_t *subdat = data_raw_blockread_sub(&term);
             if (!subdat) {
                 if (term == ']') {
                     if (commapending)
-                        gli_fatal_error("data: Array should not end with comma");
+                        gli_fatal_error("data: List should not end with comma");
                     break;
                 }
-                gli_fatal_error("data: Mismatched end of array");
+                gli_fatal_error("data: Mismatched end of list");
             }
             data_raw_ensure_size(dat, count+1);
             dat->list[count++] = subdat;
@@ -396,6 +408,59 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
                 gli_fatal_error("data: Expected comma in list");
             commapending = TRUE;
         }
+
+        dat->count = count;
+        return dat;
+    }
+
+    if (ch == '{') {
+        data_raw_t *dat = data_raw_alloc(rawtyp_Struct);
+        int count = 0;
+        int commapending = FALSE;
+        char term = '\0';
+
+        while (TRUE) {
+            data_raw_t *keydat = data_raw_blockread_sub(&term);
+            if (!keydat) {
+                if (term == '}') {
+                    if (commapending)
+                        gli_fatal_error("data: Struct should not end with comma");
+                    break;
+                }
+                gli_fatal_error("data: Mismatched end of struct");
+            }
+
+            if (keydat->type != rawtyp_Str)
+                gli_fatal_error("data: Struct key must be string");
+
+            while (isspace(ch = getchar())) { };
+            
+            if (ch != ':')
+                gli_fatal_error("data: Expected colon in struct");
+
+            data_raw_t *subdat = data_raw_blockread_sub(&term);
+            if (!keydat)
+                gli_fatal_error("data: Mismatched end of struct");
+
+            subdat->key = keydat->str;
+            subdat->keylen = keydat->count;
+            keydat->str = NULL;
+            keydat->count = 0;
+            data_raw_free(keydat);
+            keydat = NULL;
+
+            data_raw_ensure_size(dat, count+1);
+            dat->list[count++] = subdat;
+            commapending = FALSE;
+
+            while (isspace(ch = getchar())) { };
+            if (ch == '}')
+                break;
+            if (ch != ',')
+                gli_fatal_error("data: Expected comma in struct");
+            commapending = TRUE;
+        }
+
         dat->count = count;
         return dat;
     }
@@ -439,6 +504,11 @@ void data_input_print(data_input_t *data)
 data_input_t *data_input_read()
 {
     data_raw_t *rawdata = data_raw_blockread();
+    data_raw_print(rawdata); printf("\n"); /*###*/
 
+    if (rawdata->type != rawtyp_Struct)
+        gli_fatal_error("data: Input struct not a struct");
+
+    gli_fatal_error("###");
     return NULL; /*###*/
 }
