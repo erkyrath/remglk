@@ -138,7 +138,7 @@ static void data_raw_ensure_size(data_raw_t *dat, int size)
         gli_fatal_error("data: Unable to allocate memory for data list");
 }
 
-static void data_raw_dump(data_raw_t *dat)
+void data_raw_print(data_raw_t *dat)
 {
     int ix;
 
@@ -182,7 +182,7 @@ static void data_raw_dump(data_raw_t *dat)
         case rawtyp_List:
             printf("[ ");
             for (ix=0; ix<dat->count; ix++) {
-                data_raw_dump(dat->list[ix]);
+                data_raw_print(dat->list[ix]);
                 if (ix != dat->count-1)
                     printf(", ");
                 else
@@ -194,7 +194,7 @@ static void data_raw_dump(data_raw_t *dat)
             printf("{ ");
             for (ix=0; ix<dat->count; ix++) {
                 printf("%s: ", dat->key);
-                data_raw_dump(dat->list[ix]);
+                data_raw_print(dat->list[ix]);
                 if (ix != dat->count-1)
                     printf(", ");
                 else
@@ -404,11 +404,41 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
     return NULL;
 }
 
+void data_metrics_print(data_metrics_t *metrics)
+{
+    /* This displays very verbosely, and not in JSON-readable format.
+       That's okay -- it's only used for debugging. */
+ 
+    printf("{\n");   
+    printf("  size: %ldx%ld\n", (long)metrics->width, (long)metrics->height);
+    printf("  outspacing: %ldx%ld\n", (long)metrics->outspacingx, (long)metrics->outspacingy);
+    printf("  inspacing: %ldx%ld\n", (long)metrics->inspacingx, (long)metrics->inspacingy);
+    printf("  gridchar: %ldx%ld\n", (long)metrics->gridcharwidth, (long)metrics->gridcharheight);
+    printf("  gridmargin: %ldx%ld\n", (long)metrics->gridmarginx, (long)metrics->gridmarginy);
+    printf("  bufferchar: %ldx%ld\n", (long)metrics->buffercharwidth, (long)metrics->buffercharheight);
+    printf("  buffermargin: %ldx%ld\n", (long)metrics->buffermarginx, (long)metrics->buffermarginy);
+    printf("}\n");   
+}
+
+void data_input_print(data_input_t *data)
+{
+    switch (data->dtag) {
+        case dtag_Init:
+            printf("{ \"type\": \"init\", \"gen\": %d, \"metrics\":\n",
+                data->gen);
+            data_metrics_print(data->metrics);
+            printf("}\n");
+            break;
+
+        default:
+            printf("{? unknown dtag %d}\n", data->dtag);
+            break;
+    }
+}
+
 data_input_t *data_input_read()
 {
     data_raw_t *rawdata = data_raw_blockread();
-
-    data_raw_dump(rawdata); printf("\n"); /*###*/
 
     return NULL; /*###*/
 }

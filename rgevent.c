@@ -30,7 +30,7 @@ void glk_select(event_t *event)
     curevent = event;
     gli_event_clearevent(curevent);
     
-    /*### gli_windows_update(); ###*/
+    gli_windows_update();
     
     while (curevent->type == evtype_None) {
         data_input_t *data = data_input_read();

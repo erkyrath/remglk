@@ -10,6 +10,7 @@
 #include <string.h>
 #include "glk.h"
 #include "remglk.h"
+#include "rgdata.h"
 #include "glkstart.h"
 
 /* Declarations of preferences flags. */
@@ -19,8 +20,8 @@ int pref_screenheight = 0;
 int pref_messageline = TRUE;
 int pref_override_window_borders = FALSE;
 int pref_window_borders = FALSE;
-int pref_historylen = 20;
-int pref_prompt_defaults = TRUE;
+int pref_historylen = 20; /*### definitely delete */
+int pref_prompt_defaults = TRUE; /*### probably delete */
 
 /* Some constants for my wacky little command-line option parser. */
 #define ex_Void (0)
@@ -215,6 +216,12 @@ int main(int argc, char *argv[])
 
     /* ### set up I/O thingies? */
     gli_initialize_datainput();
+
+    if (1) { /*### unless we skip this */
+        data_input_t *data = data_input_read();
+        data_input_print(data); /*###*/
+
+    }
     
     /* Initialize things. */
     gli_initialize_misc();
