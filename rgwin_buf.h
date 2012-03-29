@@ -96,7 +96,7 @@ extern void win_textbuffer_destroy(window_textbuffer_t *dwin);
 extern void win_textbuffer_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics);
 extern void win_textbuffer_redraw(window_t *win);
 extern void win_textbuffer_update(window_t *win);
-extern void win_textbuffer_putchar(window_t *win, char ch);
+extern void win_textbuffer_putchar(window_t *win, glui32 ch);
 extern void win_textbuffer_clear(window_t *win);
 extern void win_textbuffer_trim_buffer(window_t *win);
 extern void win_textbuffer_place_cursor(window_t *win, int *xpos, int *ypos);

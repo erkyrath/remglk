@@ -603,7 +603,7 @@ void win_textbuffer_update(window_t *win)
     updatetext(dwin);
 }
 
-void win_textbuffer_putchar(window_t *win, char ch)
+void win_textbuffer_putchar(window_t *win, glui32 ch)
 {
     window_textbuffer_t *dwin = win->data;
     long lx;

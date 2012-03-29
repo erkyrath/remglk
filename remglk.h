@@ -195,7 +195,7 @@ extern void gli_window_rearrange(window_t *win, grect_t *box, data_metrics_t *me
 extern void gli_windows_update(void);
 extern void gli_windows_metrics_change(data_metrics_t *newmetrics);
 extern void gli_windows_trim_buffers(void);
-extern void gli_window_put_char(window_t *win, char ch);
+extern void gli_window_put_char(window_t *win, glui32 ch);
 extern void gli_windows_unechostream(stream_t *str);
 extern void gli_print_spaces(int len);
 

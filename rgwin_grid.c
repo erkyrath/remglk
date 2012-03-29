@@ -245,7 +245,7 @@ void win_textgrid_update(window_t *win)
     updatetext(dwin, FALSE);
 }
 
-void win_textgrid_putchar(window_t *win, char ch)
+void win_textgrid_putchar(window_t *win, glui32 ch)
 {
     window_textgrid_t *dwin = win->data;
     tgline_t *ln;

@@ -960,7 +960,7 @@ void glk_cancel_mouse_event(window_t *win)
     return;
 }
 
-void gli_window_put_char(window_t *win, char ch)
+void gli_window_put_char(window_t *win, glui32 ch)
 {
     switch (win->type) {
         case wintype_TextBuffer:
