@@ -34,7 +34,20 @@ void glk_select(event_t *event)
     
     while (curevent->type == evtype_None) {
         data_input_t *data = data_input_read();
-        /* ### */
+
+        switch (data->dtag) {
+            case dtag_Arrange:
+                gli_windows_metrics_change(data->metrics);
+                break;
+
+            /* ### */
+
+            default:
+                /* Ignore the event. */
+                break;
+        }
+
+        data_input_free(data);
     }
     
     /* An event has occurred; glk_select() is over. */
