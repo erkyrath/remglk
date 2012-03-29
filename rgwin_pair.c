@@ -44,10 +44,9 @@ void win_pair_destroy(window_pair_t *dwin)
     free(dwin);
 }
 
-void win_pair_rearrange(window_t *win, grect_t *box)
+void win_pair_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
 {
     window_pair_t *dwin = win->data;
-    data_metrics_t *metrics = gli_window_current_metrics();
     grect_t box1, box2;
     int min, diff, split, splitwid, max;
     window_t *key;
@@ -82,20 +81,24 @@ void win_pair_rearrange(window_t *win, grect_t *box)
             split = (diff * dwin->size) / 100;
             break;
         case winmethod_Fixed:
-            /* Keeping track of the key may seem silly, since we don't really
-                use it when all sizes are measured in characters. But it's
-                good to know when it's invalid, so that the split can be set
-                to zero. It would suck if invalid keys seemed to work in
-                RemGlk but not in GUI Glk libraries. */
             key = dwin->key;
             if (!key) {
                 split = 0;
             }
             else {
+                /*### allow for margins */
                 switch (key->type) {
                     case wintype_TextBuffer:
+                        if (dwin->vertical)
+                            split = dwin->size * metrics->buffercharwidth;
+                        else
+                            split = dwin->size * metrics->buffercharheight;
+                        break;
                     case wintype_TextGrid:
-                        split = dwin->size;
+                        if (dwin->vertical)
+                            split = dwin->size * metrics->gridcharwidth;
+                        else
+                            split = dwin->size * metrics->gridcharheight;
                         break;
                     default:
                         split = 0;
@@ -166,7 +169,7 @@ void win_pair_rearrange(window_t *win, grect_t *box)
         }
     }
     
-    gli_window_rearrange(ch1, &box1);
-    gli_window_rearrange(ch2, &box2);
+    gli_window_rearrange(ch1, &box1, metrics);
+    gli_window_rearrange(ch2, &box2, metrics);
 }
 

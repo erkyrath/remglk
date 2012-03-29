@@ -27,5 +27,5 @@ typedef struct window_pair_struct {
 extern window_pair_t *win_pair_create(window_t *win, glui32 method, 
     window_t *key, glui32 size);
 extern void win_pair_destroy(window_pair_t *dwin);
-extern void win_pair_rearrange(window_t *win, grect_t *box);
+extern void win_pair_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics);
 extern void win_pair_redraw(window_t *win);

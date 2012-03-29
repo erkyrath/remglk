@@ -139,7 +139,7 @@ static void final_lines(window_textbuffer_t *dwin, long beg, long end)
     }
 }
 
-void win_textbuffer_rearrange(window_t *win, grect_t *box)
+void win_textbuffer_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
 {
     int oldwid, oldhgt;
     window_textbuffer_t *dwin = win->data;

@@ -93,7 +93,7 @@ typedef struct window_textbuffer_struct {
 
 extern window_textbuffer_t *win_textbuffer_create(window_t *win);
 extern void win_textbuffer_destroy(window_textbuffer_t *dwin);
-extern void win_textbuffer_rearrange(window_t *win, grect_t *box);
+extern void win_textbuffer_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics);
 extern void win_textbuffer_redraw(window_t *win);
 extern void win_textbuffer_update(window_t *win);
 extern void win_textbuffer_putchar(window_t *win, char ch);

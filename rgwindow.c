@@ -69,11 +69,6 @@ void gli_fast_exit()
     exit(0);
 }
 
-data_metrics_t *gli_window_current_metrics()
-{
-    return &metrics;
-}
-
 static void compute_content_box(grect_t *box)
 {
     box->left = metrics.outspacingx;
@@ -230,7 +225,7 @@ winid_t glk_window_open(winid_t splitwin, glui32 method, glui32 size,
     
     if (!splitwin) {
         gli_rootwin = newwin;
-        gli_window_rearrange(newwin, &box);
+        gli_window_rearrange(newwin, &box, &metrics);
     }
     else {
         /* create pairwin, with newwin as the key */
@@ -256,7 +251,7 @@ winid_t glk_window_open(winid_t splitwin, glui32 method, glui32 size,
             gli_rootwin = pairwin;
         }
         
-        gli_window_rearrange(pairwin, &box);
+        gli_window_rearrange(pairwin, &box, &metrics);
     }
     
     return newwin;
@@ -399,10 +394,10 @@ void glk_window_close(window_t *win, stream_result_t *result)
         
         if (keydamage_flag) {
             compute_content_box(&box);
-            gli_window_rearrange(gli_rootwin, &box);
+            gli_window_rearrange(gli_rootwin, &box, &metrics);
         }
         else {
-            gli_window_rearrange(sibwin, &box);
+            gli_window_rearrange(sibwin, &box, &metrics);
         }
     }
 }
@@ -515,7 +510,7 @@ void glk_window_set_arrangement(window_t *win, glui32 method, glui32 size,
     dwin->vertical = (dwin->dir == winmethod_Left || dwin->dir == winmethod_Right);
     dwin->backward = (dwin->dir == winmethod_Left || dwin->dir == winmethod_Above);
     
-    gli_window_rearrange(win, &box);
+    gli_window_rearrange(win, &box, &metrics);
 }
 
 winid_t glk_window_iterate(winid_t win, glui32 *rock)
@@ -713,22 +708,22 @@ void gli_windows_unechostream(stream_t *str)
 /* Some trivial switch functions which make up for the fact that we're not
     doing this in C++. */
 
-void gli_window_rearrange(window_t *win, grect_t *box)
+void gli_window_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
 {
     geometry_changed = TRUE;
 
     switch (win->type) {
         case wintype_Blank:
-            win_blank_rearrange(win, box);
+            win_blank_rearrange(win, box, metrics);
             break;
         case wintype_Pair:
-            win_pair_rearrange(win, box);
+            win_pair_rearrange(win, box, metrics);
             break;
         case wintype_TextGrid:
-            win_textgrid_rearrange(win, box);
+            win_textgrid_rearrange(win, box, metrics);
             break;
         case wintype_TextBuffer:
-            win_textbuffer_rearrange(win, box);
+            win_textbuffer_rearrange(win, box, metrics);
             break;
     }
 }
@@ -749,12 +744,14 @@ void gli_windows_update()
     }
 }
 
-void gli_windows_size_change()
+void gli_windows_metrics_change(data_metrics_t *newmetrics)
 {
+    metrics = *newmetrics;
+
     if (gli_rootwin) {
         grect_t box;
         compute_content_box(&box);
-        gli_window_rearrange(gli_rootwin, &box);
+        gli_window_rearrange(gli_rootwin, &box, &metrics);
     }
     
     gli_event_store(evtype_Arrange, NULL, 0, 0);

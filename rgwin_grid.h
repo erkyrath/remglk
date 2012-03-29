@@ -37,7 +37,7 @@ typedef struct window_textgrid_struct {
 
 extern window_textgrid_t *win_textgrid_create(window_t *win);
 extern void win_textgrid_destroy(window_textgrid_t *dwin);
-extern void win_textgrid_rearrange(window_t *win, grect_t *box);
+extern void win_textgrid_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics);
 extern void win_textgrid_redraw(window_t *win);
 extern void win_textgrid_update(window_t *win);
 extern void win_textgrid_putchar(window_t *win, char ch);

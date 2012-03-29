@@ -10,5 +10,5 @@ typedef struct window_blank_struct {
 
 extern window_blank_t *win_blank_create(window_t *win);
 extern void win_blank_destroy(window_blank_t *dwin);
-extern void win_blank_rearrange(window_t *win, grect_t *box);
+extern void win_blank_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics);
 extern void win_blank_redraw(window_t *win);

@@ -76,7 +76,7 @@ void win_textgrid_destroy(window_textgrid_t *dwin)
     free(dwin);
 }
 
-void win_textgrid_rearrange(window_t *win, grect_t *box)
+void win_textgrid_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
 {
     int ix, jx, oldval;
     int newwid, newhgt;
