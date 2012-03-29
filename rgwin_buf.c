@@ -849,6 +849,36 @@ void win_textbuffer_init_line(window_t *win, void *buf, int unicode,
     }
 }
 
+void win_textbuffer_prepare_input(window_t *win, glui32 *buf, glui32 len)
+{
+    window_textbuffer_t *dwin = win->data;
+    int ix;
+
+    if (!dwin->inbuf)
+        return;
+
+    if (len > dwin->inmax)
+        len = dwin->inmax;
+
+    dwin->incurpos = len;
+
+    if (!dwin->inunicode) {
+        char *inbuf = ((char *)dwin->inbuf);
+        for (ix=0; ix<len; ix++) {
+            glui32 ch = buf[ix];
+            if (!(ch >= 0 && ch < 256))
+                ch = '?';
+            inbuf[ix] = ch;
+        }
+    }
+    else {
+        glui32 *inbuf = ((glui32 *)dwin->inbuf);
+        for (ix=0; ix<len; ix++) {
+            inbuf[ix] = buf[ix];
+        }
+    }
+}
+
 void win_textbuffer_accept_line(window_t *win)
 {
     int ix;
