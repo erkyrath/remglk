@@ -40,7 +40,7 @@ typedef struct tbline_struct {
 typedef struct window_textbuffer_struct {
     window_t *owner;
     
-    char *chars;
+    glui32 *chars;
     long numchars;
     long charssize;
     
@@ -70,7 +70,7 @@ typedef struct window_textbuffer_struct {
     tbword_t *tmpwords;
     long tmpwordssize;
 
-    /* Command history. */
+    /* Command history. ###delete */
     char **history;
     int historypos;
     int historyfirst, historypresent;
@@ -81,12 +81,11 @@ typedef struct window_textbuffer_struct {
     
     /* The following are meaningful only for the current line input request. */
     void *inbuf; /* char* or glui32*, depending on inunicode. */
+    glui32 incurpos;
     int inunicode;
     int inecho;
     glui32 intermkeys;
     int inmax;
-    long infence;
-    long incurs;
     glui32 origstyle;
     gidispatch_rock_t inarrayrock;
 } window_textbuffer_t;
@@ -99,8 +98,8 @@ extern void win_textbuffer_update(window_t *win);
 extern void win_textbuffer_putchar(window_t *win, glui32 ch);
 extern void win_textbuffer_clear(window_t *win);
 extern void win_textbuffer_trim_buffer(window_t *win);
-extern void win_textbuffer_place_cursor(window_t *win, int *xpos, int *ypos);
 extern void win_textbuffer_set_paging(window_t *win, int forcetoend);
 extern void win_textbuffer_init_line(window_t *win, void *buf, int unicode, int maxlen, int initlen);
+extern void win_textbuffer_accept_line(window_t *win);
 extern void win_textbuffer_cancel_line(window_t *win, event_t *ev);
 

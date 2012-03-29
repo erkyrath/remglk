@@ -20,9 +20,6 @@ static void final_lines(window_textbuffer_t *dwin, long beg, long end);
 static long find_style_by_pos(window_textbuffer_t *dwin, long pos);
 static long find_line_by_pos(window_textbuffer_t *dwin, long pos);
 static void set_last_run(window_textbuffer_t *dwin, glui32 style);
-static void import_input_line(window_textbuffer_t *dwin, void *buf, 
-    int unicode, long len);
-static void export_input_line(void *buf, int unicode, long len, char *chars);
 
 window_textbuffer_t *win_textbuffer_create(window_t *win)
 {
@@ -32,7 +29,7 @@ window_textbuffer_t *win_textbuffer_create(window_t *win)
     
     dwin->numchars = 0;
     dwin->charssize = 500;
-    dwin->chars = (char *)malloc(dwin->charssize * sizeof(char));
+    dwin->chars = (glui32 *)malloc(dwin->charssize * sizeof(glui32));
     
     dwin->numlines = 0;
     dwin->linessize = 50;
@@ -227,7 +224,7 @@ static long layout_chars(window_textbuffer_t *dwin, long chbeg, long chend,
     short style;
     long styleendpos;
     /* cache some values */
-    char *chars = dwin->chars;
+    glui32 *chars = dwin->chars;
     tbrun_t *runs = dwin->runs;
     
     lastlinetype = (startpara) ? wd_EndLine : wd_Text;
@@ -610,8 +607,8 @@ void win_textbuffer_putchar(window_t *win, glui32 ch)
     
     if (dwin->numchars >= dwin->charssize) {
         dwin->charssize *= 2;
-        dwin->chars = (char *)realloc(dwin->chars, 
-            dwin->charssize * sizeof(char));
+        dwin->chars = (glui32 *)realloc(dwin->chars, 
+            dwin->charssize * sizeof(glui32));
     }
     
     lx = dwin->numchars;
@@ -659,51 +656,6 @@ static void set_last_run(window_textbuffer_t *dwin, glui32 style)
 
 }
 
-/* This assumes that the text is all within the final style run. 
-    Convenient, but true, since this is only used by editing in the
-    input text. */
-static void put_text(window_textbuffer_t *dwin, char *buf, long len, 
-    long pos, long oldlen)
-{
-    long diff = len - oldlen;
-    
-    if (dwin->numchars + diff > dwin->charssize) {
-        while (dwin->numchars + diff > dwin->charssize)
-            dwin->charssize *= 2;
-        dwin->chars = (char *)realloc(dwin->chars, 
-            dwin->charssize * sizeof(char));
-    }
-    
-    if (diff != 0 && pos+oldlen < dwin->numchars) {
-        memmove(dwin->chars+(pos+len), dwin->chars+(pos+oldlen), 
-            (dwin->numchars - (pos+oldlen) * sizeof(char)));
-    }
-    if (len > 0) {
-        memmove(dwin->chars+pos, buf, len * sizeof(char));
-    }
-    dwin->numchars += diff;
-    
-    if (dwin->inbuf) {
-        if (dwin->incurs >= pos+oldlen)
-            dwin->incurs += diff;
-        else if (dwin->incurs >= pos)
-            dwin->incurs = pos+len;
-    }
-    
-    if (dwin->dirtybeg == -1) {
-        dwin->dirtybeg = pos;
-        dwin->dirtyend = pos+len;
-        dwin->dirtydelta = diff;
-    }
-    else {
-        if (pos < dwin->dirtybeg)
-            dwin->dirtybeg = pos;
-        if (pos+len > dwin->dirtyend)
-            dwin->dirtyend = pos+len;
-        dwin->dirtydelta += diff;
-    }
-}
-
 void win_textbuffer_clear(window_t *win)
 {
     window_textbuffer_t *dwin = win->data;
@@ -748,8 +700,6 @@ void win_textbuffer_trim_buffer(window_t *win)
     trimsize = dwin->numchars - BUFFER_SIZE;
     if (dwin->dirtybeg != -1 && trimsize > dwin->dirtybeg)
         trimsize = dwin->dirtybeg;
-    if (dwin->inbuf && trimsize > dwin->infence) 
-        trimsize = dwin->infence;
     
     lnum = find_line_by_pos(dwin, trimsize);
     if (lnum <= 0)
@@ -820,12 +770,6 @@ void win_textbuffer_trim_buffer(window_t *win)
 
     /* trim all the other assorted crap */
     
-    if (dwin->inbuf) {
-        /* there's pending line input */
-        dwin->infence -= cnum;
-        dwin->incurs -= cnum;
-    }
-    
     if (dwin->scrollpos > cnum) {
         dwin->scrollpos -= cnum;
     }
@@ -848,51 +792,6 @@ void win_textbuffer_trim_buffer(window_t *win)
         dwin->scrollline = dwin->numlines - dwin->height;
     if (dwin->scrollline < 0)
         dwin->scrollline = 0;
-}
-
-void win_textbuffer_place_cursor(window_t *win, int *xpos, int *ypos)
-{
-    window_textbuffer_t *dwin = win->data;
-    int ix;
-
-    if (win->line_request) {
-        /* figure out where the input cursor is. */
-        long lx = find_line_by_pos(dwin, dwin->incurs);
-        if (lx < 0 || lx - dwin->scrollline < 0) {
-            *ypos = 0;
-            *xpos = 0;
-        }
-        else if (lx - dwin->scrollline >= dwin->height) {
-            *ypos = dwin->height - 1;
-            *xpos = dwin->width - 1;
-        }
-        else {
-            *ypos = lx - dwin->scrollline;
-            ix = dwin->incurs - dwin->lines[lx].pos;
-            if (ix >= dwin->width)
-                ix = dwin->width-1;
-            *xpos = ix;
-        }
-    }
-    else {
-        /* put the cursor at the end of the text. */
-        long lx = dwin->numlines - 1;
-        if (lx < 0 || lx - dwin->scrollline < 0) {
-            *ypos = 0;
-            *xpos = 0;
-        }
-        else if (lx - dwin->scrollline >= dwin->height) {
-            *ypos = dwin->height - 1;
-            *xpos = dwin->width - 1;
-        }
-        else {
-            *ypos = lx - dwin->scrollline;
-            ix = dwin->lines[lx].len;
-            if (ix >= dwin->width)
-                ix = dwin->width-1;
-            *xpos = ix;
-        }
-    }
 }
 
 void win_textbuffer_set_paging(window_t *win, int forcetoend)
@@ -936,8 +835,7 @@ void win_textbuffer_init_line(window_t *win, void *buf, int unicode,
     dwin->inbuf = buf;
     dwin->inunicode = unicode;
     dwin->inmax = maxlen;
-    dwin->infence = dwin->numchars;
-    dwin->incurs = dwin->numchars;
+    dwin->incurpos = initlen;
     dwin->inecho = win->echo_line_input;
     dwin->intermkeys = win->terminate_line_input;
     dwin->origstyle = win->style;
@@ -945,13 +843,76 @@ void win_textbuffer_init_line(window_t *win, void *buf, int unicode,
     set_last_run(dwin, win->style);
     dwin->historypos = dwin->historypresent;
     
-    if (initlen) {
-        import_input_line(dwin, dwin->inbuf, dwin->inunicode, initlen);
-    }
-
     if (gli_register_arr) {
         char *typedesc = (dwin->inunicode ? "&+#!Iu" : "&+#!Cn");
         dwin->inarrayrock = (*gli_register_arr)(dwin->inbuf, maxlen, typedesc);
+    }
+}
+
+void win_textbuffer_accept_line(window_t *win)
+{
+    int ix;
+    long len;
+    char *cx;
+    void *inbuf;
+    int inmax, inunicode, inecho;
+    glui32 termkey = 0;
+    gidispatch_rock_t inarrayrock;
+    window_textbuffer_t *dwin = win->data;
+    
+    if (!dwin->inbuf)
+        return;
+    
+    inbuf = dwin->inbuf;
+    inmax = dwin->inmax;
+    inarrayrock = dwin->inarrayrock;
+    inunicode = dwin->inunicode;
+    inecho = dwin->inecho;
+
+    len = dwin->incurpos;
+    if (inecho && win->echostr) {
+        if (!inunicode)
+            gli_stream_echo_line(win->echostr, (char *)inbuf, len);
+        else
+            gli_stream_echo_line_uni(win->echostr, (glui32 *)inbuf, len);
+    }
+    
+    if (inecho) {
+        /* Add the typed text to the buffer. */
+        int ix;
+        if (!inunicode) {
+            for (ix=0; ix<len; ix++) {
+                glui32 ch = ((char *)inbuf)[ix];
+                win_textbuffer_putchar(win, ch);
+            }
+        }
+        else {
+            for (ix=0; ix<len; ix++) {
+                glui32 ch = ((glui32 *)inbuf)[ix];
+                win_textbuffer_putchar(win, ch);
+            }
+        }
+    }
+    
+    win->style = dwin->origstyle;
+    set_last_run(dwin, win->style);
+
+    /* ### set termkey */
+
+    gli_event_store(evtype_LineInput, win, len, termkey);
+    win->line_request = FALSE;
+    dwin->inbuf = NULL;
+    dwin->incurpos = 0;
+    dwin->inmax = 0;
+    dwin->inecho = FALSE;
+    dwin->intermkeys = 0;
+
+    if (inecho)
+        win_textbuffer_putchar(win, '\n');
+
+    if (gli_unregister_arr) {
+        char *typedesc = (inunicode ? "&+#!Iu" : "&+#!Cn");
+        (*gli_unregister_arr)(inbuf, inmax, typedesc, inarrayrock);
     }
 }
 
@@ -973,21 +934,29 @@ void win_textbuffer_cancel_line(window_t *win, event_t *ev)
     inunicode = dwin->inunicode;
     inecho = dwin->inecho;
 
-    len = dwin->numchars - dwin->infence;
-    if (inecho && win->echostr) 
-        gli_stream_echo_line(win->echostr, &(dwin->chars[dwin->infence]), len);
+    len = dwin->incurpos;
+    if (inecho && win->echostr) {
+        if (!inunicode)
+            gli_stream_echo_line(win->echostr, (char *)inbuf, len);
+        else
+            gli_stream_echo_line_uni(win->echostr, (glui32 *)inbuf, len);
+    }
 
-    /* Store in event buffer. */
-        
-    if (len > inmax)
-        len = inmax;
-        
-    export_input_line(inbuf, inunicode, len, &dwin->chars[dwin->infence]);
-        
-    if (!inecho) {
-        /* Wipe the typed text from the buffer. */
-        put_text(dwin, "", 0, dwin->infence, 
-            dwin->numchars - dwin->infence);
+    if (inecho) {
+        /* Add the typed text to the buffer. */
+        int ix;
+        if (!inunicode) {
+            for (ix=0; ix<len; ix++) {
+                glui32 ch = ((char *)inbuf)[ix];
+                win_textbuffer_putchar(win, ch);
+            }
+        }
+        else {
+            for (ix=0; ix<len; ix++) {
+                glui32 ch = ((glui32 *)inbuf)[ix];
+                win_textbuffer_putchar(win, ch);
+            }
+        }
     }
     
     win->style = dwin->origstyle;
@@ -999,6 +968,7 @@ void win_textbuffer_cancel_line(window_t *win, event_t *ev)
     
     win->line_request = FALSE;
     dwin->inbuf = NULL;
+    dwin->incurpos = 0;
     dwin->inmax = 0;
     dwin->inecho = FALSE;
     dwin->intermkeys = 0;
@@ -1009,52 +979,6 @@ void win_textbuffer_cancel_line(window_t *win, event_t *ev)
     if (gli_unregister_arr) {
         char *typedesc = (inunicode ? "&+#!Iu" : "&+#!Cn");
         (*gli_unregister_arr)(inbuf, inmax, typedesc, inarrayrock);
-    }
-}
-
-static void import_input_line(window_textbuffer_t *dwin, void *buf, 
-    int unicode, long len)
-{
-    /* len will be nonzero. */
-
-    if (!unicode) {
-        put_text(dwin, buf, len, dwin->incurs, 0);
-    }
-    else {
-        int ix;
-        char *cx = (char *)malloc(len * sizeof(char));
-        for (ix=0; ix<len; ix++) {
-            glui32 kval = ((glui32 *)buf)[ix];
-            if (!(kval >= 0 && kval < 256))
-                kval = '?';
-            cx[ix] = kval;
-        }
-        put_text(dwin, cx, len, dwin->incurs, 0);
-        free(cx);
-    }
-}
-
-/* Clone in rgwin_grid.c */
-/*### unicode argument?*/
-static void export_input_line(void *buf, int unicode, long len, char *chars)
-{
-    int ix;
-
-    if (!unicode) {
-        for (ix=0; ix<len; ix++) {
-            int val = chars[ix];
-            glui32 kval = (val & 0xFF);
-            if (!(kval >= 0 && kval < 256))
-                kval = '?';
-            ((unsigned char *)buf)[ix] = kval;
-        }
-    }
-    else {
-        for (ix=0; ix<len; ix++) {
-            int val = chars[ix];
-            glui32 kval = (val & 0xFF);
-            ((glui32 *)buf)[ix] = kval;
-        }
     }
 }
 
