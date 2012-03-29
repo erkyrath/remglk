@@ -320,29 +320,6 @@ void win_textgrid_move_cursor(window_t *win, int xpos, int ypos)
     dwin->cury = ypos;
 }
 
-void win_textgrid_place_cursor(window_t *win, int *xpos, int *ypos)
-{
-    window_textgrid_t *dwin = win->data;
-    
-    /* Canonicalize the cursor position */
-    if (dwin->curx < 0)
-        dwin->curx = 0;
-    else if (dwin->curx >= dwin->width) {
-        dwin->curx = 0;
-        dwin->cury++;
-    }
-    if (dwin->cury < 0)
-        dwin->cury = 0;
-    else if (dwin->cury >= dwin->height) {
-        *xpos = dwin->width-1;
-        *ypos = dwin->height-1;
-        return;
-    }
-    
-    *xpos = dwin->curx;
-    *ypos = dwin->cury;
-}
-
 /* Prepare the window for line input. */
 void win_textgrid_init_line(window_t *win, void *buf, int unicode,
     int maxlen, int initlen)
