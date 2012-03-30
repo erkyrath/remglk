@@ -18,6 +18,7 @@ typedef struct data_input_struct data_input_t;
 typedef struct data_update_struct data_update_t;
 typedef struct data_window_struct data_window_t;
 typedef struct data_line_struct data_line_t;
+typedef struct data_span_struct data_span_t;
 
 struct data_metrics_struct {
     glui32 width, height;
@@ -65,7 +66,16 @@ struct data_content_struct {
 struct data_line_struct {
     glui32 linenum;
     int append;
-    /*### content */
+    data_span_t *spans;
+    int count;
+    int allocsize;
+};
+
+struct data_span_struct {
+    short style;
+    glui32 *str; /* This will always be a reference to existing data.
+                    Do not free. */
+    long len;
 };
 
 extern void gli_initialize_datainput(void);
@@ -96,4 +106,5 @@ extern void data_content_print(data_content_t *data);
 
 extern data_line_t *data_line_alloc(void);
 extern void data_line_free(data_line_t *data);
+extern void data_line_add_span(data_line_t *data, short style, glui32 *str, long len);
 extern void data_line_print(data_line_t *data, glui32 wintype);

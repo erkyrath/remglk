@@ -1008,7 +1008,7 @@ void data_window_print(data_window_t *dat)
             break;
     }
 
-    printf(" { \"id\":%d, \"type\":%s, \"rock\":%d,\n", dat->window, typename, dat->rock);
+    printf(" { \"id\":%d, \"type\":\"%s\", \"rock\":%d,\n", dat->window, typename, dat->rock);
     printf("   \"left\":%d, \"top\":%d, \"width\":%d, \"height\":%d }",
         dat->size.left, dat->size.top, dat->size.right-dat->size.left, dat->size.bottom-dat->size.top);
 }
@@ -1087,13 +1087,46 @@ data_line_t *data_line_alloc()
     dat->append = FALSE;
     dat->linenum = 0;
 
+    dat->spans = NULL;
+    dat->count = 0;
+    dat->allocsize = 0;
+
     return dat;
 }
 
 void data_line_free(data_line_t *dat)
 {
+    if (dat->spans) {
+        free(dat->spans);
+        dat->spans = NULL;
+    };
+    dat->allocsize = 0;
+    dat->count = 0;
+
     free(dat);
     return;
+}
+
+void data_line_add_span(data_line_t *data, short style, glui32 *str, long len)
+{
+    if (!data->spans) {
+        data->allocsize = 4;
+        data->spans = malloc(data->allocsize * sizeof(data_span_t));
+    }
+    else {
+        if (data->count >= data->allocsize) {
+            data->allocsize *= 2;
+            data->spans = realloc(data->spans, data->allocsize * sizeof(data_span_t));
+        }
+    }
+
+    if (!data->spans)
+        gli_fatal_error("data: Unable to allocate memory for span buffer");
+
+    data_span_t *span = &(data->spans[data->count++]);
+    span->style = style;
+    span->str = str;
+    span->len = len;
 }
 
 void data_line_print(data_line_t *dat, glui32 wintype)
