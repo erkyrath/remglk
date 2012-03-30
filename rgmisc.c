@@ -9,6 +9,7 @@
 #include <string.h>
 #include "glk.h"
 #include "remglk.h"
+#include "rgdata.h"
 
 static unsigned char char_tolower_table[256];
 static unsigned char char_toupper_table[256];
@@ -135,6 +136,33 @@ unsigned char glk_char_to_lower(unsigned char ch)
 unsigned char glk_char_to_upper(unsigned char ch)
 {
     return char_toupper_table[ch];
+}
+
+void gli_display_warning(char *msg)
+{
+    if (pref_stderr) {
+        fprintf(stderr, "Glk library error: %s\n", msg);
+    }
+    else {
+        printf("{\"type\":\"error\", \"message\":");
+        print_string_json(msg, stdout);
+        printf("}\n");
+    }
+    fflush(stdout);
+}
+
+void gli_display_error(char *msg)
+{
+    if (pref_stderr) {
+        fprintf(stderr, "%s\n", msg);
+    }
+    else {
+        printf("{\"type\":\"error\", \"message\":");
+        print_string_json(msg, stdout);
+        printf("}\n");
+    }
+    fflush(stdout);
+    exit(1);
 }
 
 #ifdef NO_MEMMOVE

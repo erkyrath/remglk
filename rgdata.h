@@ -80,6 +80,9 @@ struct data_span_struct {
 
 extern void gli_initialize_datainput(void);
 
+extern void print_ustring_json(glui32 *buf, glui32 len, FILE *fl);
+extern void print_string_json(char *buf, FILE *fl);
+
 extern void gen_list_init(gen_list_t *list);
 extern void gen_list_free(gen_list_t *list);
 extern void gen_list_append(gen_list_t *list, void *val);

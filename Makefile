@@ -19,7 +19,7 @@ GLKLIB = libremglk.a
 
 REMGLK_OBJS = \
   main.o rgevent.o rgfref.o rggestal.o \
-  rgmessage.o rgdata.o rgmisc.o rgstream.o rgstyle.o \
+  rgdata.o rgmisc.o rgstream.o rgstyle.o \
   rgwin_blank.o rgwin_buf.o rgwin_grid.o rgwin_pair.o rgwindow.o \
   rgschan.o rgblorb.o cgunicod.o cgdate.o gi_dispa.o gi_blorb.o
 

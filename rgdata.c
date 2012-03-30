@@ -88,13 +88,36 @@ static void ensure_ustringbuf_size(int val)
         gli_fatal_error("data: Unable to allocate memory for ustring buffer");
 }
 
-static void print_string_json_utf8(glui32 *buf, glui32 len, FILE *fl)
+void print_ustring_json(glui32 *buf, glui32 len, FILE *fl)
 {
     int ix;
 
     fprintf(fl, "\"");
     for (ix=0; ix<len; ix++) {
         glui32 ch = buf[ix];
+        if (ch == '\"')
+            fprintf(fl, "\\\"");
+        else if (ch == '\\')
+            fprintf(fl, "\\\\");
+        else if (ch == '\n')
+            fprintf(fl, "\\n");
+        else if (ch == '\t')
+            fprintf(fl, "\\t");
+        else if (ch < 32)
+            fprintf(fl, "\\u%04X", ch);
+        else
+            gli_putchar_utf8(ch, fl);
+    }
+    fprintf(fl, "\"");
+}
+
+void print_string_json(char *buf, FILE *fl)
+{
+    char *cx;
+
+    fprintf(fl, "\"");
+    for (cx=buf; *cx; cx++) {
+        glui32 ch = (*cx) & 0xFF;
         if (ch == '\"')
             fprintf(fl, "\\\"");
         else if (ch == '\\')
@@ -222,7 +245,7 @@ void data_raw_print(data_raw_t *dat)
             printf("null");
             return;
         case rawtyp_Str:
-            print_string_json_utf8(dat->str, dat->count, stdout);
+            print_ustring_json(dat->str, dat->count, stdout);
             return;
         case rawtyp_List:
             printf("[ ");
@@ -239,7 +262,7 @@ void data_raw_print(data_raw_t *dat)
             printf("{ ");
             for (ix=0; ix<dat->count; ix++) {
                 data_raw_t *subdat = dat->list[ix];
-                print_string_json_utf8(subdat->key, subdat->keylen, stdout);
+                print_ustring_json(subdat->key, subdat->keylen, stdout);
                 printf(": ");
                 data_raw_print(subdat);
                 if (ix != dat->count-1)

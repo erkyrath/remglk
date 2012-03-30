@@ -27,10 +27,10 @@
     or illegal operation from the game program. */
 
 #define gli_strict_warning(msg)   \
-    (gli_msgline_warning(msg)) 
+    (gli_display_warning(msg)) 
 
 #define gli_fatal_error(msg)   \
-    (gli_msgline_error(msg))
+    (gli_display_error(msg))
 
 /* Some useful type declarations. */
 
@@ -163,6 +163,7 @@ extern gidispatch_rock_t (*gli_register_arr)(void *array, glui32 len, char *type
 extern void (*gli_unregister_arr)(void *array, glui32 len, char *typecode, 
     gidispatch_rock_t objrock);
 
+extern int pref_stderr;
 extern int pref_printversion;
 extern int pref_screenwidth;
 extern int pref_screenheight;
@@ -190,6 +191,8 @@ extern void gli_event_store(glui32 type, window_t *win, glui32 val1, glui32 val2
 
 extern void gli_initialize_windows(data_metrics_t *metrics);
 extern void gli_fast_exit(void);
+extern void gli_display_warning(char *msg);
+extern void gli_display_error(char *msg);
 extern glui32 gli_window_current_generation(void);
 extern window_t *gli_new_window(glui32 type, glui32 rock);
 extern void gli_delete_window(window_t *win);
