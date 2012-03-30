@@ -17,7 +17,6 @@ typedef struct gen_list_struct {
 typedef struct data_input_struct data_input_t;
 typedef struct data_update_struct data_update_t;
 typedef struct data_window_struct data_window_t;
-typedef struct data_content_struct data_content_t;
 typedef struct data_line_struct data_line_t;
 
 struct data_metrics_struct {

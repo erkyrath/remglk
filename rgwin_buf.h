@@ -24,7 +24,7 @@ typedef struct tbrun_struct {
     long pos;
 } tbrun_t;
 
-/* One laid-out line of words */
+/* One laid-out line of words ###delete */
 typedef struct tbline_struct {
     int numwords;
     tbword_t *words;
@@ -54,7 +54,7 @@ typedef struct window_textbuffer_struct {
     int drawall; /* Does the whole window need to be redrawn at the next
         update? (Set when the text is scrolled, for example.) */
     
-    tbline_t *lines;
+    tbline_t *lines; /* ###delete */
     long numlines;
     long linessize;
     
@@ -86,7 +86,7 @@ extern window_textbuffer_t *win_textbuffer_create(window_t *win);
 extern void win_textbuffer_destroy(window_textbuffer_t *dwin);
 extern void win_textbuffer_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics);
 extern void win_textbuffer_redraw(window_t *win);
-extern void win_textbuffer_update(window_t *win);
+extern data_content_t *win_textbuffer_update(window_t *win);
 extern void win_textbuffer_putchar(window_t *win, glui32 ch);
 extern void win_textbuffer_clear(window_t *win);
 extern void win_textbuffer_trim_buffer(window_t *win);

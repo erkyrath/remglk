@@ -1036,6 +1036,24 @@ void data_content_free(data_content_t *dat)
     free(dat);
 }
 
+void data_content_print(data_content_t *dat)
+{
+    if (dat->type == wintype_TextBuffer) {
+        char *isclear = "";
+        if (dat->clear)
+            isclear = ", \"clear\":true";
+        printf(" {\"id\":%d%s, \"text\": [\n", dat->window, isclear);
+    }
+    else if (dat->type == wintype_TextGrid) {
+        printf(" {\"id\":%d, \"lines\": [\n", dat->window);
+    }
+    else {
+        gli_fatal_error("data: Unknown window type in content_print");
+    }
+
+    printf(" ]}\n");
+}
+
 data_line_t *data_line_alloc()
 {
     data_line_t *dat = (data_line_t *)malloc(sizeof(data_line_t));

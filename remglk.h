@@ -44,6 +44,7 @@ typedef struct grect_struct {
      (boxref)->right = (wid), (boxref)->bottom = (hgt))
 
 typedef struct data_metrics_struct data_metrics_t;
+typedef struct data_content_struct data_content_t;
 
 typedef struct glk_window_struct window_t;
 typedef struct glk_stream_struct stream_t;

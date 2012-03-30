@@ -9,6 +9,7 @@
 #include <string.h>
 #include "glk.h"
 #include "remglk.h"
+#include "rgdata.h"
 #include "rgwin_buf.h"
 
 /* Maximum buffer size. The slack value is how much larger than the size 
@@ -197,10 +198,65 @@ static long find_style_by_pos(window_textbuffer_t *dwin, long pos)
     return beg;
 }
 
-void win_textbuffer_update(window_t *win)
+data_content_t *win_textbuffer_update(window_t *win)
 {
     window_textbuffer_t *dwin = win->data;
-    /*###*/
+    long snum, cnum;
+    long nextrunpos;
+    short curstyle;
+
+    if (dwin->dirtybeg == -1) {
+        return NULL;
+    }
+
+    data_content_t *dat = data_content_alloc(win->updatetag, win->type);
+
+    /* ### not exactly the right test */
+    if (dwin->dirtybeg == 0)
+        dat->clear = TRUE;
+
+    if (dwin->dirtybeg < dwin->dirtyend) {
+        cnum = dwin->dirtybeg;
+        snum = find_style_by_pos(dwin, cnum);
+        curstyle = dwin->runs[snum].style;
+        if (snum+1 < dwin->numruns)
+            nextrunpos = dwin->runs[snum+1].pos;
+        else
+            nextrunpos = dwin->numchars+1;
+
+        data_line_t *line = data_line_alloc();
+        gen_list_append(&dat->lines, line);
+        line->append = TRUE;
+
+        while (cnum < dwin->dirtyend) {
+            glui32 ch = dwin->chars[cnum];
+            if (ch == '\n') {
+                line = data_line_alloc();
+                gen_list_append(&dat->lines, line);
+                line->append = FALSE;
+
+                cnum++;
+                continue;
+            }
+
+            while (cnum >= nextrunpos) {
+                snum++;
+                curstyle = dwin->runs[snum].style;
+                if (snum+1 < dwin->numruns)
+                    nextrunpos = dwin->runs[snum+1].pos;
+                else
+                    nextrunpos = dwin->numchars+1;
+            }
+            /*### stuff ch into line */
+
+            cnum++;
+        }
+    }
+
+    dwin->dirtybeg = -1;
+    dwin->dirtyend = -1;
+
+    return dat;
 }
 
 void win_textbuffer_putchar(window_t *win, glui32 ch)
@@ -452,9 +508,7 @@ void win_textbuffer_prepare_input(window_t *win, glui32 *buf, glui32 len)
 
 void win_textbuffer_accept_line(window_t *win)
 {
-    int ix;
     long len;
-    char *cx;
     void *inbuf;
     int inmax, inunicode, inecho;
     glui32 termkey = 0;
