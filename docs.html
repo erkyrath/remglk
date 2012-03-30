@@ -1,0 +1,147 @@
+<!doctype HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+<head>
+<title>RemGlk: remote-procedure-call implementation of the Glk IF API</title>
+
+<style type="text/css">
+
+body {
+  margin-left: 20px;
+  margin-right: 20px;
+}
+
+h2 {
+  font-family: Gill Sans, Helvetica, Arial, sans-serif;
+  font-weight: normal;
+}
+
+h3 {
+  font-family: Gill Sans, Helvetica, Arial, sans-serif;
+  font-weight: normal;
+}
+
+h4 {
+  font-family: Gill Sans, Helvetica, Arial, sans-serif;
+  font-weight: normal;
+}
+
+h2 a {
+  border-bottom: 1px dotted #AAA;
+}
+
+h3 a {
+  border-bottom: 1px dotted #AAA;
+}
+
+h4 a {
+  border-bottom: 1px dotted #AAA;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 24px;
+}
+
+li {
+  margin-top: 2px;
+}
+
+dt {
+  margin-top: 4px;
+}
+
+.ContentTop > li > a {
+  border-left: 2px solid #AAA;
+  padding-left: 8px;
+}
+
+.ContentTop > li > ul {
+  border-left: 2px dotted #DDD;
+}
+
+.Def {
+  margin-left: 4px;
+  background: #D0F8D4;
+  border-left: 4px solid #98E0A0;
+  padding: 4px 0px 4px 8px;
+}
+
+.Sample {
+  margin-left: 20px;
+  margin-right: 30px;
+  background: #E0F0C0;
+  padding: 4px 0px 4px 8px;
+}
+
+.Huge {
+  margin-left: 20px;
+  background: #E0F0C0;
+  max-width: 90%;
+  height: 300px;
+  overflow: scroll;
+  padding: 4px 4px 4px 8px;
+}
+
+.Diagram {
+  margin-left: 20px;
+  margin-right: 30px;
+  background: #F8E8C0;
+  padding: 4px 0px 4px 8px;
+}
+
+.Inline {
+  background: #E0F0C0;
+  padding-left: 2px;
+  padding-right: 2px;
+}
+
+</style>
+
+</head>
+<body>
+
+<h1>RemGlk: remote-procedure-call implementation of the Glk IF API</h1>
+
+<em>RemGlk version 0.1###</em><br>
+
+<em>Designed by Andrew Plotkin (erkyrath@eblong.com)<br>
+<a href="http://eblong.com/zarf/glk/remglk.html">(RemGlk home page</a>
+--
+<a href="http://eblong.com/zarf/glk/index.html">Glk home page)</a></em>
+<p>
+
+This documentation is licensed under a 
+<a href="http://creativecommons.org/licenses/by-nc-sa/3.0">Creative
+Commons Attribution-Noncommercial-Share Alike 3.0 Unported License</a>.
+<p>
+
+<hr>
+
+<h2>What is RemGlk?</h2>
+
+RemGlk is a C library which implements the <a href="http://eblong.com/zarf/glk/index.html">Glk API</a>. You can compile a Glk application and link it with this library.
+<p>
+
+RemGlk does not provide a user interface. Instead, it wraps up the application's output as a <a href="http://json.org/">JSON data structure</a> and sends it to stdout. It then waits for input to arrive from stdin; the input data must also be encoded as JSON.
+<p>
+
+RemGlk is therefore like CheapGlk, in that it works entirely through input and output streams, and can easily be attached to a bot or web service. However, unlike CheapGlk, RemGlk supports multiple Glk windows and most Glk I/O features. Whatever it's attached to just has to decode the structured output and display it appropriately.
+<p>
+
+RemGlk was designed to complement the <a href="http://eblong.com/zarf/glk/glkote/docs.html">GlkOte</a> Javascript library. GlkOte more or less implements the other half of the job: it accepts game output (as Javascript objects), displays it, and then returns the player's commands in the same format. It should be possible to connect an IF interpreter, RemGlk, and GlkOte to build a complete IF web service.
+<p>
+
+<em>Warning: this has not yet been tested in any way. This is an alpha release of RemGlk, and nothing is guaranteed.</em>
+<p>
+
+<hr>
+Last updated March 30, 2012.
+<p>
+
+<em><a href="http://eblong.com/zarf/glk/remglk.html">RemGlk home page</a>
+--
+<a href="http://eblong.com/zarf/glk/index.html">Glk home page</a></em>
+<p>
+
+</body>
+</html>
