@@ -946,14 +946,25 @@ void data_update_print(data_update_t *dat)
     int ix;
 
     printf("{\"type\":\"update\", \"gen\":%d", dat->gen);
+
     if (dat->windows.count) {
         data_window_t **winlist = (data_window_t **)(dat->windows.list);
-        printf(", [\n");
+        printf(",\n \"windows\":[\n");
         for (ix=0; ix<dat->windows.count; ix++) {
             data_window_print(winlist[ix]);
         }
-        printf("]");
+        printf(" ]");
     }
+
+    if (dat->contents.count) {
+        data_content_t **contlist = (data_content_t **)(dat->contents.list);
+        printf(",\n \"contents\":[\n");
+        for (ix=0; ix<dat->contents.count; ix++) {
+            data_content_print(contlist[ix]);
+        }
+        printf(" ]");
+    }
+
     printf("}\n");
 }
 
@@ -991,8 +1002,54 @@ void data_window_print(data_window_t *dat)
             break;
     }
 
-    printf("{ \"id\":%d, \"type\":%s, \"rock\":%d,\n", dat->window, typename, dat->rock);
-    printf("  \"left\":%d, \"top\":%d, \"width\":%d, \"height\":%d }\n",
+    printf(" { \"id\":%d, \"type\":%s, \"rock\":%d,\n", dat->window, typename, dat->rock);
+    printf("   \"left\":%d, \"top\":%d, \"width\":%d, \"height\":%d }\n",
         dat->size.left, dat->size.top, dat->size.right-dat->size.left, dat->size.bottom-dat->size.top);
 }
 
+data_content_t *data_content_alloc(glui32 window, glui32 type)
+{
+    data_content_t *dat = (data_content_t *)malloc(sizeof(data_content_t));
+    if (!dat)
+        gli_fatal_error("data: Unable to alloc content structure");
+
+    dat->window = window;
+    dat->type = type;
+    dat->clear = FALSE;
+
+    gen_list_init(&dat->lines);
+
+    return dat;
+}
+
+void data_content_free(data_content_t *dat)
+{
+    int ix;
+
+    data_line_t **linelist = (data_line_t **)(dat->lines.list);
+    for (ix=0; ix<dat->lines.count; ix++) {
+        data_line_free(linelist[ix]);
+    }
+
+    gen_list_free(&dat->lines);
+
+    free(dat);
+}
+
+data_line_t *data_line_alloc()
+{
+    data_line_t *dat = (data_line_t *)malloc(sizeof(data_line_t));
+    if (!dat)
+        gli_fatal_error("data: Unable to alloc line structure");
+
+    dat->append = FALSE;
+    dat->linenum = 0;
+
+    return dat;
+}
+
+void data_line_free(data_line_t *dat)
+{
+    free(dat);
+    return;
+}

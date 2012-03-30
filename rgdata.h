@@ -17,6 +17,8 @@ typedef struct gen_list_struct {
 typedef struct data_input_struct data_input_t;
 typedef struct data_update_struct data_update_t;
 typedef struct data_window_struct data_window_t;
+typedef struct data_content_struct data_content_t;
+typedef struct data_line_struct data_line_t;
 
 struct data_metrics_struct {
     glui32 width, height;
@@ -41,9 +43,9 @@ struct data_input_struct {
 
 struct data_update_struct {
     glsi32 gen;
-    gen_list_t windows;
-    gen_list_t contents;
-    gen_list_t inputs;
+    gen_list_t windows; /* data_window_t */
+    gen_list_t contents; /* data_content_t */
+    gen_list_t inputs; /* data_input_t */
     int disable;
 };
 
@@ -52,6 +54,19 @@ struct data_window_struct {
     glui32 type;
     glui32 rock;
     grect_t size;
+};
+
+struct data_content_struct {
+    glui32 window;
+    glui32 type;
+    gen_list_t lines; /* data_line_t */
+    int clear;
+};
+
+struct data_line_struct {
+    glui32 linenum;
+    int append;
+    /*### content */
 };
 
 extern void gli_initialize_datainput(void);
@@ -75,3 +90,10 @@ extern void data_update_print(data_update_t *data);
 extern data_window_t *data_window_alloc(glui32 window, glui32 type, glui32 rock);
 extern void data_window_free(data_window_t *data);
 extern void data_window_print(data_window_t *data);
+
+extern data_content_t *data_content_alloc(glui32 window, glui32 type);
+extern void data_content_free(data_content_t *data);
+extern void data_content_print(data_content_t *data);
+
+extern data_line_t *data_line_alloc(void);
+extern void data_line_free(data_line_t *data);
