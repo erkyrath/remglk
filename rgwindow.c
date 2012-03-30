@@ -752,7 +752,7 @@ void gli_windows_update()
         data_content_t *dat = NULL;
         switch (win->type) {
             case wintype_TextGrid:
-                /*### win_textgrid_update(win); ###*/
+                dat = win_textgrid_update(win);
                 break;
             case wintype_TextBuffer:
                 dat = win_textbuffer_update(win);

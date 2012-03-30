@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include "glk.h"
 #include "remglk.h"
+#include "rgdata.h"
 #include "rgwin_grid.h"
 
 /* A grid of characters. We store the window as a list of lines (see
@@ -159,13 +160,52 @@ static void init_lines(window_textgrid_t *dwin, int beg, int end, int linewid)
     }
 }
 
-void win_textgrid_update(window_t *win)
+data_content_t *win_textgrid_update(window_t *win)
 {
     int jx, ix;
+    int spanstart;
+    short curstyle;
     window_textgrid_t *dwin = win->data;
 
-    if (!dwin->lines)
-        return;
+    if (!dwin->lines) {
+        dwin->alldirty = FALSE;
+        return NULL;
+    }
+
+    data_content_t *dat = data_content_alloc(win->updatetag, win->type);
+
+    for (jx=0; jx<dwin->height; jx++) {
+        tgline_t *ln = &(dwin->lines[jx]);
+        if (!dwin->alldirty && !ln->dirty)
+            continue;
+
+        data_line_t *line = data_line_alloc();
+        gen_list_append(&dat->lines, line);
+        line->linenum = jx;
+
+        curstyle = -1;
+        spanstart = 0;
+        for (ix=0; ix<dwin->width; ix++) {
+            if (ln->styles[ix] != curstyle) {
+                if (ix > spanstart) {
+                    data_line_add_span(line, curstyle, ln->chars+spanstart, ix-spanstart);
+                    spanstart = ix;
+                }
+
+                curstyle = ln->styles[ix];
+            }
+        }
+        if (ix > spanstart) {
+            data_line_add_span(line, curstyle, ln->chars+spanstart, ix-spanstart);
+            spanstart = ix;
+        }
+
+        ln->dirty = FALSE;
+    }
+
+    dwin->alldirty = FALSE;
+
+    return dat;
 }
 
 void win_textgrid_putchar(window_t *win, glui32 ch)
@@ -264,7 +304,6 @@ void win_textgrid_init_line(window_t *win, void *buf, int unicode,
         initlen = maxlen;
         
     if (initlen) {
-        int ix;
         tgline_t *ln = &(dwin->lines[dwin->inorgy]);
 
         if (initlen) {
@@ -289,7 +328,6 @@ void win_textgrid_init_line(window_t *win, void *buf, int unicode,
 /* Abort line input, storing whatever's been typed so far. */
 void win_textgrid_cancel_line(window_t *win, event_t *ev)
 {
-    int ix;
     void *inbuf;
     int inoriglen, inmax, inunicode;
     gidispatch_rock_t inarrayrock;
