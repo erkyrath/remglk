@@ -952,6 +952,9 @@ void data_update_print(data_update_t *dat)
         printf(",\n \"windows\":[\n");
         for (ix=0; ix<dat->windows.count; ix++) {
             data_window_print(winlist[ix]);
+            if (ix+1 < dat->windows.count)
+                printf(",");
+            printf("\n");
         }
         printf(" ]");
     }
@@ -961,6 +964,9 @@ void data_update_print(data_update_t *dat)
         printf(",\n \"contents\":[\n");
         for (ix=0; ix<dat->contents.count; ix++) {
             data_content_print(contlist[ix]);
+            if (ix+1 < dat->contents.count)
+                printf(",");
+            printf("\n");
         }
         printf(" ]");
     }
@@ -1003,7 +1009,7 @@ void data_window_print(data_window_t *dat)
     }
 
     printf(" { \"id\":%d, \"type\":%s, \"rock\":%d,\n", dat->window, typename, dat->rock);
-    printf("   \"left\":%d, \"top\":%d, \"width\":%d, \"height\":%d }\n",
+    printf("   \"left\":%d, \"top\":%d, \"width\":%d, \"height\":%d }",
         dat->size.left, dat->size.top, dat->size.right-dat->size.left, dat->size.bottom-dat->size.top);
 }
 
@@ -1038,20 +1044,38 @@ void data_content_free(data_content_t *dat)
 
 void data_content_print(data_content_t *dat)
 {
+    int ix;
+    char *linelabel;
+
     if (dat->type == wintype_TextBuffer) {
         char *isclear = "";
         if (dat->clear)
             isclear = ", \"clear\":true";
-        printf(" {\"id\":%d%s, \"text\": [\n", dat->window, isclear);
+        linelabel = "text";
+        printf(" {\"id\":%d%s", dat->window, isclear);
     }
     else if (dat->type == wintype_TextGrid) {
-        printf(" {\"id\":%d, \"lines\": [\n", dat->window);
+        linelabel = "lines";
+        printf(" {\"id\":%d", dat->window);
     }
     else {
         gli_fatal_error("data: Unknown window type in content_print");
     }
 
-    printf(" ]}\n");
+    if (dat->lines.count) {
+        printf(", \"%s\": [\n", linelabel);
+
+        data_line_t **linelist = (data_line_t **)(dat->lines.list);
+        for (ix=0; ix<dat->lines.count; ix++) {
+            data_line_print(linelist[ix], dat->type);
+            if (ix+1 < dat->lines.count)
+                printf(",");
+            printf("\n");
+        }
+        printf(" ]");
+    }
+
+    printf(" }");
 }
 
 data_line_t *data_line_alloc()
@@ -1070,4 +1094,20 @@ void data_line_free(data_line_t *dat)
 {
     free(dat);
     return;
+}
+
+void data_line_print(data_line_t *dat, glui32 wintype)
+{
+    if (wintype == wintype_TextGrid) {
+        printf("  { \"line\":%d, \"content\":[\n", dat->linenum);
+    }
+    else {
+        char *isappend = "";
+        if (dat->append)
+            isappend = "\"append\":true, ";
+        printf("  { %s\"content\":[\n", isappend);
+    }
+
+    printf("   ] }");
+
 }

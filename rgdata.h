@@ -96,3 +96,4 @@ extern void data_content_print(data_content_t *data);
 
 extern data_line_t *data_line_alloc(void);
 extern void data_line_free(data_line_t *data);
+extern void data_line_print(data_line_t *data, glui32 wintype);
