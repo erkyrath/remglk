@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "glk.h"
 #include "remglk.h"
@@ -49,6 +50,7 @@ void gli_initialize_windows(data_metrics_t *newmetrics)
     int ix;
 
     generation = 0;
+    srandom(time(NULL));
     tagcounter = (random() % 15) + 16;
     gli_rootwin = NULL;
     gli_focuswin = NULL;

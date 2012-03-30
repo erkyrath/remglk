@@ -1213,6 +1213,8 @@ void data_line_print(data_line_t *dat, glui32 wintype)
             printf("{ \"style\":\"%s\", \"text\":", stylename);
             print_ustring_json(span->str, span->len, stdout);
             printf("}");
+            if (ix+1 < dat->count)
+                printf(", ");
         }
         
         printf(" ]");
