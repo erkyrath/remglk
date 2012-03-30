@@ -15,6 +15,12 @@
 #include "rgwin_grid.h"
 #include "rgwin_buf.h"
 
+/* The update generation number. */
+static glui32 generation = 0;
+
+/* Used to generate window updatetag values. */
+static glui32 tagcounter = 0;
+
 /* Linked list of all windows */
 static window_t *gli_windowlist = NULL; 
 
@@ -41,7 +47,9 @@ static void compute_content_box(grect_t *box);
 void gli_initialize_windows(data_metrics_t *newmetrics)
 {
     int ix;
-    
+
+    generation = 0;
+    tagcounter = (random() % 15) + 16;
     gli_rootwin = NULL;
     gli_focuswin = NULL;
     
@@ -51,7 +59,6 @@ void gli_initialize_windows(data_metrics_t *newmetrics)
     spacebuffer[NUMSPACES] = '\0';
     
     metrics = *newmetrics;
-    data_metrics_print(&metrics); /*###*/
 
     geometry_changed = TRUE;
 }
@@ -77,6 +84,11 @@ static void compute_content_box(grect_t *box)
     box->bottom = metrics.height - metrics.outspacingy;
 }
 
+glui32 gli_window_current_generation()
+{
+    return generation;
+}
+
 window_t *gli_new_window(glui32 type, glui32 rock)
 {
     window_t *win = (window_t *)malloc(sizeof(window_t));
@@ -86,6 +98,8 @@ window_t *gli_new_window(glui32 type, glui32 rock)
     win->magicnum = MAGIC_WINDOW_NUM;
     win->rock = rock;
     win->type = type;
+    win->updatetag = tagcounter;
+    tagcounter += 3;
     
     win->parent = NULL; /* for now */
     win->data = NULL; /* for now */
@@ -705,6 +719,48 @@ void gli_windows_unechostream(stream_t *str)
     }
 }
 
+/* This constructs an update object for the library state. (It's in
+   rgwindow.c because most of the work is window-related.)
+
+   This clears all the dirty flags, constructs an update, sends it to
+   stdout, and flushes. */
+void gli_windows_update()
+{
+    window_t *win;
+    int ix;
+    data_update_t *update = data_update_alloc();
+
+    generation++;
+    update->gen = generation;
+
+    if (geometry_changed) {
+        geometry_changed = FALSE;
+
+        for (win=gli_windowlist, ix=0; win; win=win->next, ix++) {
+            data_window_t **winlist = gen_list_ensure(&update->windows, ix+1);
+            winlist[ix] = data_window_alloc(win->updatetag,
+                win->type, win->rock);
+            winlist[ix]->size = win->bbox;
+        }
+    }
+    
+    for (win=gli_windowlist; win; win=win->next) {
+        switch (win->type) {
+            case wintype_TextGrid:
+                win_textgrid_update(win);
+                break;
+            case wintype_TextBuffer:
+                win_textbuffer_update(win);
+                break;
+        }
+    }
+
+    data_update_print(update);
+    fflush(stdout);
+
+    data_update_free(update);
+}
+
 /* Some trivial switch functions which make up for the fact that we're not
     doing this in C++. */
 
@@ -725,22 +781,6 @@ void gli_window_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
         case wintype_TextBuffer:
             win_textbuffer_rearrange(win, box, metrics);
             break;
-    }
-}
-
-void gli_windows_update()
-{
-    window_t *win;
-    
-    for (win=gli_windowlist; win; win=win->next) {
-        switch (win->type) {
-            case wintype_TextGrid:
-                win_textgrid_update(win);
-                break;
-            case wintype_TextBuffer:
-                win_textbuffer_update(win);
-                break;
-        }
     }
 }
 

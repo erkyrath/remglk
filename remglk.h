@@ -57,6 +57,7 @@ struct glk_window_struct {
     glui32 magicnum;
     glui32 rock;
     glui32 type;
+    glui32 updatetag; /* numeric tag for the window in output */
     
     grect_t bbox; /* content rectangle, excluding borders */
     window_t *parent; /* pair window which contains this one */
@@ -188,6 +189,7 @@ extern void gli_event_store(glui32 type, window_t *win, glui32 val1, glui32 val2
 
 extern void gli_initialize_windows(data_metrics_t *metrics);
 extern void gli_fast_exit(void);
+extern glui32 gli_window_current_generation(void);
 extern window_t *gli_new_window(glui32 type, glui32 rock);
 extern void gli_delete_window(window_t *win);
 extern window_t *gli_window_iterate_treeorder(window_t *win);

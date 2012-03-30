@@ -111,6 +111,43 @@ static void print_string_json_utf8(glui32 *buf, glui32 len, FILE *fl)
     fprintf(fl, "\"");
 }
 
+void gen_list_init(gen_list_t *list)
+{
+    list->list = NULL;
+    list->count = 0;
+    list->allocsize = 0;
+}
+
+void gen_list_free(gen_list_t *list)
+{
+    if (list->list) {
+        free(list->list);
+        list->list = NULL;
+    }
+    list->count = 0;
+    list->allocsize = 0;
+}
+
+void *gen_list_ensure(gen_list_t *list, int val)
+{
+    if (val <= list->allocsize)
+        return list->list;
+
+    if (!list->list) {
+        list->allocsize = 4+val*2;
+        list->list = malloc(list->allocsize * sizeof(void *));
+    }
+    else {
+        list->allocsize = 1+val*2;
+        list->list = realloc(list->list, list->allocsize * sizeof(void *));
+    }
+
+    if (!list->list)
+        gli_fatal_error("data: Unable to allocate memory for list buffer");
+
+    return list->list;
+}
+
 static data_raw_t *data_raw_alloc(RawType type)
 {
     data_raw_t *dat = malloc(sizeof(data_raw_t));
@@ -801,12 +838,12 @@ data_input_t *data_input_read()
 
         dat = data_raw_struct_field(rawdata, "gen");
         if (dat)
-            input->gen = data_raw_int_value(dat);
+            gli_fatal_error("data: Init input struct has no gen");
+        input->gen = data_raw_int_value(dat);
 
         dat = data_raw_struct_field(rawdata, "metrics");
         if (!dat)
             gli_fatal_error("data: Init input struct has no metrics");
-
         input->metrics = data_metrics_parse(dat);
     }
     else if (data_raw_string_is(dat, "arrange")) {
@@ -872,3 +909,60 @@ data_input_t *data_input_read()
 
     return input;
 }
+
+data_update_t *data_update_alloc()
+{
+    data_update_t *dat = (data_update_t *)malloc(sizeof(data_update_t));
+    if (!dat)
+        gli_fatal_error("data: Unable to alloc update structure");
+
+    dat->gen = 0;
+    dat->disable = FALSE;
+    gen_list_init(&dat->windows);
+    gen_list_init(&dat->contents);
+    gen_list_init(&dat->inputs);
+
+    return dat;
+}
+
+void data_update_free(data_update_t *dat)
+{
+    int ix;
+
+    data_window_t **winlist = (data_window_t **)(dat->windows.list);
+    for (ix=0; ix<dat->windows.count; ix++) {
+        data_window_free(winlist[ix]);
+    }
+
+    /*### free contents, inputs */
+
+    gen_list_free(&dat->windows);
+    gen_list_free(&dat->contents);
+    gen_list_free(&dat->inputs);
+    free(dat);
+}
+
+void data_update_print(data_update_t *dat)
+{
+    /*###*/
+}
+
+data_window_t *data_window_alloc(glui32 window, glui32 type, glui32 rock)
+{
+    data_window_t *dat = (data_window_t *)malloc(sizeof(data_window_t));
+    if (!dat)
+        gli_fatal_error("data: Unable to alloc window structure");
+
+    dat->window = window;
+    dat->type = type;
+    dat->rock = rock;
+    grect_set_from_size(&dat->size, 0, 0);
+
+    return dat;
+}
+
+void data_window_free(data_window_t *dat)
+{
+    free(dat);
+}
+

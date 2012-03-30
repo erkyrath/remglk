@@ -62,14 +62,6 @@ typedef struct window_textbuffer_struct {
     long numruns;
     long runssize;
 
-    /* Temporary lines; used during layout. */
-    tbline_t *tmplines; 
-    long tmplinessize;
-
-    /* Temporary words; used during layout. */
-    tbword_t *tmpwords;
-    long tmpwordssize;
-
     /* Command history. ###delete */
     char **history;
     int historypos;
