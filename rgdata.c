@@ -1217,7 +1217,7 @@ void data_line_print(data_line_t *dat, glui32 wintype)
                 printf(", ");
         }
         
-        printf(" ]");
+        printf("]");
     }
 
     printf("}");

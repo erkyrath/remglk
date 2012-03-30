@@ -17,9 +17,7 @@
 #define BUFFER_SIZE (5000)
 #define BUFFER_SLACK (1000)
 
-static void final_lines(window_textbuffer_t *dwin, long beg, long end);
 static long find_style_by_pos(window_textbuffer_t *dwin, long pos);
-static long find_line_by_pos(window_textbuffer_t *dwin, long pos);
 static void set_last_run(window_textbuffer_t *dwin, glui32 style);
 
 window_textbuffer_t *win_textbuffer_create(window_t *win)
@@ -32,15 +30,11 @@ window_textbuffer_t *win_textbuffer_create(window_t *win)
     dwin->charssize = 500;
     dwin->chars = (glui32 *)malloc(dwin->charssize * sizeof(glui32));
     
-    dwin->numlines = 0;
-    dwin->linessize = 50;
-    dwin->lines = (tbline_t *)malloc(dwin->linessize * sizeof(tbline_t));
-    
     dwin->numruns = 0;
     dwin->runssize = 40;
     dwin->runs = (tbrun_t *)malloc(dwin->runssize * sizeof(tbrun_t));
     
-    if (!dwin->chars || !dwin->runs || !dwin->lines)
+    if (!dwin->chars || !dwin->runs)
         return NULL;
 
     dwin->inbuf = NULL;
@@ -69,10 +63,6 @@ window_textbuffer_t *win_textbuffer_create(window_t *win)
     dwin->dirtybeg = -1;
     dwin->dirtyend = -1;
     dwin->dirtydelta = -1;
-    dwin->scrollline = 0;
-    dwin->scrollpos = 0;
-    dwin->lastseenline = 0;
-    dwin->drawall = TRUE;
     
     dwin->width = -1;
     dwin->height = -1;
@@ -92,12 +82,6 @@ void win_textbuffer_destroy(window_textbuffer_t *dwin)
     
     dwin->owner = NULL;
     
-    if (dwin->lines) {
-        final_lines(dwin, 0, dwin->numlines);
-        free(dwin->lines);
-        dwin->lines = NULL;
-    }
-    
     if (dwin->runs) {
         free(dwin->runs);
         dwin->runs = NULL;
@@ -109,19 +93,6 @@ void win_textbuffer_destroy(window_textbuffer_t *dwin)
     }
     
     free(dwin);
-}
-
-static void final_lines(window_textbuffer_t *dwin, long beg, long end)
-{
-    long lx;
-    
-    for (lx=beg; lx<end; lx++) {
-        tbline_t *ln = &(dwin->lines[lx]);
-        if (ln->words) {
-            free(ln->words);
-            ln->words = NULL;
-        }
-    }
 }
 
 void win_textbuffer_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
@@ -151,24 +122,6 @@ void win_textbuffer_rearrange(window_t *win, grect_t *box, data_metrics_t *metri
     }
     else if (oldhgt != dwin->height) {
     }
-}
-
-/* Find the last line for which pos >= line.pos. If pos is before the first 
-    line.pos, or if there are no lines, this returns -1. Lines always go to
-    the end of the text, so this will never be numlines or higher. */
-static long find_line_by_pos(window_textbuffer_t *dwin, long pos)
-{
-    long lx;
-    
-    if (dwin->numlines == 0)
-        return -1;
-    
-    for (lx=dwin->numlines-1; lx >= 0; lx--) {
-        if (pos >= dwin->lines[lx].pos)
-            return lx;
-    }
-    
-    return -1;
 }
 
 /* Find the last stylerun for which pos >= style.pos. We know run[0].pos == 0,
@@ -351,20 +304,13 @@ void win_textbuffer_clear(window_t *win)
         dwin->dirtyend = 0;
         dwin->dirtydelta -= oldlen;
     }
-
-    dwin->scrollline = 0;
-    dwin->scrollpos = 0;
-    dwin->lastseenline = 0;
-    dwin->drawall = TRUE;
 }
 
 void win_textbuffer_trim_buffer(window_t *win)
 {
     window_textbuffer_t *dwin = win->data;
-    long trimsize;
-    long lnum, snum, cnum;
-    long lx, wx, rx;
-    tbline_t *ln;
+    long snum, cnum;
+    long rx;
     
     if (dwin->numchars <= BUFFER_SIZE + BUFFER_SLACK)
         return; 
@@ -372,18 +318,13 @@ void win_textbuffer_trim_buffer(window_t *win)
     /* We need to knock BUFFER_SLACK chars off the beginning of the buffer, if
         such are conveniently available. */
         
-    trimsize = dwin->numchars - BUFFER_SIZE;
-    if (dwin->dirtybeg != -1 && trimsize > dwin->dirtybeg)
-        trimsize = dwin->dirtybeg;
+    cnum = dwin->numchars - BUFFER_SIZE;
+    if (dwin->dirtybeg != -1 && cnum > dwin->dirtybeg)
+        cnum = dwin->dirtybeg;
     
-    lnum = find_line_by_pos(dwin, trimsize);
-    if (lnum <= 0)
-        return;
-    /* The trimsize point is at the beginning of lnum, or inside it. So lnum
-        will be the first remaining line. */
-        
-    ln = &(dwin->lines[lnum]);
-    cnum = ln->pos;
+    /* Back up to the previous newline. */
+    while (cnum > 0 && dwin->chars[cnum-1] != '\n')
+        cnum--;
     if (cnum <= 0)
         return;
     snum = find_style_by_pos(dwin, cnum);
@@ -426,47 +367,6 @@ void win_textbuffer_trim_buffer(window_t *win)
         dwin->numruns -= snum;
     }
     
-    /* trim lines */
-    
-    final_lines(dwin, 0, lnum);
-    for (lx=lnum; lx<dwin->numlines; lx++) {
-        tbline_t *ln2 = &(dwin->lines[lx]);
-        ln2->pos -= cnum;
-        for (wx=0; wx<ln2->numwords; wx++) {
-            tbword_t *wd = &(ln2->words[wx]);
-            wd->pos -= cnum;
-        }
-    }
-
-    if (lnum < dwin->numlines)
-        memmove(&(dwin->lines[0]), &(dwin->lines[lnum]), 
-            (dwin->numlines - lnum) * sizeof(tbline_t));
-    dwin->numlines -= lnum;
-
-    /* trim all the other assorted crap */
-    
-    if (dwin->scrollpos > cnum) {
-        dwin->scrollpos -= cnum;
-    }
-    else {
-        dwin->scrollpos = 0;
-        dwin->drawall = TRUE;
-    }
-    
-    if (dwin->scrollline > lnum) 
-        dwin->scrollline -= lnum;
-    else 
-        dwin->scrollline = 0;
-
-    if (dwin->lastseenline > lnum) 
-        dwin->lastseenline -= lnum;
-    else 
-        dwin->lastseenline = 0;
-
-    if (dwin->scrollline > dwin->numlines - dwin->height)
-        dwin->scrollline = dwin->numlines - dwin->height;
-    if (dwin->scrollline < 0)
-        dwin->scrollline = 0;
 }
 
 /* Prepare the window for line input. */

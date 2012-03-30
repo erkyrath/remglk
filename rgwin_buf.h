@@ -24,19 +24,6 @@ typedef struct tbrun_struct {
     long pos;
 } tbrun_t;
 
-/* One laid-out line of words ###delete */
-typedef struct tbline_struct {
-    int numwords;
-    tbword_t *words;
-    
-    long pos; /* Position in the chars array. */
-    long len; /* Number of characters, including blanks */
-    int startpara; /* Is this line the start of a new paragraph, or is it
-        wrapped? */
-    int printwords; /* Number of words to actually print. (Excludes the last
-        blank word, if that goes outside the window.) */
-} tbline_t;
-
 typedef struct window_textbuffer_struct {
     window_t *owner;
     
@@ -51,12 +38,6 @@ typedef struct window_textbuffer_struct {
         last update. Also the amount the dirty region has grown/shrunk;
         so the old end of the dirty region == (dirtyend - dirtydelta). 
         If dirtybeg == -1, dirtydelta is invalid. */
-    int drawall; /* Does the whole window need to be redrawn at the next
-        update? (Set when the text is scrolled, for example.) */
-    
-    tbline_t *lines; /* ###delete */
-    long numlines;
-    long linessize;
     
     tbrun_t *runs;
     long numruns;
@@ -67,10 +48,6 @@ typedef struct window_textbuffer_struct {
     int historypos;
     int historyfirst, historypresent;
 
-    long scrollline;
-    long scrollpos;
-    long lastseenline;
-    
     /* The following are meaningful only for the current line input request. */
     void *inbuf; /* char* or glui32*, depending on inunicode. */
     glui32 incurpos;
