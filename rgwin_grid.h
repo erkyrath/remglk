@@ -6,10 +6,10 @@
 
 /* One line of the window. */
 typedef struct tgline_struct {
-    int size; /* this is the allocated size; only width is valid */
-    char *chars;
-    unsigned char *attrs;
-    int dirtybeg, dirtyend; /* characters [dirtybeg, dirtyend) need to be redrawn */
+    int allocsize; /* this is the allocated size; only width is valid */
+    glui32 *chars;
+    short *styles;
+    int dirty;
 } tgline_t;
 
 typedef struct window_textgrid_struct {
@@ -22,7 +22,7 @@ typedef struct window_textgrid_struct {
     
     int curx, cury; /* the window cursor position */
     
-    int dirtybeg, dirtyend; /* lines [dirtybeg, dirtyend) need to be redrawn */
+    int alldirty; /* all lines should be considered dirty */
     
     /* for line input */
     void *inbuf; /* char* or glui32*, depending on inunicode. */
