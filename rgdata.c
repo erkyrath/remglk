@@ -68,6 +68,36 @@ static int parse_hex_digit(char ch)
     return 0;
 }
 
+static char *name_for_style(short val)
+{
+    switch (val) {
+        case style_Normal:
+            return "normal";
+        case style_Emphasized:
+            return "emphasized";
+        case style_Preformatted:
+            return "preformatted";
+        case style_Header:
+            return "header";
+        case style_Subheader:
+            return "subheader";
+        case style_Alert:
+            return "alert";
+        case style_Note:
+            return "note";
+        case style_BlockQuote:
+            return "blockquote";
+        case style_Input:
+            return "input";
+        case style_User1:
+            return "user1";
+        case style_User2:
+            return "user2";
+        default:
+            return "unknown";
+    }
+}
+
 static void ensure_stringbuf_size(int val)
 {
     if (val <= stringbuf_size)
@@ -1120,6 +1150,7 @@ data_line_t *data_line_alloc()
 void data_line_free(data_line_t *dat)
 {
     if (dat->spans) {
+        /* Do not free the span strings. */
         free(dat->spans);
         dat->spans = NULL;
     };
@@ -1154,16 +1185,39 @@ void data_line_add_span(data_line_t *data, short style, glui32 *str, long len)
 
 void data_line_print(data_line_t *dat, glui32 wintype)
 {
+    int ix;
+    int any = FALSE;
+
+    printf("  {");
+
     if (wintype == wintype_TextGrid) {
-        printf("  { \"line\":%d, \"content\":[\n", dat->linenum);
+        printf(" \"line\":%d", dat->linenum);
+        any = TRUE;
     }
     else {
-        char *isappend = "";
-        if (dat->append)
-            isappend = "\"append\":true, ";
-        printf("  { %s\"content\":[\n", isappend);
+        if (dat->append) {
+            printf("\"append\":true");
+            any = TRUE;
+        }
     }
 
-    printf("   ] }");
+    if (dat->count) {
+        if (any)
+            printf(", ");
+
+        printf("\"content\":[");
+        
+        for (ix=0; ix<dat->count; ix++) {
+            data_span_t *span = &(dat->spans[ix]);
+            char *stylename = name_for_style(span->style);
+            printf("{ \"style\":\"%s\", \"text\":", stylename);
+            print_ustring_json(span->str, span->len, stdout);
+            printf("}");
+        }
+        
+        printf(" ]");
+    }
+
+    printf("}");
 
 }

@@ -201,7 +201,7 @@ static long find_style_by_pos(window_textbuffer_t *dwin, long pos)
 data_content_t *win_textbuffer_update(window_t *win)
 {
     window_textbuffer_t *dwin = win->data;
-    long snum, cnum;
+    long snum, cnum, spanstart;
     long nextrunpos;
     short curstyle;
 
@@ -217,6 +217,7 @@ data_content_t *win_textbuffer_update(window_t *win)
 
     if (dwin->dirtybeg < dwin->dirtyend) {
         cnum = dwin->dirtybeg;
+        spanstart = cnum;
         snum = find_style_by_pos(dwin, cnum);
         curstyle = dwin->runs[snum].style;
         if (snum+1 < dwin->numruns)
@@ -231,15 +232,26 @@ data_content_t *win_textbuffer_update(window_t *win)
         while (cnum < dwin->dirtyend) {
             glui32 ch = dwin->chars[cnum];
             if (ch == '\n') {
+                if (cnum > spanstart) {
+                    data_line_add_span(line, curstyle, dwin->chars+spanstart, cnum-spanstart);
+                    spanstart = cnum;
+                }
+
                 line = data_line_alloc();
                 gen_list_append(&dat->lines, line);
                 line->append = FALSE;
 
                 cnum++;
+                spanstart = cnum;
                 continue;
             }
 
             while (cnum >= nextrunpos) {
+                if (cnum > spanstart) {
+                    data_line_add_span(line, curstyle, dwin->chars+spanstart, cnum-spanstart);
+                    spanstart = cnum;
+                }
+
                 snum++;
                 curstyle = dwin->runs[snum].style;
                 if (snum+1 < dwin->numruns)
@@ -247,9 +259,13 @@ data_content_t *win_textbuffer_update(window_t *win)
                 else
                     nextrunpos = dwin->numchars+1;
             }
-            /*### stuff ch into line */
 
             cnum++;
+        }
+
+        if (cnum > spanstart) {
+            data_line_add_span(line, curstyle, dwin->chars+spanstart, cnum-spanstart);
+            spanstart = cnum;
         }
     }
 
