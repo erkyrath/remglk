@@ -19,7 +19,6 @@ int pref_stderr = FALSE;
 int pref_fixedmetrics = FALSE;
 int pref_screenwidth = 80;
 int pref_screenheight = 50;
-int pref_historylen = 20; /*### definitely delete */
 int pref_prompt_defaults = TRUE; /*### probably delete */
 
 /* Some constants for my wacky little command-line option parser. */
@@ -147,10 +146,6 @@ int main(int argc, char *argv[])
             pref_printversion = val;
         else if (extract_value(argc, argv, "v", ex_Void, &ix, &val, FALSE))
             pref_printversion = val;
-        else if (extract_value(argc, argv, "historylen", ex_Int, &ix, &val, 20))
-            pref_historylen = val;
-        else if (extract_value(argc, argv, "hl", ex_Int, &ix, &val, 20))
-            pref_historylen = val;
         else if (extract_value(argc, argv, "fixmetrics", ex_Bool, &ix, &val, FALSE))
             pref_fixedmetrics = val;
         else if (extract_value(argc, argv, "fm", ex_Bool, &ix, &val, FALSE))
@@ -197,7 +192,6 @@ int main(int argc, char *argv[])
         printf("  -fixmetrics BOOL: define screen size manually (default 'no')\n");
         printf("  -width NUM: manual screen width (default 80)\n");
         printf("  -height NUM: manual screen height (default 50)\n");
-        printf("  -historylen NUM: length of command history (default 20)\n");
         printf("  -revgrid BOOL: reverse text in grid (status) windows (default 'no')\n");
         printf("  -border BOOL: force borders/no borders between windows\n");
         printf("  -defprompt BOOL: provide defaults for file prompts (default 'yes')\n");

@@ -22,7 +22,6 @@ static void set_last_run(window_textbuffer_t *dwin, glui32 style);
 
 window_textbuffer_t *win_textbuffer_create(window_t *win)
 {
-    int ix;
     window_textbuffer_t *dwin = (window_textbuffer_t *)malloc(sizeof(window_textbuffer_t));
     dwin->owner = win;
     
@@ -45,20 +44,6 @@ window_textbuffer_t *win_textbuffer_create(window_t *win)
     dwin->numruns = 1;
     dwin->runs[0].style = style_Normal;
     dwin->runs[0].pos = 0;
-    
-    if (pref_historylen > 1) {
-        dwin->history = (char **)malloc(sizeof(char *) * pref_historylen);
-        if (!dwin->history)
-            return NULL;
-        for (ix=0; ix<pref_historylen; ix++)
-            dwin->history[ix] = NULL;
-    }
-    else {
-        dwin->history = NULL;
-    }
-    dwin->historypos = 0;
-    dwin->historyfirst = 0;
-    dwin->historypresent = 0;
     
     dwin->dirtybeg = -1;
     dwin->dirtyend = -1;
@@ -384,7 +369,6 @@ void win_textbuffer_init_line(window_t *win, void *buf, int unicode,
     dwin->origstyle = win->style;
     win->style = style_Input;
     set_last_run(dwin, win->style);
-    dwin->historypos = dwin->historypresent;
     
     if (gli_register_arr) {
         char *typedesc = (dwin->inunicode ? "&+#!Iu" : "&+#!Cn");

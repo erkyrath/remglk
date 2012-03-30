@@ -43,11 +43,6 @@ typedef struct window_textbuffer_struct {
     long numruns;
     long runssize;
 
-    /* Command history. ###delete */
-    char **history;
-    int historypos;
-    int historyfirst, historypresent;
-
     /* The following are meaningful only for the current line input request. */
     void *inbuf; /* char* or glui32*, depending on inunicode. */
     glui32 incurpos;
