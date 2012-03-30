@@ -34,6 +34,7 @@ void glk_select(event_t *event)
     
     while (curevent->type == evtype_None) {
         data_input_t *data = data_input_read();
+        data_input_print(data); /*###*/
 
         if (data->gen != gli_window_current_generation())
             gli_fatal_error("Input generation number does not match.");

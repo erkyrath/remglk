@@ -128,24 +128,23 @@ void gen_list_free(gen_list_t *list)
     list->allocsize = 0;
 }
 
-void *gen_list_ensure(gen_list_t *list, int val)
+void gen_list_append(gen_list_t *list, void *val)
 {
-    if (val <= list->allocsize)
-        return list->list;
-
     if (!list->list) {
-        list->allocsize = 4+val*2;
+        list->allocsize = 4;
         list->list = malloc(list->allocsize * sizeof(void *));
     }
     else {
-        list->allocsize = 1+val*2;
-        list->list = realloc(list->list, list->allocsize * sizeof(void *));
+        if (list->count >= list->allocsize) {
+            list->allocsize *= 2;
+            list->list = realloc(list->list, list->allocsize * sizeof(void *));
+        }
     }
 
     if (!list->list)
         gli_fatal_error("data: Unable to allocate memory for list buffer");
 
-    return list->list;
+    list->list[list->count++] = val;
 }
 
 static data_raw_t *data_raw_alloc(RawType type)
@@ -944,7 +943,18 @@ void data_update_free(data_update_t *dat)
 
 void data_update_print(data_update_t *dat)
 {
-    /*###*/
+    int ix;
+
+    printf("{\"type\":\"update\", \"gen\":%d", dat->gen);
+    if (dat->windows.count) {
+        data_window_t **winlist = (data_window_t **)(dat->windows.list);
+        printf(", [\n");
+        for (ix=0; ix<dat->windows.count; ix++) {
+            data_window_print(winlist[ix]);
+        }
+        printf("]");
+    }
+    printf("}\n");
 }
 
 data_window_t *data_window_alloc(glui32 window, glui32 type, glui32 rock)
@@ -964,5 +974,25 @@ data_window_t *data_window_alloc(glui32 window, glui32 type, glui32 rock)
 void data_window_free(data_window_t *dat)
 {
     free(dat);
+}
+
+void data_window_print(data_window_t *dat)
+{
+    char *typename;
+    switch (dat->type) {
+        case wintype_TextGrid:
+            typename = "grid";
+            break;
+        case wintype_TextBuffer:
+            typename = "buffer";
+            break;
+        default:
+            typename = "unknown";
+            break;
+    }
+
+    printf("{ \"id\":%d, \"type\":%s, \"rock\":%d,\n", dat->window, typename, dat->rock);
+    printf("  \"left\":%d, \"top\":%d, \"width\":%d, \"height\":%d }\n",
+        dat->size.left, dat->size.top, dat->size.right-dat->size.left, dat->size.bottom-dat->size.top);
 }
 

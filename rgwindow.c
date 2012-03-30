@@ -737,17 +737,19 @@ void gli_windows_update()
         geometry_changed = FALSE;
 
         for (win=gli_windowlist, ix=0; win; win=win->next, ix++) {
-            data_window_t **winlist = gen_list_ensure(&update->windows, ix+1);
-            winlist[ix] = data_window_alloc(win->updatetag,
+            if (win->type == wintype_Pair)
+                continue;
+            data_window_t *dat = data_window_alloc(win->updatetag,
                 win->type, win->rock);
-            winlist[ix]->size = win->bbox;
+            dat->size = win->bbox;
+            gen_list_append(&update->windows, dat);
         }
     }
     
     for (win=gli_windowlist; win; win=win->next) {
         switch (win->type) {
             case wintype_TextGrid:
-                win_textgrid_update(win);
+                /*### win_textgrid_update(win); ###*/
                 break;
             case wintype_TextBuffer:
                 win_textbuffer_update(win);
