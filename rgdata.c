@@ -889,7 +889,7 @@ data_event_t *data_event_read()
         input->dtag = dtag_Init;
 
         dat = data_raw_struct_field(rawdata, "gen");
-        if (dat)
+        if (!dat)
             gli_fatal_error("data: Init input struct has no gen");
         input->gen = data_raw_int_value(dat);
 
