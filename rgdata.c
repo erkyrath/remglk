@@ -994,7 +994,10 @@ void data_update_free(data_update_t *dat)
         data_content_free(contlist[ix]);
     }
 
-    /*### free inputs */
+    data_input_t **inplist = (data_input_t **)(dat->inputs.list);
+    for (ix=0; ix<dat->inputs.count; ix++) {
+        data_input_free(inplist[ix]);
+    }
 
     gen_list_free(&dat->windows);
     gen_list_free(&dat->contents);
@@ -1032,6 +1035,18 @@ void data_update_print(data_update_t *dat)
         printf(" ]");
     }
 
+    if (dat->useinputs) {
+        data_input_t **inplist = (data_input_t **)(dat->inputs.list);
+        printf(",\n \"inputs\":[\n");
+        for (ix=0; ix<dat->inputs.count; ix++) {
+            data_input_print(inplist[ix]);
+            if (ix+1 < dat->inputs.count)
+                printf(",");
+            printf("\n");
+        }
+        printf(" ]");
+    }
+
     printf("}\n");
 }
 
@@ -1053,6 +1068,7 @@ data_window_t *data_window_alloc(glui32 window, glui32 type, glui32 rock)
 
 void data_window_free(data_window_t *dat)
 {
+    dat->window = 0;
     free(dat);
 }
 
@@ -1076,6 +1092,56 @@ void data_window_print(data_window_t *dat)
         printf("   \"gridwidth\":%d, \"gridheight\":%d,\n", dat->gridwidth, dat->gridheight);
     printf("   \"left\":%d, \"top\":%d, \"width\":%d, \"height\":%d }",
         dat->size.left, dat->size.top, dat->size.right-dat->size.left, dat->size.bottom-dat->size.top);
+}
+
+data_input_t *data_input_alloc(glui32 window, glui32 evtype)
+{
+    data_input_t *dat = (data_input_t *)malloc(sizeof(data_input_t));
+    if (!dat)
+        gli_fatal_error("data: Unable to alloc input structure");
+
+    dat->window = window;
+    dat->evtype = evtype;
+    dat->gen = 0;
+    dat->initstr = NULL;
+    dat->initlen = 0;
+    dat->maxlen = 0;
+
+    return dat;
+}
+
+void data_input_free(data_input_t *dat)
+{
+    dat->window = 0;
+    dat->evtype = 0;
+    dat->gen = 0;
+
+    if (dat->initstr) {
+        free(dat->initstr);
+        dat->initstr = NULL;
+    }
+
+    free(dat);
+}
+
+void data_input_print(data_input_t *dat)
+{
+    printf(" {\"id\":%d, \"gen\":%d", dat->window, dat->gen);
+
+    switch (dat->evtype) {
+        case evtype_CharInput:
+            printf(", \"type\":\"char\"");
+            break;
+        case evtype_LineInput:
+            printf(", \"type\":\"line\", \"maxlen\":%d", dat->maxlen);
+            if (dat->initstr && dat->initlen) {
+                printf(", \"initial\":");
+                print_ustring_json(dat->initstr, dat->initlen, stdout);
+            }
+            break;
+    }
+
+    printf(" }");
 }
 
 data_content_t *data_content_alloc(glui32 window, glui32 type)

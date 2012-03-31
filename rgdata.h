@@ -17,6 +17,7 @@ typedef struct gen_list_struct {
 typedef struct data_event_struct data_event_t;
 typedef struct data_update_struct data_update_t;
 typedef struct data_window_struct data_window_t;
+typedef struct data_input_struct data_input_t;
 typedef struct data_line_struct data_line_t;
 typedef struct data_span_struct data_span_t;
 
@@ -57,6 +58,15 @@ struct data_window_struct {
     glui32 rock;
     grect_t size;
     glui32 gridwidth, gridheight;
+};
+
+struct data_input_struct {
+    glui32 window;
+    glsi32 evtype;
+    glsi32 gen;
+    glui32 *initstr;
+    glui32 initlen;
+    glui32 maxlen;
 };
 
 struct data_content_struct {
@@ -105,6 +115,10 @@ extern void data_update_print(data_update_t *data);
 extern data_window_t *data_window_alloc(glui32 window, glui32 type, glui32 rock);
 extern void data_window_free(data_window_t *data);
 extern void data_window_print(data_window_t *data);
+
+extern data_input_t *data_input_alloc(glui32 window, glui32 evtype);
+extern void data_input_free(data_input_t *data);
+extern void data_input_print(data_input_t *data);
 
 extern data_content_t *data_content_alloc(glui32 window, glui32 type);
 extern void data_content_free(data_content_t *data);

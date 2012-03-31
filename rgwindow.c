@@ -731,6 +731,27 @@ void gli_windows_unechostream(stream_t *str)
     }
 }
 
+static glui32 *dup_buffer(void *buf, int len, int unicode)
+{
+    int ix;
+    glui32 *res = malloc(len * sizeof(glui32));
+    if (!res)
+        return NULL;
+
+    if (!unicode) {
+        char *cbuf = (char *)buf;
+        for (ix=0; ix<len; ix++)
+            res[ix] = cbuf[ix];
+    }
+    else {
+        glui32 *cbuf = (glui32 *)buf;
+        for (ix=0; ix<len; ix++)
+            res[ix] = cbuf[ix];
+    }
+
+    return res;
+}
+
 /* This constructs an update object for the library state. (It's in
    rgwindow.c because most of the work is window-related.)
 
@@ -778,6 +799,37 @@ void gli_windows_update()
 
         if (dat) {
             gen_list_append(&update->contents, dat);
+        }
+    }
+
+    for (win=gli_windowlist; win; win=win->next) {
+        data_input_t *dat = NULL;
+        if (win->char_request) {
+            dat = data_input_alloc(win->updatetag, evtype_CharInput);
+        }
+        else if (win->line_request) {
+            dat = data_input_alloc(win->updatetag, evtype_LineInput);
+            if (win->type == wintype_TextBuffer) {
+                window_textbuffer_t *dwin = win->data;
+                dat->maxlen = dwin->inmax;
+                if (dwin->incurpos) {
+                    dat->initlen = dwin->incurpos;
+                    dat->initstr = dup_buffer(dwin->inbuf, dwin->incurpos, dwin->inunicode);
+                }
+            }
+            else if (win->type == wintype_TextGrid) {
+                window_textgrid_t *dwin = win->data;
+                dat->maxlen = dwin->inmax;
+                if (dwin->incurpos) {
+                    dat->initlen = dwin->incurpos;
+                    dat->initstr = dup_buffer(dwin->inbuf, dwin->incurpos, dwin->inunicode);
+                }
+            }
+        }
+
+        if (dat) {
+            update->useinputs = TRUE;
+            gen_list_append(&update->inputs, dat);
         }
     }
 
