@@ -14,7 +14,7 @@ typedef struct gen_list_struct {
     int allocsize;
 } gen_list_t;
 
-typedef struct data_input_struct data_input_t;
+typedef struct data_event_struct data_event_t;
 typedef struct data_update_struct data_update_t;
 typedef struct data_window_struct data_window_t;
 typedef struct data_line_struct data_line_t;
@@ -30,7 +30,7 @@ struct data_metrics_struct {
     glui32 buffermarginx, buffermarginy;
 };
 
-struct data_input_struct {
+struct data_event_struct {
     DTag dtag;
     glsi32 gen;
     glui32 window;
@@ -47,7 +47,7 @@ struct data_update_struct {
     gen_list_t windows; /* data_window_t */
     gen_list_t contents; /* data_content_t */
     int useinputs;
-    gen_list_t inputs; /* data_input_t */
+    gen_list_t inputs; /* data_event_t */
     int disable;
 };
 
@@ -94,9 +94,9 @@ extern data_metrics_t *data_metrics_alloc(int width, int height);
 extern void data_metrics_free(data_metrics_t *metrics);
 extern void data_metrics_print(data_metrics_t *metrics);
 
-extern data_input_t *data_input_read(void);
-extern void data_input_free(data_input_t *data);
-extern void data_input_print(data_input_t *data);
+extern data_event_t *data_event_read(void);
+extern void data_event_free(data_event_t *data);
+extern void data_event_print(data_event_t *data);
 
 extern data_update_t *data_update_alloc(void);
 extern void data_update_free(data_update_t *data);

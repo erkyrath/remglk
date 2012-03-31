@@ -33,7 +33,7 @@ void glk_select(event_t *event)
     gli_windows_update();
     
     while (curevent->type == evtype_None) {
-        data_input_t *data = data_input_read();
+        data_event_t *data = data_event_read();
         window_t *win = NULL;
         glui32 val;
 
@@ -75,7 +75,7 @@ void glk_select(event_t *event)
                 break;
         }
 
-        data_input_free(data);
+        data_event_free(data);
     }
     
     /* An event has occurred; glk_select() is over. */

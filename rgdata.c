@@ -832,7 +832,7 @@ void data_metrics_print(data_metrics_t *metrics)
     printf("}\n");   
 }
 
-void data_input_free(data_input_t *data)
+void data_event_free(data_event_t *data)
 {
     data->dtag = dtag_Unknown;
     if (data->linevalue) {
@@ -846,7 +846,7 @@ void data_input_free(data_input_t *data)
     free(data);
 }
 
-void data_input_print(data_input_t *data)
+void data_event_print(data_event_t *data)
 {
     switch (data->dtag) {
         case dtag_Init:
@@ -862,7 +862,7 @@ void data_input_print(data_input_t *data)
     }
 }
 
-data_input_t *data_input_read()
+data_event_t *data_event_read()
 {
     data_raw_t *dat;
 
@@ -875,7 +875,7 @@ data_input_t *data_input_read()
     if (!dat)
         gli_fatal_error("data: Input struct has no type");
 
-    data_input_t *input = (data_input_t *)malloc(sizeof(data_input_t));
+    data_event_t *input = (data_event_t *)malloc(sizeof(data_event_t));
     input->dtag = dtag_Unknown;
     input->gen = 0;
     input->window = 0;

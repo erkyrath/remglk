@@ -212,12 +212,12 @@ int main(int argc, char *argv[])
 
     data_metrics_t *metrics = data_metrics_alloc(pref_screenwidth, pref_screenheight);
     if (!pref_fixedmetrics) {
-        data_input_t *data = data_input_read();
+        data_event_t *data = data_event_read();
         if (data->dtag != dtag_Init)
             gli_fatal_error("First input event must be 'init'");
         /* Copy them into the permanent structure */
         *metrics = *data->metrics;
-        data_input_free(data);
+        data_event_free(data);
     }
     
     /* Initialize things. */
