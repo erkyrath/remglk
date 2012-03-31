@@ -65,5 +65,7 @@ extern void win_textbuffer_trim_buffer(window_t *win);
 extern void win_textbuffer_set_paging(window_t *win, int forcetoend);
 extern void win_textbuffer_init_line(window_t *win, void *buf, int unicode, int maxlen, int initlen);
 extern void win_textbuffer_accept_line(window_t *win);
+extern void win_textbuffer_prepare_input(window_t *win, glui32 *buf, glui32 len);
+extern void win_textbuffer_accept_line(window_t *win);
 extern void win_textbuffer_cancel_line(window_t *win, event_t *ev);
 

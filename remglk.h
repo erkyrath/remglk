@@ -193,6 +193,7 @@ extern void gli_fast_exit(void);
 extern void gli_display_warning(char *msg);
 extern void gli_display_error(char *msg);
 extern glui32 gli_window_current_generation(void);
+extern window_t *gli_window_find_by_tag(glui32 tag);
 extern window_t *gli_new_window(glui32 type, glui32 rock);
 extern void gli_delete_window(window_t *win);
 extern window_t *gli_window_iterate_treeorder(window_t *win);
@@ -202,6 +203,8 @@ extern void gli_windows_metrics_change(data_metrics_t *newmetrics);
 extern void gli_windows_trim_buffers(void);
 extern void gli_window_put_char(window_t *win, glui32 ch);
 extern void gli_windows_unechostream(stream_t *str);
+extern void gli_window_prepare_input(window_t *win, glui32 *buf, glui32 len);
+extern void gli_window_accept_line(window_t *win);
 extern void gli_print_spaces(int len);
 
 extern void gcmd_win_change_focus(window_t *win, glui32 arg);

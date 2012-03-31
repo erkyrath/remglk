@@ -1041,6 +1041,8 @@ data_window_t *data_window_alloc(glui32 window, glui32 type, glui32 rock)
     dat->window = window;
     dat->type = type;
     dat->rock = rock;
+    dat->gridwidth = 0;
+    dat->gridheight = 0;
     grect_set_from_size(&dat->size, 0, 0);
 
     return dat;
@@ -1067,6 +1069,8 @@ void data_window_print(data_window_t *dat)
     }
 
     printf(" { \"id\":%d, \"type\":\"%s\", \"rock\":%d,\n", dat->window, typename, dat->rock);
+    if (dat->type == wintype_TextGrid)
+        printf("   \"gridwidth\":%d, \"gridheight\":%d\n", dat->gridwidth, dat->gridheight);
     printf("   \"left\":%d, \"top\":%d, \"width\":%d, \"height\":%d }",
         dat->size.left, dat->size.top, dat->size.right-dat->size.left, dat->size.bottom-dat->size.top);
 }

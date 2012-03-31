@@ -744,6 +744,11 @@ void gli_windows_update()
             data_window_t *dat = data_window_alloc(win->updatetag,
                 win->type, win->rock);
             dat->size = win->bbox;
+            if (win->type == wintype_TextGrid) {
+                window_textgrid_t *dwin = win->data;
+                dat->gridwidth = dwin->width;
+                dat->gridheight = dwin->height;
+            }
             gen_list_append(&update->windows, dat);
         }
     }

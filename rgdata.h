@@ -54,6 +54,7 @@ struct data_window_struct {
     glui32 type;
     glui32 rock;
     grect_t size;
+    glui32 gridwidth, gridheight;
 };
 
 struct data_content_struct {
