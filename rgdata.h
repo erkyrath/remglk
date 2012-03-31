@@ -1,3 +1,20 @@
+/* rgdata.h: JSON data structure header
+        for RemGlk, remote-procedure-call implementation of the Glk API.
+    Designed by Andrew Plotkin <erkyrath@eblong.com>
+    http://eblong.com/zarf/glk/
+*/
+
+/* There are two levels of data structures here. The high-level ones 
+   (data_event_t, data_update_t, data_window_t, etc) are built and accepted
+   by the other parts of the library.
+
+   The low-level structure, data_raw_t, is defined and used only inside
+   rgdata.c. It maps directly to and from JSON objects.
+
+   Every data structure has a print() method, which sends it to stdout
+   as a JSON structure.
+ */
+
 typedef enum DTag_enum {
     dtag_Unknown = 0,
     dtag_Init = 1,
@@ -8,6 +25,10 @@ typedef enum DTag_enum {
     dtag_Hyperlink = 5,
 } DTag;
 
+/* gen_list_t: A boring little structure which holds a dynamic list of
+   void pointers. Several of the high-level data objects use these
+   to store lists of other high-level data objects. (You embed a
+   gen_list_t directly, rather than a pointer to it.) */
 typedef struct gen_list_struct {
     void **list;
     int count;
@@ -21,6 +42,7 @@ typedef struct data_input_struct data_input_t;
 typedef struct data_line_struct data_line_t;
 typedef struct data_span_struct data_span_t;
 
+/* data_metrics_t: Defines the display metrics. */
 struct data_metrics_struct {
     glui32 width, height;
     glui32 outspacingx, outspacingy;
@@ -31,6 +53,8 @@ struct data_metrics_struct {
     glui32 buffermarginx, buffermarginy;
 };
 
+/* data_event_t: Represents an input event (either the initial setup event,
+   or user input). */
 struct data_event_struct {
     DTag dtag;
     glsi32 gen;
@@ -42,6 +66,8 @@ struct data_event_struct {
     data_metrics_t *metrics;
 };
 
+/* data_update_t: Represents a complete output update, including what
+   happened to all the windows this cycle. */
 struct data_update_struct {
     glsi32 gen;
     int usewindows;
@@ -52,6 +78,8 @@ struct data_update_struct {
     int disable;
 };
 
+/* data_window_t: Represents one window, either newly created, resized, or
+   repositioned. */
 struct data_window_struct {
     glui32 window;
     glui32 type;
@@ -60,6 +88,7 @@ struct data_window_struct {
     glui32 gridwidth, gridheight;
 };
 
+/* data_input_t: Represents the input request of one window. */
 struct data_input_struct {
     glui32 window;
     glsi32 evtype;
@@ -69,6 +98,8 @@ struct data_input_struct {
     glui32 maxlen;
 };
 
+/* data_content_t: Represents the output changes of one window (text
+   updates). */
 struct data_content_struct {
     glui32 window;
     glui32 type;
@@ -76,6 +107,9 @@ struct data_content_struct {
     int clear;
 };
 
+/* data_line_t: One line of text in a data_content_t. This is used for
+   both grid windows and buffer windows. (In a buffer window, a "line"
+   is a complete paragraph.) */
 struct data_line_struct {
     glui32 linenum;
     int append;
@@ -84,6 +118,7 @@ struct data_line_struct {
     int allocsize;
 };
 
+/* data_span_t: One style-span of text in a data_line_t. */
 struct data_span_struct {
     short style;
     glui32 *str; /* This will always be a reference to existing data.

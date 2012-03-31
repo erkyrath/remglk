@@ -1,3 +1,8 @@
+/* rgdata.c: JSON data structure objects
+        for RemGlk, remote-procedure-call implementation of the Glk API.
+    Designed by Andrew Plotkin <erkyrath@eblong.com>
+    http://eblong.com/zarf/glk/
+*/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,6 +13,7 @@
 #include "remglk.h"
 #include "rgdata.h"
 
+/* RawType encodes the type of a JSON data element. */
 typedef enum RawType_enum {
     rawtyp_None = 0,
     rawtyp_Int = 1,
@@ -19,10 +25,49 @@ typedef enum RawType_enum {
     rawtyp_Null = 7,
 } RawType;
 
+typedef struct strint_struct {
+    char *str;
+    glui32 val;
+} strint_t;
+
+static strint_t special_char_table[] = {
+    { "left", keycode_Left },
+    { "right", keycode_Right },
+    { "up", keycode_Up },
+    { "down", keycode_Down },
+    { "return", keycode_Return },
+    { "delete", keycode_Delete },
+    { "escape", keycode_Escape },
+    { "tab", keycode_Tab },
+    { "pageup", keycode_PageUp },
+    { "pagedown", keycode_PageDown },
+    { "home", keycode_Home },
+    { "end", keycode_End },
+    { "func1", keycode_Func1 },
+    { "func2", keycode_Func2 },
+    { "func3", keycode_Func3 },
+    { "func4", keycode_Func4 },
+    { "func5", keycode_Func5 },
+    { "func6", keycode_Func6 },
+    { "func7", keycode_Func7 },
+    { "func8", keycode_Func8 },
+    { "func9", keycode_Func9 },
+    { "func10", keycode_Func10 },
+    { "func11", keycode_Func11 },
+    { "func12", keycode_Func12 },
+    { NULL, 0 }
+};
+
 typedef struct data_raw_struct data_raw_t;
 
+/* data_raw_t: Encodes a JSON data object. For lists and structs,
+   this contains further JSON structures recursively. All text data
+   is Unicode, stored as glui32 arrays. */
 struct data_raw_struct {
     RawType type;
+
+    /* If this object is contained in a struct, key/keylen is the key
+       (of the parent struct) that refers to it. */
     glui32 *key;
     int keylen;
 
@@ -36,6 +81,8 @@ struct data_raw_struct {
 static data_raw_t *data_raw_blockread(void);
 static data_raw_t *data_raw_blockread_sub(char *termchar);
 
+/* While parsing JSON, we need a place to stash strings as they come in.
+   Here are a couple of resizable character buffers. */
 static char *stringbuf = NULL;
 static int stringbuf_size = 0;
 static glui32 *ustringbuf = NULL;
@@ -118,6 +165,8 @@ static void ensure_ustringbuf_size(int val)
         gli_fatal_error("data: Unable to allocate memory for ustring buffer");
 }
 
+/* Send a Unicode string to an output stream, validly JSON-encoded.
+   This includes the delimiting double-quotes. */
 void print_ustring_json(glui32 *buf, glui32 len, FILE *fl)
 {
     int ix;
@@ -141,6 +190,8 @@ void print_ustring_json(glui32 *buf, glui32 len, FILE *fl)
     fprintf(fl, "\"");
 }
 
+/* Send a Latin-1 string to an output stream, validly JSON-encoded.
+   This includes the delimiting double-quotes. */
 void print_string_json(char *buf, FILE *fl)
 {
     char *cx;
@@ -257,7 +308,7 @@ void data_raw_print(data_raw_t *dat)
     int ix;
 
     if (!dat) {
-        printf("<?NULL>");
+        printf("null");
         return;
     }
 
@@ -303,11 +354,13 @@ void data_raw_print(data_raw_t *dat)
             printf("}");
             return;
         default:
-            printf("<?>");
+            printf("null");
             return;
     }
 }
 
+/* Read one JSON data object from stdin. If there is none, or if the
+   object is incomplete, this blocks and waits for an object to finish. */
 static data_raw_t *data_raw_blockread()
 {
     char termchar;
@@ -319,6 +372,7 @@ static data_raw_t *data_raw_blockread()
     return dat;
 }
 
+/* Validate that the object is an int, and get its value. */
 static glsi32 data_raw_int_value(data_raw_t *dat)
 {
     if (dat->type != rawtyp_Int)
@@ -327,6 +381,9 @@ static glsi32 data_raw_int_value(data_raw_t *dat)
     return dat->number;
 }
 
+/* Validate that the object is a string, and return its value as a
+   freshly-malloced Unicode array. (Not null-terminated! The caller
+   must record the length separately.) */
 static glui32 *data_raw_str_dup(data_raw_t *dat)
 {
     glui32 *str;
@@ -346,39 +403,10 @@ static glui32 *data_raw_str_dup(data_raw_t *dat)
     return str;
 }
 
-typedef struct strint_struct {
-    char *str;
-    glui32 val;
-} strint_t;
-
-static strint_t special_char_table[] = {
-    { "left", keycode_Left },
-    { "right", keycode_Right },
-    { "up", keycode_Up },
-    { "down", keycode_Down },
-    { "return", keycode_Return },
-    { "delete", keycode_Delete },
-    { "escape", keycode_Escape },
-    { "tab", keycode_Tab },
-    { "pageup", keycode_PageUp },
-    { "pagedown", keycode_PageDown },
-    { "home", keycode_Home },
-    { "end", keycode_End },
-    { "func1", keycode_Func1 },
-    { "func2", keycode_Func2 },
-    { "func3", keycode_Func3 },
-    { "func4", keycode_Func4 },
-    { "func5", keycode_Func5 },
-    { "func6", keycode_Func6 },
-    { "func7", keycode_Func7 },
-    { "func8", keycode_Func8 },
-    { "func9", keycode_Func9 },
-    { "func10", keycode_Func10 },
-    { "func11", keycode_Func11 },
-    { "func12", keycode_Func12 },
-    { NULL, 0 }
-};
-
+/* Validate that the object is a string, and return its value considered as
+   a Unicode character. Special character names ("return", "escape", etc)
+   are returned as Glk special character codes (keycode_Return, 
+   keycode_Escape, etc.) */
 static glui32 data_raw_str_char(data_raw_t *dat)
 {
     if (dat->type != rawtyp_Str)
@@ -408,6 +436,7 @@ static glui32 data_raw_str_char(data_raw_t *dat)
     return dat->str[0];
 }
 
+/* Check whether the object is a string matching a given string. */
 static int data_raw_string_is(data_raw_t *dat, char *key)
 {
     char *cx;
@@ -427,6 +456,8 @@ static int data_raw_string_is(data_raw_t *dat, char *key)
         return FALSE;
 }
 
+/* Validate that the object is a struct, and return the field matching
+   a given key. If there is no such field, returns NULL. */
 static data_raw_t *data_raw_struct_field(data_raw_t *dat, char *key)
 {
     int ix;
@@ -450,6 +481,9 @@ static data_raw_t *data_raw_struct_field(data_raw_t *dat, char *key)
     return NULL;
 }
 
+/* Internal method: read a JSON element from stdin. If this sees
+   a close-brace or close-bracket, it returns NULL and stores the
+   character in *termchar. */
 static data_raw_t *data_raw_blockread_sub(char *termchar)
 {
     int ch;
@@ -689,6 +723,11 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
     return NULL;
 }
 
+
+/* All the rest of this file is methods to allocate, free, parse, and 
+   output the high-level data structures. */
+   
+
 data_metrics_t *data_metrics_alloc(int width, int height)
 {
     data_metrics_t *metrics = (data_metrics_t *)malloc(sizeof(data_metrics_t));
@@ -870,7 +909,8 @@ static data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
 void data_metrics_print(data_metrics_t *metrics)
 {
     /* This displays very verbosely, and not in JSON-readable format.
-       That's okay -- it's only used for debugging. */
+       That's okay -- the library never outputs metrics, so this is only 
+       used for debugging. */
  
     printf("{\n");   
     printf("  size: %ldx%ld\n", (long)metrics->width, (long)metrics->height);
