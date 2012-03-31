@@ -128,14 +128,72 @@ RemGlk does not provide a user interface. Instead, it wraps up the application's
 RemGlk is therefore like CheapGlk, in that it works entirely through input and output streams, and can easily be attached to a bot or web service. However, unlike CheapGlk, RemGlk supports multiple Glk windows and most Glk I/O features. Whatever it's attached to just has to decode the structured output and display it appropriately.
 <p>
 
-RemGlk was designed to complement the <a href="http://eblong.com/zarf/glk/glkote/docs.html">GlkOte</a> Javascript library. GlkOte more or less implements the other half of the job: it accepts game output (as Javascript objects), displays it, and then returns the player's commands in the same format. It should be possible to connect an IF interpreter, RemGlk, and GlkOte to build a complete IF web service.
+RemGlk was designed to complement the <a href="http://eblong.com/zarf/glk/glkote.html">GlkOte</a> Javascript library. GlkOte more or less implements the other half of the job: it accepts game output (as Javascript objects), displays it, and then returns the player's commands in the same format. It should be possible to connect an IF interpreter, RemGlk, and GlkOte to build a complete IF web service.
 <p>
 
 <em>Warning: this has not yet been tested in any way. This is an alpha release of RemGlk, and nothing is guaranteed.</em>
 <p>
 
+<h2>Using RemGlk</h2>
+
+Once you have compiled your application, run it as usual. For glulxe, this probably looks like:
+<p>
+
+<pre class="Sample">
+glulxe Advent.ulx
+</pre>
+<p>
+
+If you do this, you will see nothing at first. The application is waiting for an initial input which describes the display and font sizes. Try typing this, exactly:
+<p>
+
+<pre class="Sample">
+{ "type": "init", "gen": 0, "metrics": { "width":80, "height":24 } }
+</pre>
+<p>
+
+This tells RemGlk that it has an 80x24 "screen" to work with. The default "font size" is 1, so this gives the effect of an 80x24 terminal window.
+<p>
+
+If you instead entered:
+
+<pre class="Sample">
+{ "type": "init", "gen": 0, "metrics": { "width":400, "height":600,
+  "charwidth":12, "charheight":14 } }
+</pre>
+<p>
+
+...you would get a layout for a 400x600 pixel window, assuming a 14-point font with 12-pixel-wide characters.
+<p>
+
+(The font size is only critical for grid (status) windows. You can approximate the measurements for buffer (story) windows; these typically have proportional fonts and perhaps various font sizes as well.)
+<p>
+
+The metrics object also allows you to specify margins and border spacing, which improve the layout behavior. See below for details.
+<p>
+
+Alternatively, you can specify basic layout information on the command line. If you type:
+
+<pre class="Sample">
+glulxe -fm -width 80 -height 50 Advent.ulx
+</pre>
+<p>
+
+...then the application will <em>not</em> wait for an <code>init</code> event. (And you should not enter one.) Instead, the game will start immediately (with an 80x50 "terminal window"), and send its first screenful of output.
+<p>
+
+<h2>The Data Format</h2>
+
+<em>I have not written out this documentation in detail yet. Please refer to the <a href="http://eblong.com/zarf/glk/glkote/docs.html">GlkOte documentation</a>. Input what GlkOte outputs, and vice versa.</em>
+<p>
+
+A note on <a href="http://json.org/">JSON</a>: this is a strict (in both senses) subset of Javascript's data literal format. The biggest differences are: you always use double quotes, never single quotes; strings are always quoted, but numbers never are; an object (dictionary) always has quotes around its keys.
+<p>
+
+
+
 <hr>
-Last updated March 30, 2012.
+Last updated March 31, 2012.
 <p>
 
 <em><a href="http://eblong.com/zarf/glk/remglk.html">RemGlk home page</a>
