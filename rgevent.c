@@ -63,8 +63,12 @@ void glk_select(event_t *event)
                 if (!win->char_request)
                     break;
                 val = data->charvalue;
-                if (!win->char_request_uni && val >= 256)
-                    val = '?';
+                if (!win->char_request_uni) {
+                    /* Filter out non-Latin-1 characters, except we also
+                       accept special chars. */
+                    if (val >= 256 && val < 0xffffffff-keycode_MAXVAL)
+                        val = '?';
+                }
                 win->char_request = FALSE;
                 win->char_request_uni = FALSE;
                 win->inputgen = 0;

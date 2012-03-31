@@ -346,6 +346,39 @@ static glui32 *data_raw_str_dup(data_raw_t *dat)
     return str;
 }
 
+typedef struct strint_struct {
+    char *str;
+    glui32 val;
+} strint_t;
+
+static strint_t special_char_table[] = {
+    { "left", keycode_Left },
+    { "right", keycode_Right },
+    { "up", keycode_Up },
+    { "down", keycode_Down },
+    { "return", keycode_Return },
+    { "delete", keycode_Delete },
+    { "escape", keycode_Escape },
+    { "tab", keycode_Tab },
+    { "pageup", keycode_PageUp },
+    { "pagedown", keycode_PageDown },
+    { "home", keycode_Home },
+    { "end", keycode_End },
+    { "func1", keycode_Func1 },
+    { "func2", keycode_Func2 },
+    { "func3", keycode_Func3 },
+    { "func4", keycode_Func4 },
+    { "func5", keycode_Func5 },
+    { "func6", keycode_Func6 },
+    { "func7", keycode_Func7 },
+    { "func8", keycode_Func8 },
+    { "func9", keycode_Func9 },
+    { "func10", keycode_Func10 },
+    { "func11", keycode_Func11 },
+    { "func12", keycode_Func12 },
+    { NULL, 0 }
+};
+
 static glui32 data_raw_str_char(data_raw_t *dat)
 {
     if (dat->type != rawtyp_Str)
@@ -353,6 +386,24 @@ static glui32 data_raw_str_char(data_raw_t *dat)
 
     if (dat->count == 0) 
         gli_fatal_error("data: Need nonempty string");
+
+    /* Check for special character names. */
+    if (dat->count > 1) {
+        strint_t *pair;
+        for (pair = special_char_table; pair->str; pair++) {
+            int match = TRUE;
+            int pos;
+            char *cx;
+            for (pos=0, cx=pair->str; *cx && pos<dat->count; pos++, cx++) {
+                if (dat->str[pos] != (glui32)(*cx)) {
+                    match = FALSE;
+                    break;
+                }
+                if (match)
+                    return pair->val;
+            }
+        }
+    }
 
     return dat->str[0];
 }
