@@ -970,6 +970,7 @@ data_update_t *data_update_alloc()
 
     dat->gen = 0;
     dat->usewindows = FALSE;
+    dat->useinputs = FALSE;
     dat->disable = FALSE;
 
     gen_list_init(&dat->windows);

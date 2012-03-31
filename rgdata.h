@@ -46,6 +46,7 @@ struct data_update_struct {
     int usewindows;
     gen_list_t windows; /* data_window_t */
     gen_list_t contents; /* data_content_t */
+    int useinputs;
     gen_list_t inputs; /* data_input_t */
     int disable;
 };
