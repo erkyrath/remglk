@@ -64,7 +64,7 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
             return FALSE;
             
         case gestalt_Timer: 
-            return TRUE;
+            return FALSE; /* ### for now */
 
         case gestalt_Graphics:
         case gestalt_GraphicsTransparency:
@@ -89,7 +89,7 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
             return TRUE;
 
         case gestalt_LineTerminators:
-            return TRUE;
+            return FALSE; /* ### for now */
         case gestalt_LineTerminatorKey:
             /* RemGlk never uses the escape or function keys for anything,
                so we'll allow them to be line terminators. */
