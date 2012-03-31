@@ -66,7 +66,8 @@ struct glk_window_struct {
     
     stream_t *str; /* the window stream. */
     stream_t *echostr; /* the window's echo stream, if any. */
-    
+
+    glui32 inputgen;    
     int line_request;
     int line_request_uni;
     int char_request;

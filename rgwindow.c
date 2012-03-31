@@ -115,6 +115,7 @@ window_t *gli_new_window(glui32 type, glui32 rock)
     
     win->parent = NULL; /* for now */
     win->data = NULL; /* for now */
+    win->inputgen = 0;
     win->char_request = FALSE;
     win->line_request = FALSE;
     win->line_request_uni = FALSE;
@@ -806,9 +807,11 @@ void gli_windows_update()
         data_input_t *dat = NULL;
         if (win->char_request) {
             dat = data_input_alloc(win->updatetag, evtype_CharInput);
+            dat->gen = win->inputgen;
         }
         else if (win->line_request) {
             dat = data_input_alloc(win->updatetag, evtype_LineInput);
+            dat->gen = win->inputgen;
             if (win->type == wintype_TextBuffer) {
                 window_textbuffer_t *dwin = win->data;
                 dat->maxlen = dwin->inmax;
@@ -929,6 +932,7 @@ void glk_request_char_event(window_t *win)
         case wintype_TextGrid:
             win->char_request = TRUE;
             win->char_request_uni = FALSE;
+            win->inputgen = generation+1;
             break;
         default:
             gli_strict_warning("request_char_event: window does not support keyboard input");
@@ -954,11 +958,13 @@ void glk_request_line_event(window_t *win, char *buf, glui32 maxlen,
         case wintype_TextBuffer:
             win->line_request = TRUE;
             win->line_request_uni = FALSE;
+            win->inputgen = generation+1;
             win_textbuffer_init_line(win, buf, FALSE, maxlen, initlen);
             break;
         case wintype_TextGrid:
             win->line_request = TRUE;
             win->line_request_uni = FALSE;
+            win->inputgen = generation+1;
             win_textgrid_init_line(win, buf, FALSE, maxlen, initlen);
             break;
         default:
@@ -987,6 +993,7 @@ void glk_request_char_event_uni(window_t *win)
         case wintype_TextGrid:
             win->char_request = TRUE;
             win->char_request_uni = TRUE;
+            win->inputgen = generation+1;
             break;
         default:
             gli_strict_warning("request_char_event: window does not support keyboard input");
@@ -1012,11 +1019,13 @@ void glk_request_line_event_uni(window_t *win, glui32 *buf, glui32 maxlen,
         case wintype_TextBuffer:
             win->line_request = TRUE;
             win->line_request_uni = TRUE;
+            win->inputgen = generation+1;
             win_textbuffer_init_line(win, buf, TRUE, maxlen, initlen);
             break;
         case wintype_TextGrid:
             win->line_request = TRUE;
             win->line_request_uni = TRUE;
+            win->inputgen = generation+1;
             win_textgrid_init_line(win, buf, TRUE, maxlen, initlen);
             break;
         default:
@@ -1051,6 +1060,7 @@ void glk_cancel_char_event(window_t *win)
         case wintype_TextBuffer:
         case wintype_TextGrid:
             win->char_request = FALSE;
+            win->inputgen = 0;
             break;
         default:
             /* do nothing */
@@ -1077,11 +1087,13 @@ void glk_cancel_line_event(window_t *win, event_t *ev)
         case wintype_TextBuffer:
             if (win->line_request) {
                 win_textbuffer_cancel_line(win, ev);
+                win->inputgen = 0;
             }
             break;
         case wintype_TextGrid:
             if (win->line_request) {
                 win_textgrid_cancel_line(win, ev);
+                win->inputgen = 0;
             }
             break;
         default:

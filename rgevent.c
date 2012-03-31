@@ -53,6 +53,7 @@ void glk_select(event_t *event)
                     break;
                 gli_window_prepare_input(win, data->linevalue, data->linelen);
                 gli_window_accept_line(win);
+                win->inputgen = 0;
                 break;
 
             case dtag_Char:
@@ -66,6 +67,7 @@ void glk_select(event_t *event)
                     val = '?';
                 win->char_request = FALSE;
                 win->char_request_uni = FALSE;
+                win->inputgen = 0;
                 gli_event_store(evtype_CharInput, win, val, 0);
                 break;
             /* ### */
