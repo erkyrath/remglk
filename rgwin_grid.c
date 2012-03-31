@@ -18,9 +18,6 @@
 */
 
 static void init_lines(window_textgrid_t *dwin, int beg, int end, int linewid);
-static void export_input_line(void *buf, int unicode, long len, char *chars);
-static void import_input_line(tgline_t *ln, int offset, void *buf, 
-    int unicode, long len);
 
 
 window_textgrid_t *win_textgrid_create(window_t *win)
@@ -39,8 +36,7 @@ window_textgrid_t *win_textgrid_create(window_t *win)
     
     dwin->inbuf = NULL;
     dwin->inunicode = FALSE;
-    dwin->inorgx = 0;
-    dwin->inorgy = 0;
+    dwin->inecho = FALSE;
     
     return dwin;
 }
@@ -83,8 +79,8 @@ void win_textgrid_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics
     window_textgrid_t *dwin = win->data;
     dwin->owner->bbox = *box;
     
-    newwid = box->right - box->left;
-    newhgt = box->bottom - box->top;
+    newwid = (((box->right - box->left) - 2*metrics->gridmarginx) / metrics->gridcharwidth);
+    newhgt = (((box->bottom - box->top) - 2*metrics->gridmarginy) / metrics->gridcharheight);
     
     if (dwin->lines == NULL) {
         dwin->linessize = (newhgt+1);
@@ -104,6 +100,7 @@ void win_textgrid_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics
             init_lines(dwin, oldval, dwin->linessize, newwid);
         }
         if (newhgt > dwin->height) {
+            /* Clear any new lines */
             for (jx=dwin->height; jx<newhgt; jx++) {
                 tgline_t *ln = &(dwin->lines[jx]);
                 for (ix=0; ix<ln->allocsize; ix++) {
@@ -286,16 +283,24 @@ void win_textgrid_init_line(window_t *win, void *buf, int unicode,
 {
     window_textgrid_t *dwin = win->data;
     
+    /* Canonicalize the cursor position a little. */
+    if (dwin->curx >= dwin->width) {
+        dwin->curx = 0;
+        dwin->cury++;
+    }
+    if (dwin->cury >= dwin->height) {
+        /* Outside the window; put the cursor in the bottom right. */
+        dwin->curx = dwin->width-1;
+        dwin->cury = dwin->height-1;
+    }
+
     dwin->inbuf = buf;
     dwin->inunicode = unicode;
     dwin->inoriglen = maxlen;
     if (maxlen > (dwin->width - dwin->curx))
         maxlen = (dwin->width - dwin->curx);
     dwin->inmax = maxlen;
-    dwin->inlen = 0;
-    dwin->incurs = 0;
-    dwin->inorgx = dwin->curx;
-    dwin->inorgy = dwin->cury;
+    dwin->inecho = win->echo_line_input;
     dwin->intermkeys = win->terminate_line_input;
     dwin->origstyle = win->style;
     win->style = style_Input;
@@ -303,25 +308,105 @@ void win_textgrid_init_line(window_t *win, void *buf, int unicode,
     if (initlen > maxlen)
         initlen = maxlen;
         
-    if (initlen) {
-        tgline_t *ln = &(dwin->lines[dwin->inorgy]);
-
-        if (initlen) {
-            import_input_line(ln, dwin->inorgx, dwin->inbuf, 
-                dwin->inunicode, initlen);
-        }        
-        
-        ln->dirty = TRUE;
-            
-        dwin->incurs += initlen;
-        dwin->inlen += initlen;
-        dwin->curx = dwin->inorgx+dwin->incurs;
-        dwin->cury = dwin->inorgy;
-    }
-
     if (gli_register_arr) {
         char *typedesc = (dwin->inunicode ? "&+#!Iu" : "&+#!Cn");
         dwin->inarrayrock = (*gli_register_arr)(dwin->inbuf, dwin->inoriglen, typedesc);
+    }
+}
+
+void win_textgrid_prepare_input(window_t *win, glui32 *buf, glui32 len)
+{
+    window_textgrid_t *dwin = win->data;
+    int ix;
+
+    if (!dwin->inbuf)
+        return;
+
+    if (len > dwin->inmax)
+        len = dwin->inmax;
+
+    dwin->incurpos = len;
+
+    if (!dwin->inunicode) {
+        char *inbuf = ((char *)dwin->inbuf);
+        for (ix=0; ix<len; ix++) {
+            glui32 ch = buf[ix];
+            if (!(ch >= 0 && ch < 256))
+                ch = '?';
+            inbuf[ix] = ch;
+        }
+    }
+    else {
+        glui32 *inbuf = ((glui32 *)dwin->inbuf);
+        for (ix=0; ix<len; ix++) {
+            inbuf[ix] = buf[ix];
+        }
+    }
+}
+
+void win_textgrid_accept_line(window_t *win)
+{
+    long len;
+    void *inbuf;
+    int inmax, inoriglen, inunicode, inecho;
+    glui32 termkey = 0;
+    gidispatch_rock_t inarrayrock;
+    window_textgrid_t *dwin = win->data;
+    
+    if (!dwin->inbuf)
+        return;
+    
+    inbuf = dwin->inbuf;
+    inmax = dwin->inmax;
+    inoriglen = dwin->inoriglen;
+    inarrayrock = dwin->inarrayrock;
+    inunicode = dwin->inunicode;
+    inecho = dwin->inecho;
+
+    len = dwin->incurpos;
+    if (inecho && win->echostr) {
+        if (!inunicode)
+            gli_stream_echo_line(win->echostr, (char *)inbuf, len);
+        else
+            gli_stream_echo_line_uni(win->echostr, (glui32 *)inbuf, len);
+    }
+    
+    if (inecho) {
+        /* Add the typed text to the grid. */
+        int ix;
+        if (!inunicode) {
+            for (ix=0; ix<len; ix++) {
+                glui32 ch = ((char *)inbuf)[ix];
+                win_textgrid_putchar(win, ch);
+            }
+        }
+        else {
+            for (ix=0; ix<len; ix++) {
+                glui32 ch = ((glui32 *)inbuf)[ix];
+                win_textgrid_putchar(win, ch);
+            }
+        }
+
+        dwin->cury = dwin->cury+1;
+        dwin->curx = 0;
+    }
+    
+    win->style = dwin->origstyle;
+
+    /* ### set termkey */
+
+    gli_event_store(evtype_LineInput, win, len, termkey);
+    win->line_request = FALSE;
+    dwin->inbuf = NULL;
+    dwin->inoriglen = 0;
+    dwin->incurpos = 0;
+    dwin->inmax = 0;
+    dwin->inecho = FALSE;
+    dwin->intermkeys = 0;
+
+    if (gli_unregister_arr) {
+        char *typedesc = (inunicode ? "&+#!Iu" : "&+#!Cn");
+        (*gli_unregister_arr)(inbuf, inoriglen, typedesc, inarrayrock);
     }
 }
 
@@ -329,10 +414,9 @@ void win_textgrid_init_line(window_t *win, void *buf, int unicode,
 void win_textgrid_cancel_line(window_t *win, event_t *ev)
 {
     void *inbuf;
-    int inoriglen, inmax, inunicode;
+    int inoriglen, inmax, inunicode, inecho, len;
     gidispatch_rock_t inarrayrock;
     window_textgrid_t *dwin = win->data;
-    tgline_t *ln = &(dwin->lines[dwin->inorgy]);
 
     if (!dwin->inbuf)
         return;
@@ -342,30 +426,46 @@ void win_textgrid_cancel_line(window_t *win, event_t *ev)
     inoriglen = dwin->inoriglen;
     inarrayrock = dwin->inarrayrock;
     inunicode = dwin->inunicode;
+    inecho = dwin->inecho;
 
-    export_input_line(inbuf, inunicode, dwin->inlen, &ln->chars[dwin->inorgx]);
-
-    if (win->echostr) {
+    len = dwin->incurpos;
+    if (inecho && win->echostr) {
         if (!inunicode)
-            gli_stream_echo_line(win->echostr, inbuf, dwin->inlen);
+            gli_stream_echo_line(win->echostr, (char *)inbuf, len);
         else
-            gli_stream_echo_line_uni(win->echostr, inbuf, dwin->inlen);
+            gli_stream_echo_line_uni(win->echostr, (glui32 *)inbuf, len);
     }
 
-    dwin->cury = dwin->inorgy+1;
-    dwin->curx = 0;
+    if (inecho) {
+        /* Add the typed text to the buffer. */
+        int ix;
+        if (!inunicode) {
+            for (ix=0; ix<len; ix++) {
+                glui32 ch = ((char *)inbuf)[ix];
+                win_textgrid_putchar(win, ch);
+            }
+        }
+        else {
+            for (ix=0; ix<len; ix++) {
+                glui32 ch = ((glui32 *)inbuf)[ix];
+                win_textgrid_putchar(win, ch);
+            }
+        }
+
+        dwin->cury = dwin->cury+1;
+        dwin->curx = 0;
+    }
+
     win->style = dwin->origstyle;
 
     ev->type = evtype_LineInput;
     ev->win = win;
-    ev->val1 = dwin->inlen;
+    ev->val1 = len;
     
     win->line_request = FALSE;
     dwin->inbuf = NULL;
     dwin->inoriglen = 0;
     dwin->inmax = 0;
-    dwin->inorgx = 0;
-    dwin->inorgy = 0;
     dwin->intermkeys = 0;
 
     if (gli_unregister_arr) {
@@ -373,51 +473,3 @@ void win_textgrid_cancel_line(window_t *win, event_t *ev)
         (*gli_unregister_arr)(inbuf, inoriglen, typedesc, inarrayrock);
     }
 }
-
-static void import_input_line(tgline_t *ln, int offset, void *buf, 
-    int unicode, long len)
-{
-    int ix;
-
-    if (!unicode) {
-        for (ix=0; ix<len; ix++) {
-            char ch = ((char *)buf)[ix];
-            ln->styles[offset+ix] = style_Input;
-            ln->chars[offset+ix] = ch;
-        }
-    }
-    else {
-        for (ix=0; ix<len; ix++) {
-            glui32 kval = ((glui32 *)buf)[ix];
-            if (!(kval >= 0 && kval < 256))
-                kval = '?';
-            ln->styles[offset+ix] = style_Input;
-            ln->chars[offset+ix] = kval;
-        }
-    }
-}
-
-/* Clone in rgwin_buf.c */
-/*### unicode argument?*/
-static void export_input_line(void *buf, int unicode, long len, char *chars)
-{
-    int ix;
-
-    if (!unicode) {
-        for (ix=0; ix<len; ix++) {
-            int val = chars[ix];
-            glui32 kval = (val & 0xFF);
-            if (!(kval >= 0 && kval < 256))
-                kval = '?';
-            ((unsigned char *)buf)[ix] = kval;
-        }
-    }
-    else {
-        for (ix=0; ix<len; ix++) {
-            int val = chars[ix];
-            glui32 kval = (val & 0xFF);
-            ((glui32 *)buf)[ix] = kval;
-        }
-    }
-}
-

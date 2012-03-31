@@ -26,11 +26,11 @@ typedef struct window_textgrid_struct {
     
     /* for line input */
     void *inbuf; /* char* or glui32*, depending on inunicode. */
+    glui32 incurpos;
     int inunicode;
-    int inorgx, inorgy;
+    int inecho;
     glui32 intermkeys;
     int inoriglen, inmax;
-    int incurs, inlen;
     glui32 origstyle;
     gidispatch_rock_t inarrayrock;
 } window_textgrid_t;
