@@ -986,7 +986,12 @@ void data_update_free(data_update_t *dat)
         data_window_free(winlist[ix]);
     }
 
-    /*### free contents, inputs */
+    data_content_t **contlist = (data_content_t **)(dat->contents.list);
+    for (ix=0; ix<dat->contents.count; ix++) {
+        data_content_free(contlist[ix]);
+    }
+
+    /*### free inputs */
 
     gen_list_free(&dat->windows);
     gen_list_free(&dat->contents);

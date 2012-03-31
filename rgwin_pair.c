@@ -86,19 +86,18 @@ void win_pair_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
                 split = 0;
             }
             else {
-                /*### allow for margins */
                 switch (key->type) {
                     case wintype_TextBuffer:
                         if (dwin->vertical)
-                            split = dwin->size * metrics->buffercharwidth;
+                            split = dwin->size * metrics->buffercharwidth + 2*metrics->buffermarginx;
                         else
-                            split = dwin->size * metrics->buffercharheight;
+                            split = dwin->size * metrics->buffercharheight + 2*metrics->buffermarginy;
                         break;
                     case wintype_TextGrid:
                         if (dwin->vertical)
-                            split = dwin->size * metrics->gridcharwidth;
+                            split = dwin->size * metrics->gridcharwidth + 2*metrics->gridmarginx;
                         else
-                            split = dwin->size * metrics->gridcharheight;
+                            split = dwin->size * metrics->gridcharheight + 2*metrics->gridmarginy;
                         break;
                     default:
                         split = 0;
