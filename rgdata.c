@@ -969,7 +969,9 @@ data_update_t *data_update_alloc()
         gli_fatal_error("data: Unable to alloc update structure");
 
     dat->gen = 0;
+    dat->usewindows = FALSE;
     dat->disable = FALSE;
+
     gen_list_init(&dat->windows);
     gen_list_init(&dat->contents);
     gen_list_init(&dat->inputs);
@@ -1005,7 +1007,7 @@ void data_update_print(data_update_t *dat)
 
     printf("{\"type\":\"update\", \"gen\":%d", dat->gen);
 
-    if (dat->windows.count) {
+    if (dat->usewindows) {
         data_window_t **winlist = (data_window_t **)(dat->windows.list);
         printf(",\n \"windows\":[\n");
         for (ix=0; ix<dat->windows.count; ix++) {

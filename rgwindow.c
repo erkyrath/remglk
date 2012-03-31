@@ -91,6 +91,16 @@ glui32 gli_window_current_generation()
     return generation;
 }
 
+window_t *gli_window_find_by_tag(glui32 tag)
+{
+    window_t *win;
+    for (win=gli_windowlist; win; win=win->next) {
+        if (win->updatetag == tag)
+            return win;
+    }
+    return NULL;
+}
+
 window_t *gli_new_window(glui32 type, glui32 rock)
 {
     window_t *win = (window_t *)malloc(sizeof(window_t));
@@ -737,6 +747,8 @@ void gli_windows_update()
 
     if (geometry_changed) {
         geometry_changed = FALSE;
+
+        update->usewindows = TRUE;
 
         for (win=gli_windowlist, ix=0; win; win=win->next, ix++) {
             if (win->type == wintype_Pair)

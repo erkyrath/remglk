@@ -169,12 +169,15 @@ data_content_t *win_textgrid_update(window_t *win)
         return NULL;
     }
 
-    data_content_t *dat = data_content_alloc(win->updatetag, win->type);
+    data_content_t *dat = NULL;
 
     for (jx=0; jx<dwin->height; jx++) {
         tgline_t *ln = &(dwin->lines[jx]);
         if (!dwin->alldirty && !ln->dirty)
             continue;
+
+        if (!dat)
+            dat = data_content_alloc(win->updatetag, win->type);
 
         data_line_t *line = data_line_alloc();
         gen_list_append(&dat->lines, line);
