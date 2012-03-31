@@ -134,6 +134,8 @@ RemGlk was designed to complement the <a href="http://eblong.com/zarf/glk/glkote
 
 <h2>Using RemGlk</h2>
 
+<h3>Starting up</h3>
+
 Once you have compiled your application, run it as usual. For glulxe, this probably looks like:
 <p>
 
@@ -180,6 +182,93 @@ glulxe -fm -width 80 -height 50 Advent.ulx
 ...then the application will <em>not</em> wait for an <code>init</code> event. (And you should not enter one.) Instead, the game will start immediately (with an 80x50 "terminal window"), and send its first screenful of output.
 <p>
 
+<h3>The first screen of output</h3>
+
+For <em>Adventure</em>, the initial output looks something like:
+
+<pre class="Sample">
+{"type":"update", "gen":1,
+ "windows":[
+ { "id":25, "type":"grid", "rock":202,
+   "gridwidth":80, "gridheight":1,
+   "left":0, "top":0, "width":80, "height":1 },
+ { "id":22, "type":"buffer", "rock":201,
+   "left":0, "top":1, "width":80, "height":49 } ],
+ "contents":[
+ {"id":25, "lines": [
+  { "line":0, "content":[{ "style":"normal", "text":" At End Of Road
+     Score: 36    Moves: 1      "}]}
+ ] },
+ {"id":22, "clear":true, "text": [
+  {"append":true},
+  {}, {}, {}, {}, {},
+  {"content":[{ "style":"normal", "text":"Welcome to Adventure!"}]},
+  {},
+  {"content":[{ "style":"header", "text":"ADVENTURE"}]},
+  {"content":[{ "style":"normal", "text":"The Interactive Original"}]},
+  {"content":[{ "style":"normal", "text":"By Will Crowther (1973)
+     and Don Woods (1977)"}]},
+  {"content":[{ "style":"normal", "text":"Reconstructed in three steps by:"}]},
+  {"content":[{ "style":"normal", "text":"Donald Ekman, David M. Baggett (1993)
+     and Graham Nelson (1994)"}]},
+  {"content":[{ "style":"normal", "text":"[In memoriam Stephen Bishop
+     (1820?-1857): GN]"}]},
+  {"content":[{ "style":"normal", "text":"Release 5 / Serial number
+     961209 / Inform v6.21(G0.33) Library 6/10 "}]},
+  {},
+  {"content":[{ "style":"subheader", "text":"At End Of Road"}]},
+  {"content":[{ "style":"normal", "text":"You are standing at the end of
+     a road before a small brick building. Around you is a forest. A small
+     stream flows out of the building and down a gully."}]},
+  {},
+  {"content":[{ "style":"normal", "text":"&gt;"}]}
+ ] } ],
+ "inputs":[
+ {"id":22, "gen":1, "type":"line", "maxlen":256 }
+ ]}
+</pre>
+<p>
+
+This is just to give you a feel for what's going on. Roughly, this says:
+<p>
+
+<ul>
+<li>First update.
+<li>Two windows have been opened:
+<ul>
+<li>A grid (status) window, ID number 25, 80 characters wide, 1 line high;
+<li>A buffer (story) window, ID number 22.
+</ul>
+<li>Both windows were updated this cycle:
+<ul>
+<li>Window 25 (the status window), line zero, contains the room name and score.
+<li>Window 22 (the story window) contains the initial game text.
+<ul>
+<li>(Each line contains some content, in some style. It so happens that we don't see any mid-line style changes, although they're perfectly possible. {} is a blank line.)
+</ul>
+</ul>
+<li>One window is requesting input this cycle:
+<ul>
+<li>Window 22 (the story window) requests line input, up to 256 characters' worth.
+</ul>
+</ul>
+
+(The window ID numbers will vary from run to run, by the way. Window rock numbers are consistent for a given game, but may vary from game to game.)
+<p>
+
+<h3>The first input</h3>
+
+A human types "go east" into some user interface, which then passes the following input to RemGlk:
+<p>
+
+<pre class="Sample">
+{ "type":"line", "gen":1, "window":22, "value": "go east"}
+</pre>
+<p>
+
+The library accepts this, mulls it, and generates a new output update. So it goes.
+<p>
+
 <h2>The Data Format</h2>
 
 <em>I have not written out this documentation in detail yet. Please refer to the <a href="http://eblong.com/zarf/glk/glkote/docs.html">GlkOte documentation</a>. Input what GlkOte outputs, and vice versa.</em>
@@ -188,7 +277,8 @@ glulxe -fm -width 80 -height 50 Advent.ulx
 A note on <a href="http://json.org/">JSON</a>: this is a strict (in both senses) subset of Javascript's data literal format. The biggest differences are: you always use double quotes, never single quotes; strings are always quoted, but numbers never are; an object (dictionary) always has quotes around its keys.
 <p>
 
-
+All input and output is UTF-8.
+<p>
 
 <hr>
 Last updated March 31, 2012.
