@@ -1072,7 +1072,7 @@ void data_window_print(data_window_t *dat)
 
     printf(" { \"id\":%d, \"type\":\"%s\", \"rock\":%d,\n", dat->window, typename, dat->rock);
     if (dat->type == wintype_TextGrid)
-        printf("   \"gridwidth\":%d, \"gridheight\":%d\n", dat->gridwidth, dat->gridheight);
+        printf("   \"gridwidth\":%d, \"gridheight\":%d,\n", dat->gridwidth, dat->gridheight);
     printf("   \"left\":%d, \"top\":%d, \"width\":%d, \"height\":%d }",
         dat->size.left, dat->size.top, dat->size.right-dat->size.left, dat->size.bottom-dat->size.top);
 }

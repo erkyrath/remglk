@@ -810,6 +810,30 @@ void gli_window_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
     }
 }
 
+void gli_window_prepare_input(window_t *win, glui32 *buf, glui32 len)
+{
+    switch (win->type) {
+        case wintype_TextGrid:
+            win_textgrid_prepare_input(win, buf, len);
+            break;
+        case wintype_TextBuffer:
+            win_textbuffer_prepare_input(win, buf, len);
+            break;
+    }
+}
+
+void gli_window_accept_line(window_t *win)
+{
+    switch (win->type) {
+        case wintype_TextGrid:
+            win_textgrid_accept_line(win);
+            break;
+        case wintype_TextBuffer:
+            win_textbuffer_accept_line(win);
+            break;
+    }
+}
+
 void gli_windows_metrics_change(data_metrics_t *newmetrics)
 {
     metrics = *newmetrics;
