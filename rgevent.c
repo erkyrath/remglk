@@ -35,6 +35,7 @@ void glk_select(event_t *event)
     while (curevent->type == evtype_None) {
         data_input_t *data = data_input_read();
         window_t *win = NULL;
+        glui32 val;
 
         if (data->gen != gli_window_current_generation())
             gli_fatal_error("Input generation number does not match.");
@@ -48,10 +49,25 @@ void glk_select(event_t *event)
                 win = gli_window_find_by_tag(data->window);
                 if (!win)
                     break;
+                if (!win->line_request)
+                    break;
                 gli_window_prepare_input(win, data->linevalue, data->linelen);
                 gli_window_accept_line(win);
                 break;
 
+            case dtag_Char:
+                win = gli_window_find_by_tag(data->window);
+                if (!win)
+                    break;
+                if (!win->char_request)
+                    break;
+                val = data->charvalue;
+                if (!win->char_request_uni && val >= 256)
+                    val = '?';
+                win->char_request = FALSE;
+                win->char_request_uni = FALSE;
+                gli_event_store(evtype_CharInput, win, val, 0);
+                break;
             /* ### */
 
             default:
