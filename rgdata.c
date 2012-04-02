@@ -425,9 +425,9 @@ static glui32 data_raw_str_char(data_raw_t *dat)
                 if (dat->str[pos] != (glui32)(*cx)) {
                     break;
                 }
-                if (*cx == '\0' && pos == dat->count)
-                    return pair->val;
             }
+            if (*cx == '\0' && pos == dat->count)
+                return pair->val;
         }
     }
 
