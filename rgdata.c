@@ -419,15 +419,13 @@ static glui32 data_raw_str_char(data_raw_t *dat)
     if (dat->count > 1) {
         strint_t *pair;
         for (pair = special_char_table; pair->str; pair++) {
-            int match = TRUE;
             int pos;
             char *cx;
             for (pos=0, cx=pair->str; *cx && pos<dat->count; pos++, cx++) {
                 if (dat->str[pos] != (glui32)(*cx)) {
-                    match = FALSE;
                     break;
                 }
-                if (match)
+                if (*cx == '\0' && pos == dat->count)
                     return pair->val;
             }
         }
