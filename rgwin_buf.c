@@ -318,7 +318,7 @@ void win_textbuffer_trim_buffer(window_t *win)
     
     if (dwin->numchars > cnum)
         memmove(dwin->chars, &(dwin->chars[cnum]), 
-            (dwin->numchars - cnum) * sizeof(char));
+            (dwin->numchars - cnum) * sizeof(glui32));
     dwin->numchars -= cnum;
 
     if (dwin->dirtybeg == -1) {
