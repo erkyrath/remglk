@@ -1161,7 +1161,7 @@ void data_update_print(data_update_t *dat)
     }
 
     if (dat->specialreq) {
-        printf(",\n \"specialreq\":\n");
+        printf(",\n \"specialinput\":\n");
         data_specialreq_print(dat->specialreq);
     }
 
@@ -1480,7 +1480,8 @@ void data_specialreq_print(data_specialreq_t *dat)
             break;
     }
 
-    printf("  { \"filemode\":\"%s\", \"filetype\":\"%s\"", filemode, filetype);
+    printf("  { \"type\":\"%s\", \"filemode\":\"%s\", \"filetype\":\"%s\"", 
+        "fileref_prompt", filemode, filetype);
     if (dat->gameid) {
         printf(",\n    \"gameid\":");
         print_string_json(dat->gameid, stdout);
