@@ -1482,7 +1482,7 @@ void data_specialreq_print(data_specialreq_t *dat)
 
     printf("  { \"filemode\":\"%s\", \"filetype\":\"%s\"", filemode, filetype);
     if (dat->gameid) {
-        printf("\n,  \"gameid\":");
+        printf(",\n    \"gameid\":");
         print_string_json(dat->gameid, stdout);
     }
     printf(" }");

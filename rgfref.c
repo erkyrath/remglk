@@ -11,6 +11,7 @@
 #include <sys/stat.h> /* for stat() */
 
 #include "glk.h"
+#include "gi_dispa.h"
 #include "remglk.h"
 #include "rgdata.h"
 
@@ -209,7 +210,14 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
 
     /* Set up special request. */
     data_specialreq_t *special = data_specialreq_alloc(fmode, (usage & fileusage_TypeMask));
-    special->gameid = NULL; /*###*/
+    special->gameid = NULL;
+
+#ifdef GI_DISPA_GAME_ID_AVAILABLE
+    cx = gidispatch_get_game_id();
+    if (cx) {
+        special->gameid = strdup(cx);
+    }
+#endif /* GI_DISPA_GAME_ID_AVAILABLE */
     
     /* This will look a lot like glk_select(), but we're waiting only for
        a special-input response. */
