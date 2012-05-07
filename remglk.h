@@ -9,7 +9,7 @@
 
 #include "gi_dispa.h"
 
-#define LIBRARY_VERSION "0.1"
+#define LIBRARY_VERSION "0.2"
 
 /* We define our own TRUE and FALSE and NULL, because ANSI
     is a strange world. */
