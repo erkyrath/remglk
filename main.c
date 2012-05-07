@@ -19,7 +19,6 @@ int pref_stderr = FALSE;
 int pref_fixedmetrics = FALSE;
 int pref_screenwidth = 80;
 int pref_screenheight = 50;
-int pref_prompt_defaults = TRUE; /*### probably delete */
 
 /* Some constants for my wacky little command-line option parser. */
 #define ex_Void (0)
@@ -158,8 +157,6 @@ int main(int argc, char *argv[])
             pref_screenheight = val;
         else if (extract_value(argc, argv, "h", ex_Int, &ix, &val, 50))
             pref_screenheight = val;
-        else if (extract_value(argc, argv, "defprompt", ex_Bool, &ix, &val, pref_prompt_defaults))
-            pref_prompt_defaults = val;
         else if (extract_value(argc, argv, "stderr", ex_Bool, &ix, &val, FALSE))
             pref_stderr = val;
         else {

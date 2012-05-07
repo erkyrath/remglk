@@ -25,9 +25,6 @@ static fileref_t *gli_filereflist = NULL;
 #define BUFLEN (256)
 
 static char workingdir[BUFLEN] = ".";
-static char lastsavename[BUFLEN] = "game.glksave";
-static char lastscriptname[BUFLEN] = "script.txt";
-static char lastdataname[BUFLEN] = "file.glkdata";
 
 fileref_t *gli_new_fileref(char *filename, glui32 usage, glui32 rock)
 {
@@ -379,18 +376,5 @@ void glkunix_set_base_file(char *filename)
         /* No slash, just a filename. */
         ix = 0;
     }
-
-    strcpy(lastsavename, filename+ix);
-    for (ix=strlen(lastsavename)-1; ix >= 0; ix--) 
-        if (lastsavename[ix] == '.') 
-            break;
-    if (ix >= 0)
-        lastsavename[ix] = '\0';
-    strcpy(lastscriptname, lastsavename);
-    strcpy(lastdataname, lastsavename);
-    
-    strcat(lastsavename, gli_suffix_for_usage(fileusage_SavedGame));
-    strcat(lastscriptname, gli_suffix_for_usage(fileusage_Transcript));
-    strcat(lastdataname, gli_suffix_for_usage(fileusage_Data));
 }
 
