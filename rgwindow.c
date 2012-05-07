@@ -757,8 +757,12 @@ static glui32 *dup_buffer(void *buf, int len, int unicode)
    rgwindow.c because most of the work is window-related.)
 
    This clears all the dirty flags, constructs an update, sends it to
-   stdout, and flushes. */
-void gli_windows_update()
+   stdout, and flushes. 
+
+   If special is provided, it goes into the update. It will be freed
+   after sending.
+*/
+void gli_windows_update(data_specialreq_t *special)
 {
     window_t *win;
     int ix;
@@ -835,6 +839,8 @@ void gli_windows_update()
             gen_list_append(&update->inputs, dat);
         }
     }
+
+    update->specialreq = special;
 
     data_update_print(update);
     fflush(stdout);

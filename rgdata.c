@@ -1042,6 +1042,24 @@ data_event_t *data_event_read()
             gli_fatal_error("data: Char input struct has no value");
         input->charvalue = data_raw_str_char(dat);
     }
+    else if (data_raw_string_is(dat, "specialresponse")) {
+        input->dtag = dtag_SpecialResponse;
+
+        dat = data_raw_struct_field(rawdata, "gen");
+        if (!dat)
+            gli_fatal_error("data: Special input struct has no gen");
+        input->gen = data_raw_int_value(dat);
+
+        dat = data_raw_struct_field(rawdata, "response");
+        if (!data_raw_string_is(dat, "fileref_prompt"))
+            gli_fatal_error("data: Special input struct has unknown response type");
+
+        dat = data_raw_struct_field(rawdata, "value");
+        if (dat && dat->type == rawtyp_Str) {
+            input->linevalue = data_raw_str_dup(dat);
+            input->linelen = dat->count;
+        }
+    }
     else {
         gli_fatal_error("data: Input struct has unknown type");
     }
@@ -1061,6 +1079,7 @@ data_update_t *data_update_alloc()
     dat->usewindows = FALSE;
     dat->useinputs = FALSE;
     dat->disable = FALSE;
+    dat->specialreq = NULL;
 
     gen_list_init(&dat->windows);
     gen_list_init(&dat->contents);
@@ -1072,6 +1091,11 @@ data_update_t *data_update_alloc()
 void data_update_free(data_update_t *dat)
 {
     int ix;
+
+    if (dat->specialreq) {
+        data_specialreq_free(dat->specialreq);
+        dat->specialreq = NULL;
+    }
 
     data_window_t **winlist = (data_window_t **)(dat->windows.list);
     for (ix=0; ix<dat->windows.count; ix++) {
@@ -1134,6 +1158,11 @@ void data_update_print(data_update_t *dat)
             printf("\n");
         }
         printf(" ]");
+    }
+
+    if (dat->specialreq) {
+        printf(",\n \"specialreq\":\n");
+        data_specialreq_print(dat->specialreq);
     }
 
     printf("}\n");
@@ -1390,3 +1419,72 @@ void data_line_print(data_line_t *dat, glui32 wintype)
     printf("}");
 
 }
+
+data_specialreq_t *data_specialreq_alloc(glui32 filemode, glui32 filetype)
+{
+    data_specialreq_t *dat = (data_specialreq_t *)malloc(sizeof(data_specialreq_t));
+    if (!dat)
+        gli_fatal_error("data: Unable to alloc specialreq structure");
+
+    dat->filemode = filemode;
+    dat->filetype = filetype;
+    dat->gameid = NULL;
+
+    return dat;
+}
+
+void data_specialreq_free(data_specialreq_t *dat)
+{
+    if (dat->gameid) {
+        free(dat->gameid);
+        dat->gameid = NULL;
+    }
+    free(dat);
+    return;
+}
+
+void data_specialreq_print(data_specialreq_t *dat)
+{
+    char *filemode;
+    char *filetype;
+
+    switch (dat->filemode) {
+        case filemode_Write:
+            filemode = "write";
+            break;
+        case filemode_ReadWrite:
+            filemode = "readwrite";
+            break;
+        case filemode_WriteAppend:
+            filemode = "writeappend";
+            break;
+        case filemode_Read:
+        default:
+            filemode = "read";
+            break;
+    }
+
+    switch (dat->filetype) {
+        case fileusage_SavedGame:
+            filetype = "save";
+            break;
+        case fileusage_Transcript:
+            filetype = "transcript";
+            break;
+        case fileusage_InputRecord:
+            filetype = "command";
+            break;
+        default:
+        case fileusage_Data:
+            filetype = "data";
+            break;
+    }
+
+    printf("  { \"filemode\":\"%s\", \"filetype\":\"%s\"", filemode, filetype);
+    if (dat->gameid) {
+        printf("\n,  \"gameid\":");
+        print_string_json(dat->gameid, stdout);
+    }
+    printf(" }");
+}
+

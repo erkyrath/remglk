@@ -30,7 +30,7 @@ void glk_select(event_t *event)
     curevent = event;
     gli_event_clearevent(curevent);
     
-    gli_windows_update();
+    gli_windows_update(NULL);
     
     while (curevent->type == evtype_None) {
         data_event_t *data = data_event_read();
@@ -96,7 +96,7 @@ void glk_select_poll(event_t *event)
     curevent = event;
     gli_event_clearevent(curevent);
     
-    gli_windows_update();
+    gli_windows_update(NULL);
     
     /* Now we check, once, all the stuff that glk_select() checks
         periodically. This includes rearrange events and timer events. 

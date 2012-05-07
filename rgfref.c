@@ -9,8 +9,10 @@
 #include <string.h>
 #include <unistd.h> /* for unlink() */
 #include <sys/stat.h> /* for stat() */
+
 #include "glk.h"
 #include "remglk.h"
+#include "rgdata.h"
 
 /* This code implements filerefs as they work in a stdio system: a
     fileref contains a pathname, a text/binary flag, and a file
@@ -25,7 +27,6 @@ static fileref_t *gli_filereflist = NULL;
 static char workingdir[BUFLEN] = ".";
 static char lastsavename[BUFLEN] = "game.glksave";
 static char lastscriptname[BUFLEN] = "script.txt";
-static char lastcmdname[BUFLEN] = "commands.txt";
 static char lastdataname[BUFLEN] = "file.glkdata";
 
 fileref_t *gli_new_fileref(char *filename, glui32 usage, glui32 rock)
@@ -203,51 +204,45 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
     glui32 rock)
 {
     fileref_t *fref;
-    struct stat sbuf;
-    char buf[BUFLEN], prbuf[BUFLEN];
+    char buf[BUFLEN];
     char newbuf[2*BUFLEN+10];
     char *cx;
-    int ix, val, gotdot;
-    char *prompt, *prompt2, *lastbuf;
+    int val, gotdot;
+    int gotresp;
+
+    /* Set up special request. */
+    data_specialreq_t *special = data_specialreq_alloc(fmode, (usage & fileusage_TypeMask));
+    special->gameid = NULL; /*###*/
     
-    switch (usage & fileusage_TypeMask) {
-        case fileusage_SavedGame:
-            prompt = "Enter saved game";
-            lastbuf = lastsavename;
-            break;
-        case fileusage_Transcript:
-            prompt = "Enter transcript file";
-            lastbuf = lastscriptname;
-            break;
-        case fileusage_InputRecord:
-            prompt = "Enter command record file";
-            lastbuf = lastcmdname;
-            break;
-        case fileusage_Data:
-        default:
-            prompt = "Enter data file";
-            lastbuf = lastdataname;
-            break;
+    /* This will look a lot like glk_select(), but we're waiting only for
+       a special-input response. */
+    gli_windows_update(special);
+
+    gotresp = FALSE;
+    val = 0; /* length of buf */
+
+    while (!gotresp) {
+        data_event_t *data = data_event_read();
+
+        if (data->gen != gli_window_current_generation())
+            gli_fatal_error("Input generation number does not match.");
+
+        if (data->dtag == dtag_SpecialResponse) {
+            gotresp = TRUE;
+            if (data->linelen && data->linevalue) {
+                for (val=0; val<data->linelen && val<BUFLEN; val++) {
+                    glui32 ch = data->linevalue[val];
+                    if (ch > 0xFF)
+                        ch = '-';
+                    buf[val] = ch;
+                }
+            }
+        }
+
+        data_event_free(data);
     }
     
-    if (fmode == filemode_Read)
-        prompt2 = "to load";
-    else
-        prompt2 = "to store";
-    
-    sprintf(prbuf, "%s %s: ", prompt, prompt2);
-    
-    if (pref_prompt_defaults) {
-        strcpy(buf, lastbuf);
-        val = strlen(buf);
-    }
-    else {
-        buf[0] = 0;
-        val = 0;
-    }
-    
-    ix = NULL; /*### fetch somehow */
-    if (!ix) {
+    if (!val) {
         /* The player cancelled input. */
         return NULL;
     }
@@ -288,25 +283,9 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
         char *suffix = gli_suffix_for_usage(usage);
         strcat(newbuf, suffix);
     }
-    
-    /*### no overwrite check? 
-    if (fmode != filemode_Read) {
-        if (!stat(newbuf, &sbuf) && S_ISREG(sbuf.st_mode)) {
-            sprintf(prbuf, "Overwrite \"%s\"? [y/n] ", cx);
-            while (1) {
-                ix = gli_msgin_getchar(prbuf, FALSE);
-                if (ix == 'n' || ix == 'N' || ix == '\033' || ix == '\007') {
-                    return NULL;
-                }
-                if (ix == 'y' || ix == 'Y') {
-                    break;
-                }
-            }
-        }
-    }
-    ###*/
 
-    strcpy(lastbuf, cx);
+    /* We don't do an overwrite check, because that would be another
+       interchange. */
 
     fref = gli_new_fileref(newbuf, usage, rock);
     if (!fref) {
@@ -384,7 +363,6 @@ void glk_fileref_delete_file(fileref_t *fref)
 /* This should only be called from startup code. */
 void glkunix_set_base_file(char *filename)
 {
-    char *cx;
     int ix;
   
     for (ix=strlen(filename)-1; ix >= 0; ix--) 

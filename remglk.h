@@ -45,6 +45,7 @@ typedef struct grect_struct {
 
 typedef struct data_metrics_struct data_metrics_t;
 typedef struct data_content_struct data_content_t;
+typedef struct data_specialreq_struct data_specialreq_t;
 
 typedef struct glk_window_struct window_t;
 typedef struct glk_stream_struct stream_t;
@@ -199,7 +200,7 @@ extern window_t *gli_new_window(glui32 type, glui32 rock);
 extern void gli_delete_window(window_t *win);
 extern window_t *gli_window_iterate_treeorder(window_t *win);
 extern void gli_window_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics);
-extern void gli_windows_update(void);
+extern void gli_windows_update(data_specialreq_t *special);
 extern void gli_windows_metrics_change(data_metrics_t *newmetrics);
 extern void gli_windows_trim_buffers(void);
 extern void gli_window_put_char(window_t *win, glui32 ch);

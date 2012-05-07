@@ -23,6 +23,7 @@ typedef enum DTag_enum {
     dtag_Char = 3,
     dtag_Arrange = 4,
     dtag_Hyperlink = 5,
+    dtag_SpecialResponse = 6,
 } DTag;
 
 /* gen_list_t: A boring little structure which holds a dynamic list of
@@ -75,6 +76,7 @@ struct data_update_struct {
     gen_list_t contents; /* data_content_t */
     int useinputs;
     gen_list_t inputs; /* data_event_t */
+    data_specialreq_t *specialreq;
     int disable;
 };
 
@@ -126,6 +128,13 @@ struct data_span_struct {
     long len;
 };
 
+/* data_specialreq_t: A special input request. */
+struct data_specialreq_struct {
+    glui32 filemode;
+    glui32 filetype;
+    char *gameid; /* may be null */
+};
+
 extern void gli_initialize_datainput(void);
 
 extern void print_ustring_json(glui32 *buf, glui32 len, FILE *fl);
@@ -163,3 +172,8 @@ extern data_line_t *data_line_alloc(void);
 extern void data_line_free(data_line_t *data);
 extern void data_line_add_span(data_line_t *data, short style, glui32 *str, long len);
 extern void data_line_print(data_line_t *data, glui32 wintype);
+
+extern data_specialreq_t *data_specialreq_alloc(glui32 filemode, glui32 filetype);
+extern void data_specialreq_free(data_specialreq_t *data);
+extern void data_specialreq_print(data_specialreq_t *data);
+
