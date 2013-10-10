@@ -197,7 +197,7 @@ For <em>Adventure</em>, the initial output looks something like:
    "left":0, "top":0, "width":80, "height":1 },
  { "id":22, "type":"buffer", "rock":201,
    "left":0, "top":1, "width":80, "height":49 } ],
- "contents":[
+ "content":[
  {"id":25, "lines": [
   { "line":0, "content":[{ "style":"normal", "text":" At End Of Road
      Score: 36    Moves: 1      "}]}
@@ -226,7 +226,7 @@ For <em>Adventure</em>, the initial output looks something like:
   {},
   {"content":[{ "style":"normal", "text":"&gt;"}]}
  ] } ],
- "inputs":[
+ "input":[
  {"id":22, "gen":1, "type":"line", "maxlen":256 }
  ]}
 </pre>
@@ -275,6 +275,9 @@ The library accepts this, mulls it, and generates a new output update. So it goe
 <h2>The Data Format</h2>
 
 <em>I have not written out this documentation in detail yet. Please refer to the <a href="http://eblong.com/zarf/glk/glkote/docs.html">GlkOte documentation</a>. Input what GlkOte outputs, and vice versa.</em>
+<p>
+
+Prior to version 0.2.1, this library used <code>contents</code> and <code>inputs</code> as the names of the top-level data fields, rather than the correct <code>content</code> and <code>input</code>.
 <p>
 
 A note on <a href="http://json.org/">JSON</a>: this is a strict (in both senses) subset of Javascript's data literal format. The biggest differences are: you always use double quotes, never single quotes; strings are always quoted, but numbers never are; an object (dictionary) always has quotes around its keys.
