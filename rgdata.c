@@ -1138,7 +1138,7 @@ void data_update_print(data_update_t *dat)
 
     if (dat->contents.count) {
         data_content_t **contlist = (data_content_t **)(dat->contents.list);
-        printf(",\n \"contents\":[\n");
+        printf(",\n \"content\":[\n");
         for (ix=0; ix<dat->contents.count; ix++) {
             data_content_print(contlist[ix]);
             if (ix+1 < dat->contents.count)
@@ -1150,7 +1150,7 @@ void data_update_print(data_update_t *dat)
 
     if (dat->useinputs) {
         data_input_t **inplist = (data_input_t **)(dat->inputs.list);
-        printf(",\n \"inputs\":[\n");
+        printf(",\n \"input\":[\n");
         for (ix=0; ix<dat->inputs.count; ix++) {
             data_input_print(inplist[ix]);
             if (ix+1 < dat->inputs.count)
