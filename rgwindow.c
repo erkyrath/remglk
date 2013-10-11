@@ -812,6 +812,13 @@ void gli_windows_update(data_specialreq_t *special)
         if (win->char_request) {
             dat = data_input_alloc(win->updatetag, evtype_CharInput);
             dat->gen = win->inputgen;
+            if (win->type == wintype_TextGrid) {
+                window_textgrid_t *dwin = win->data;
+                /* Canonicalize position first? */
+                dat->cursorpos = TRUE;
+                dat->xpos = dwin->curx;
+                dat->ypos = dwin->cury;
+            }
         }
         else if (win->line_request) {
             dat = data_input_alloc(win->updatetag, evtype_LineInput);
@@ -826,6 +833,10 @@ void gli_windows_update(data_specialreq_t *special)
             }
             else if (win->type == wintype_TextGrid) {
                 window_textgrid_t *dwin = win->data;
+                /* Canonicalize position first? */
+                dat->cursorpos = TRUE;
+                dat->xpos = dwin->curx;
+                dat->ypos = dwin->cury;
                 dat->maxlen = dwin->inmax;
                 if (dwin->incurpos) {
                     dat->initlen = dwin->incurpos;

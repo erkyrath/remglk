@@ -98,6 +98,8 @@ struct data_input_struct {
     glui32 *initstr;
     glui32 initlen;
     glui32 maxlen;
+    int cursorpos; /* only for grids */
+    glsi32 xpos, ypos; /* only if cursorpos */
 };
 
 /* data_content_t: Represents the output changes of one window (text

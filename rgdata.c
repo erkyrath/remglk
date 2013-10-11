@@ -1224,6 +1224,9 @@ data_input_t *data_input_alloc(glui32 window, glui32 evtype)
     dat->initstr = NULL;
     dat->initlen = 0;
     dat->maxlen = 0;
+    dat->cursorpos = FALSE;
+    dat->xpos = -1;
+    dat->ypos = -1;
 
     return dat;
 }
@@ -1257,6 +1260,10 @@ void data_input_print(data_input_t *dat)
                 print_ustring_json(dat->initstr, dat->initlen, stdout);
             }
             break;
+    }
+
+    if (dat->cursorpos) {
+        printf(", \"xpos\":%d, \"ypos\":%d", dat->xpos, dat->ypos);
     }
 
     printf(" }");
