@@ -21,7 +21,7 @@ to decode the structured output and display it appropriately.
 
 * Permissions
 
-The source code in this package is copyright 2012 by Andrew Plotkin.
+The source code in this package is copyright 2012-4 by Andrew Plotkin.
 You may copy and distribute it freely, by any means and under any
 conditions, as long as the code and documentation is not changed. You
 may also incorporate this code into your own program and distribute
