@@ -147,6 +147,7 @@ extern void print_string_json(char *buf, FILE *fl);
 extern void gen_list_init(gen_list_t *list);
 extern void gen_list_free(gen_list_t *list);
 extern void gen_list_append(gen_list_t *list, void *val);
+extern void gen_list_move_all(gen_list_t *dest, gen_list_t *src);
 
 extern data_metrics_t *data_metrics_alloc(int width, int height);
 extern void data_metrics_free(data_metrics_t *metrics);

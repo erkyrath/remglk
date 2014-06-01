@@ -171,11 +171,18 @@ void gli_display_error(char *msg)
 
 #if GIDEBUG_LIBRARY_SUPPORT
 
+/* A cache of debug lines generated this cycle. It's non-static because
+   gli_windows_update() will want to peek at it. Yes, I am violating the
+   prime law of header files. */
+gen_list_t debug_output_cache = { NULL, 0, 0 };
+
 void gidebug_output(char *text)
 {
     /* Send a line of text to the "debug console", if the user has
        requested debugging mode. */
-    /*###*/
+    if (gli_debugger) {
+        gen_list_append(&debug_output_cache, strdup(text));
+    }
 }
 
 /* Block and wait for debug commands. The library will accept debug commands

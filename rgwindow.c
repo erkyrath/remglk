@@ -853,6 +853,11 @@ void gli_windows_update(data_specialreq_t *special)
 
     update->specialreq = special;
 
+#if GIDEBUG_LIBRARY_SUPPORT
+    extern gen_list_t debug_output_cache;
+    gen_list_move_all(&update->debuglines, &debug_output_cache);
+#endif /* GIDEBUG_LIBRARY_SUPPORT */
+
     data_update_print(update);
     fflush(stdout);
 
