@@ -77,6 +77,7 @@ struct data_update_struct {
     int useinputs;
     gen_list_t inputs; /* data_event_t */
     data_specialreq_t *specialreq;
+    gen_list_t debuglines; /* char* (null-terminated UTF8) */
     int disable;
 };
 
@@ -140,6 +141,7 @@ struct data_specialreq_struct {
 extern void gli_initialize_datainput(void);
 
 extern void print_ustring_json(glui32 *buf, glui32 len, FILE *fl);
+extern void print_utf8string_json(char *buf, FILE *fl);
 extern void print_string_json(char *buf, FILE *fl);
 
 extern void gen_list_init(gen_list_t *list);

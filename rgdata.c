@@ -215,6 +215,33 @@ void print_string_json(char *buf, FILE *fl)
     fprintf(fl, "\"");
 }
 
+/* Send a UTF-8 string to an output stream, validly JSON-encoded.
+   (This does not check that the argument is valid UTF-8; that's the
+   caller's responsibility!)
+   This includes the delimiting double-quotes. */
+void print_utf8string_json(char *buf, FILE *fl)
+{
+    char *cx;
+
+    fprintf(fl, "\"");
+    for (cx=buf; *cx; cx++) {
+        glui32 ch = (*cx) & 0xFF;
+        if (ch == '\"')
+            fprintf(fl, "\\\"");
+        else if (ch == '\\')
+            fprintf(fl, "\\\\");
+        else if (ch == '\n')
+            fprintf(fl, "\\n");
+        else if (ch == '\t')
+            fprintf(fl, "\\t");
+        else if (ch < 32)
+            fprintf(fl, "\\u%04X", ch);
+        else
+            fputc(ch, fl);
+    }
+    fprintf(fl, "\"");
+}
+
 void gen_list_init(gen_list_t *list)
 {
     list->list = NULL;
@@ -1084,6 +1111,7 @@ data_update_t *data_update_alloc()
     gen_list_init(&dat->windows);
     gen_list_init(&dat->contents);
     gen_list_init(&dat->inputs);
+    gen_list_init(&dat->debuglines);
 
     return dat;
 }
@@ -1112,9 +1140,15 @@ void data_update_free(data_update_t *dat)
         data_input_free(inplist[ix]);
     }
 
+    char **debuglist = (char **)(dat->debuglines.list);
+    for (ix=0; ix<dat->debuglines.count; ix++) {
+        free(debuglist[ix]);
+    }
+
     gen_list_free(&dat->windows);
     gen_list_free(&dat->contents);
     gen_list_free(&dat->inputs);
+    gen_list_free(&dat->debuglines);
     free(dat);
 }
 
@@ -1163,6 +1197,18 @@ void data_update_print(data_update_t *dat)
     if (dat->specialreq) {
         printf(",\n \"specialinput\":\n");
         data_specialreq_print(dat->specialreq);
+    }
+
+    if (dat->debuglines.count) {
+        char **debuglist = (char **)(dat->debuglines.list);
+        printf(",\n \"debugoutput\":[\n");
+        for (ix=0; ix<dat->debuglines.count; ix++) {
+            print_utf8string_json(debuglist[ix], stdout);
+            if (ix+1 < dat->debuglines.count)
+                printf(",");
+            printf("\n");
+        }
+        printf(" ]");
     }
 
     printf("}\n");
