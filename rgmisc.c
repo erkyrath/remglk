@@ -176,7 +176,6 @@ void gidebug_output(char *text)
     /* Send a line of text to the "debug console", if the user has
        requested debugging mode. */
     /*###*/
-    printf("### debug: %s\n", text); /*###*/
 }
 
 /* Block and wait for debug commands. The library will accept debug commands

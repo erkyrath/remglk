@@ -32,6 +32,9 @@ void glk_select(event_t *event)
     
     gli_windows_update(NULL);
     
+    if (gli_debugger)
+        gidebug_announce_cycle(gidebug_cycle_InputWait);
+
     while (curevent->type == evtype_None) {
         data_event_t *data = data_event_read();
         window_t *win = NULL;
@@ -87,6 +90,9 @@ void glk_select(event_t *event)
     /* An event has occurred; glk_select() is over. */
     gli_windows_trim_buffers();
     curevent = NULL;
+
+    if (gli_debugger)
+        gidebug_announce_cycle(gidebug_cycle_InputAccept);
 }
 
 void glk_select_poll(event_t *event)
