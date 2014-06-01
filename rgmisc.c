@@ -58,6 +58,9 @@ void glk_exit()
     gli_windows_update(NULL);
     gli_streams_close_all();
 
+    if (gli_debugger)
+        gidebug_announce_cycle(gidebug_cycle_End);
+
     exit(0);
 }
 
@@ -165,6 +168,29 @@ void gli_display_error(char *msg)
     fflush(stdout);
     exit(1);
 }
+
+#if GIDEBUG_LIBRARY_SUPPORT
+
+void gidebug_output(char *text)
+{
+    /* Send a line of text to the "debug console", if the user has
+       requested debugging mode. */
+    /*###*/
+    printf("### debug: %s\n", text); /*###*/
+}
+
+/* Block and wait for debug commands. The library will accept debug commands
+   until gidebug_perform_command() returns nonzero.
+
+   This behaves a lot like glk_select(), except that it only handles debug
+   input, not any of the standard event types.
+*/
+void gidebug_pause()
+{
+    /*###*/
+}
+
+#endif /* GIDEBUG_LIBRARY_SUPPORT */
 
 #ifdef NO_MEMMOVE
 

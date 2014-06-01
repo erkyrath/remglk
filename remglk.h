@@ -8,6 +8,7 @@
 #define REMGLK_H
 
 #include "gi_dispa.h"
+#include "gi_debug.h"
 
 #define LIBRARY_VERSION "0.2.1"
 
@@ -169,6 +170,13 @@ extern int pref_stderr;
 extern int pref_printversion;
 extern int pref_screenwidth;
 extern int pref_screenheight;
+
+#if GIDEBUG_LIBRARY_SUPPORT
+/* Has the user requested debug support? */
+extern int gli_debugger;
+#else /* GIDEBUG_LIBRARY_SUPPORT */
+#define gli_debugger (0)
+#endif /* GIDEBUG_LIBRARY_SUPPORT */
 
 /* Declarations of library internal functions. */
 

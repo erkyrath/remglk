@@ -19,6 +19,9 @@ int pref_stderr = FALSE;
 int pref_fixedmetrics = FALSE;
 int pref_screenwidth = 80;
 int pref_screenheight = 50;
+#if GIDEBUG_LIBRARY_SUPPORT
+int gli_debugger = FALSE;
+#endif /* GIDEBUG_LIBRARY_SUPPORT */
 
 /* Some constants for my wacky little command-line option parser. */
 #define ex_Void (0)
@@ -159,6 +162,10 @@ int main(int argc, char *argv[])
             pref_screenheight = val;
         else if (extract_value(argc, argv, "stderr", ex_Bool, &ix, &val, FALSE))
             pref_stderr = val;
+#if GIDEBUG_LIBRARY_SUPPORT
+        else if (extract_value(argc, argv, "D", ex_Void, &ix, &val, FALSE))
+            gli_debugger = val;
+#endif /* GIDEBUG_LIBRARY_SUPPORT */
         else {
             printf("%s: unknown option: %s\n", argv[0], argv[ix]);
             errflag = TRUE;
@@ -193,6 +200,9 @@ int main(int argc, char *argv[])
         printf("  -border BOOL: force borders/no borders between windows\n");
         printf("  -defprompt BOOL: provide defaults for file prompts (default 'yes')\n");
         printf("  -stderr BOOL: send errors to stderr rather than stdout (default 'no')\n");
+#if GIDEBUG_LIBRARY_SUPPORT
+        printf("  -D: turn on debug console\n");
+#endif /* GIDEBUG_LIBRARY_SUPPORT */
         printf("  -version: display Glk library version\n");
         printf("  -help: display this list\n");
         printf("NUM values can be any number. BOOL values can be 'yes' or 'no', or no value to toggle.\n");
@@ -229,6 +239,10 @@ int main(int argc, char *argv[])
         glk_exit();
     }
     inittime = FALSE;
+
+    if (gli_debugger)
+        gidebug_announce_cycle(gidebug_cycle_Start);
+
     /* Call the program main entry point, and then exit. */
     glk_main();
     glk_exit();
