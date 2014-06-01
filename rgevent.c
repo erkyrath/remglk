@@ -30,11 +30,11 @@ void glk_select(event_t *event)
     curevent = event;
     gli_event_clearevent(curevent);
     
-    gli_windows_update(NULL);
-    
     if (gli_debugger)
         gidebug_announce_cycle(gidebug_cycle_InputWait);
 
+    gli_windows_update(NULL);
+    
     while (curevent->type == evtype_None) {
         data_event_t *data = data_event_read();
         window_t *win = NULL;
