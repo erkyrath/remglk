@@ -488,6 +488,8 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
 
     *termchar = '\0';
 
+    char buf[128];
+
     while (isspace(ch = getchar())) { };
     if (ch == EOF)
         gli_fatal_error("data: Unexpected end of input");
@@ -504,7 +506,10 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
             dat->number = 10 * dat->number + (ch-'0');
             ch = getchar();
         }
-
+	/* Skip any decimal portion. Actually accepts things like 1.2.3.4 => 1 */
+	while (ch == '.' || (ch >= '0' && ch <= '9')) {
+	  ch = getchar();
+	}
         if (ch != EOF)
             ungetc(ch, stdin);
         return dat;
@@ -708,8 +713,10 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
             while (isspace(ch = getchar())) { };
             if (ch == '}')
                 break;
-            if (ch != ',')
-                gli_fatal_error("data: Expected comma in struct");
+            if (ch != ',') {
+	      sprintf(buf, "data: Expected comma in struct, was #%d", (int) ch);
+	      gli_fatal_error(buf);
+	    }
             commapending = TRUE;
         }
 
@@ -717,7 +724,8 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
         return dat;
     }
 
-    gli_fatal_error("data: Invalid character in data");
+    sprintf(buf, "data: Invalid character in data: #%d", (int) ch);
+    gli_fatal_error(buf);
     return NULL;
 }
 
