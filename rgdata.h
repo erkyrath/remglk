@@ -19,11 +19,11 @@ typedef enum DTag_enum {
     dtag_Unknown = 0,
     dtag_Init = 1,
     dtag_Refresh = 2,
-    dtag_Line = 2,
-    dtag_Char = 3,
-    dtag_Arrange = 4,
-    dtag_Hyperlink = 5,
-    dtag_SpecialResponse = 6,
+    dtag_Line = 3,
+    dtag_Char = 4,
+    dtag_Arrange = 5,
+    dtag_Hyperlink = 6,
+    dtag_SpecialResponse = 7,
 } DTag;
 
 /* gen_list_t: A boring little structure which holds a dynamic list of

@@ -987,6 +987,14 @@ data_event_t *data_event_read()
             gli_fatal_error("data: Init input struct has no metrics");
         input->metrics = data_metrics_parse(dat);
     }
+    else if (data_raw_string_is(dat, "refresh")) {
+        input->dtag = dtag_Refresh;
+
+        dat = data_raw_struct_field(rawdata, "gen");
+        if (!dat)
+            gli_fatal_error("data: Init input struct has no gen");
+        input->gen = data_raw_int_value(dat);
+    }
     else if (data_raw_string_is(dat, "arrange")) {
         input->dtag = dtag_Arrange;
 
