@@ -862,6 +862,9 @@ void gli_windows_update(data_specialreq_t *special, int newgeneration)
 
 /* Set dirty flags on everything, as if the client hasn't seen any
    updates since the given generation number.
+
+   ### This ignores the generation number and just resends everything
+   we've got.
 */
 void gli_windows_refresh(glui32 fromgen)
 {
