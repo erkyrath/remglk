@@ -37,10 +37,17 @@ void glk_select(event_t *event)
         window_t *win = NULL;
         glui32 val;
 
-        if (data->gen != gli_window_current_generation())
+        if (data->gen != gli_window_current_generation() && data->dtag != dtag_Refresh)
             gli_fatal_error("Input generation number does not match.");
 
         switch (data->dtag) {
+            case dtag_Refresh:
+                /* Repeat the current display state and keep waiting for
+                   a (real) event. */
+                gli_windows_refresh(data->gen);
+                gli_windows_update(NULL);
+                break;
+
             case dtag_Arrange:
                 gli_windows_metrics_change(data->metrics);
                 break;

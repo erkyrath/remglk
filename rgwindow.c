@@ -859,6 +859,26 @@ void gli_windows_update(data_specialreq_t *special)
     data_update_free(update);
 }
 
+/* Set dirty flags on everything, as if the client hasn't seen any
+   updates since the given generation number.
+*/
+void gli_windows_refresh(glui32 fromgen)
+{
+    window_t *win;
+    for (win=gli_windowlist; win; win=win->next) {
+        if (win->type == wintype_TextBuffer) {
+            window_textbuffer_t *dwin = win->data;
+            dwin->dirtybeg = 0;
+            dwin->dirtyend = dwin->numchars;
+            dwin->dirtydelta = 0;
+        }
+        else if (win->type == wintype_TextGrid) {
+            window_textgrid_t *dwin = win->data;
+            dwin->alldirty = TRUE;
+        }
+    }
+}
+
 /* Some trivial switch functions which make up for the fact that we're not
     doing this in C++. */
 
