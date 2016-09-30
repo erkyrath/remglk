@@ -762,13 +762,14 @@ static glui32 *dup_buffer(void *buf, int len, int unicode)
    If special is provided, it goes into the update. It will be freed
    after sending.
 */
-void gli_windows_update(data_specialreq_t *special)
+void gli_windows_update(data_specialreq_t *special, int newgeneration)
 {
     window_t *win;
     int ix;
     data_update_t *update = data_update_alloc();
 
-    generation++;
+    if (newgeneration)
+        generation++;
     update->gen = generation;
 
     if (geometry_changed) {

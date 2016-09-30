@@ -221,7 +221,7 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
     
     /* This will look a lot like glk_select(), but we're waiting only for
        a special-input response. */
-    gli_windows_update(special);
+    gli_windows_update(special, TRUE);
 
     gotresp = FALSE;
     val = 0; /* length of buf */

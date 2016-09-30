@@ -55,7 +55,7 @@ void gli_initialize_misc()
 
 void glk_exit()
 {   
-    gli_windows_update(NULL);
+    gli_windows_update(NULL, TRUE);
     gli_streams_close_all();
 
     exit(0);

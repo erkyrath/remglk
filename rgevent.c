@@ -30,7 +30,7 @@ void glk_select(event_t *event)
     curevent = event;
     gli_event_clearevent(curevent);
     
-    gli_windows_update(NULL);
+    gli_windows_update(NULL, TRUE);
     
     while (curevent->type == evtype_None) {
         data_event_t *data = data_event_read();
@@ -45,7 +45,7 @@ void glk_select(event_t *event)
                 /* Repeat the current display state and keep waiting for
                    a (real) event. */
                 gli_windows_refresh(data->gen);
-                gli_windows_update(NULL);
+                gli_windows_update(NULL, FALSE);
                 break;
 
             case dtag_Arrange:
@@ -103,7 +103,7 @@ void glk_select_poll(event_t *event)
     curevent = event;
     gli_event_clearevent(curevent);
     
-    gli_windows_update(NULL);
+    gli_windows_update(NULL, TRUE);
     
     /* Now we check, once, all the stuff that glk_select() checks
         periodically. This includes rearrange events and timer events. 
