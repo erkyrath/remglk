@@ -864,7 +864,7 @@ void gli_windows_update(data_specialreq_t *special, int newgeneration)
    updates since the given generation number.
 
    ### This ignores the generation number and just resends everything
-   we've got.
+   we've got, except for the case -1, which indicates the previous generation.
 */
 void gli_windows_refresh(glui32 fromgen)
 {
@@ -872,7 +872,11 @@ void gli_windows_refresh(glui32 fromgen)
     for (win=gli_windowlist; win; win=win->next) {
         if (win->type == wintype_TextBuffer) {
             window_textbuffer_t *dwin = win->data;
-            dwin->dirtybeg = 0;
+	    if (fromgen == -1) {
+	      dwin->dirtybeg = dwin->prev_dirtybeg;
+	    } else {
+	      dwin->dirtybeg = 0;
+	    }
             dwin->dirtyend = dwin->numchars;
             dwin->dirtydelta = 0;
         }

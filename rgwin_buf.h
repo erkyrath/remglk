@@ -38,6 +38,9 @@ typedef struct window_textbuffer_struct {
         last update. Also the amount the dirty region has grown/shrunk;
         so the old end of the dirty region == (dirtyend - dirtydelta). 
         If dirtybeg == -1, dirtydelta is invalid. */
+
+    /* remember the position of the previous generation of text that was output */
+    long prev_dirtybeg;
     
     tbrun_t *runs;
     long numruns;

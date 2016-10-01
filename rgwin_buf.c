@@ -48,6 +48,7 @@ window_textbuffer_t *win_textbuffer_create(window_t *win)
     dwin->dirtybeg = -1;
     dwin->dirtyend = -1;
     dwin->dirtydelta = -1;
+    dwin->prev_dirtybeg = -1;
     
     dwin->width = -1;
     dwin->height = -1;
@@ -146,6 +147,7 @@ data_content_t *win_textbuffer_update(window_t *win)
     if (dwin->dirtybeg == -1) {
         return NULL;
     }
+    dwin->prev_dirtybeg = dwin->dirtybeg;
 
     data_content_t *dat = data_content_alloc(win->updatetag, win->type);
 
