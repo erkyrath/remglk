@@ -488,6 +488,8 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
 
     *termchar = '\0';
 
+    char buf[128];
+
     while (isspace(ch = getchar())) { };
     if (ch == EOF)
         gli_fatal_error("data: Unexpected end of input");
@@ -504,7 +506,10 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
             dat->number = 10 * dat->number + (ch-'0');
             ch = getchar();
         }
-
+	/* Skip any decimal portion. Actually accepts things like 1.2.3.4 => 1 */
+	while (ch == '.' || (ch >= '0' && ch <= '9')) {
+	  ch = getchar();
+	}
         if (ch != EOF)
             ungetc(ch, stdin);
         return dat;
@@ -708,8 +713,10 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
             while (isspace(ch = getchar())) { };
             if (ch == '}')
                 break;
-            if (ch != ',')
-                gli_fatal_error("data: Expected comma in struct");
+            if (ch != ',') {
+	      sprintf(buf, "data: Expected comma in struct, was #%d", (int) ch);
+	      gli_fatal_error(buf);
+	    }
             commapending = TRUE;
         }
 
@@ -717,7 +724,8 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
         return dat;
     }
 
-    gli_fatal_error("data: Invalid character in data");
+    sprintf(buf, "data: Invalid character in data: #%d", (int) ch);
+    gli_fatal_error(buf);
     return NULL;
 }
 
@@ -991,9 +999,12 @@ data_event_t *data_event_read()
         input->dtag = dtag_Refresh;
 
         dat = data_raw_struct_field(rawdata, "gen");
-        if (!dat)
-            gli_fatal_error("data: Init input struct has no gen");
-        input->gen = data_raw_int_value(dat);
+        if (dat) {
+	  input->gen = data_raw_int_value(dat);
+	} else {
+	  /* request the previous generation */
+	  input->gen = -1;
+	}
     }
     else if (data_raw_string_is(dat, "arrange")) {
         input->dtag = dtag_Arrange;
