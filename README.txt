@@ -21,9 +21,8 @@ to decode the structured output and display it appropriately.
 
 * Permissions
 
-The Quixe, GiDispa, and GiLoad Javascript libraries are copyright 2012-16
-by Andrew Plotkin. They are distributed under the MIT license; see the
-"LICENSE" file.
+The RemGlk library is copyright 2012-16 by Andrew Plotkin. It is
+distributed under the MIT license; see the "LICENSE" file.
 
 The RemGlk documentation is licensed under a Creative Commons
 Attribution-Noncommercial-Share Alike 3.0 Unported License.
