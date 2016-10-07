@@ -498,12 +498,17 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
     }
 
     if (ch >= '0' && ch <= '9') {
-        /* This accepts "01", which it really shouldn't, but whatever */
+        /* This accepts "01", which it really shouldn't, but whatever.
+           We also ignore the decimal part if found, which means we're
+           rounding towards zero. */
         data_raw_t *dat = data_raw_alloc(rawtyp_Int);
         while (ch >= '0' && ch <= '9') {
             dat->number = 10 * dat->number + (ch-'0');
             ch = getchar();
         }
+
+        while (ch == '.' || (ch >= '0' && ch <= '9'))
+            ch = getchar();
 
         if (ch != EOF)
             ungetc(ch, stdin);
@@ -521,6 +526,9 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
             ch = getchar();
         }
         dat->number = -dat->number;
+
+        while (ch == '.' || (ch >= '0' && ch <= '9'))
+            ch = getchar();
 
         if (ch != EOF)
             ungetc(ch, stdin);

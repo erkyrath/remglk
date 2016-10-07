@@ -11,7 +11,7 @@
 #CC = cc
 CC = gcc -ansi
 
-OPTIONS = -g -Wall
+OPTIONS = -g -Wall -Wno-tautological-compare
 
 CFLAGS = $(OPTIONS) $(INCLUDEDIRS)
 
