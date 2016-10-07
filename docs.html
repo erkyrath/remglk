@@ -280,6 +280,9 @@ The library accepts this, mulls it, and generates a new output update. So it goe
 Prior to version 0.2.1, this library used <code>contents</code> and <code>inputs</code> as the names of the top-level data fields, rather than the correct <code>content</code> and <code>input</code>. The prior version also omitted the <code>xpos</code> and <code>ypos</code> fields for grid window input.
 <p>
 
+As of version 0.2.2, the library accepts noninteger numbers but rounds them (towards zero) to integers.
+<p>
+
 A note on <a href="http://json.org/">JSON</a>: this is a strict (in both senses) subset of Javascript's data literal format. The biggest differences are: you always use double quotes, never single quotes; strings are always quoted, but numbers never are; an object (dictionary) always has quotes around its keys.
 <p>
 
