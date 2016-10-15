@@ -2,17 +2,12 @@
 #define _GI_BLORB_H
 
 /* gi_blorb.h: Blorb library layer for Glk API.
-    gi_blorb version 1.5.
+    gi_blorb version 1.5.1.
     Designed by Andrew Plotkin <erkyrath@eblong.com>
     http://eblong.com/zarf/glk/
 
-    This file is copyright 1998-2012 by Andrew Plotkin. You may copy,
-    distribute, and incorporate it into your own programs, by any means
-    and under any conditions, as long as you do not modify it. You may
-    also modify this file, incorporate it into your own programs,
-    and distribute the modified version, as long as you retain a notice
-    in your program or documentation which mentions my name and the URL
-    shown above.
+    This file is copyright 1998-2012 by Andrew Plotkin. It is
+    distributed under the MIT license; see the "LICENSE" file.
 */
 
 /* Error type and error codes */
