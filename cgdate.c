@@ -10,6 +10,10 @@
 
 #ifdef GLK_MODULE_DATETIME
 
+#ifdef NO_TIMEGM_AVAIL
+extern time_t timegm(struct tm *tm);
+#endif /* NO_TIMEGM_AVAIL */
+
 /* Copy a POSIX tm structure to a glkdate. */
 static void gli_date_from_tm(glkdate_t *date, struct tm *tm)
 {
@@ -33,7 +37,7 @@ static glsi32 gli_date_to_tm(glkdate_t *date, struct tm *tm)
 {
     glsi32 microsec;
 
-    bzero(tm, sizeof(tm));
+    bzero(tm, sizeof(*tm));
     tm->tm_year = date->year - 1900;
     tm->tm_mon = date->month - 1;
     tm->tm_mday = date->day;
@@ -192,6 +196,7 @@ void glk_date_to_time_utc(glkdate_t *date, glktimeval_t *time)
     /* The timegm function is not standard POSIX. If it's not available
        on your platform, try setting the env var "TZ" to "", calling
        mktime(), and then resetting "TZ". */
+    tm.tm_isdst = 0;
     timestamp = timegm(&tm);
 
     gli_timestamp_to_time(timestamp, microsec, time);
@@ -224,6 +229,7 @@ glsi32 glk_date_to_simple_time_utc(glkdate_t *date, glui32 factor)
     /* The timegm function is not standard POSIX. If it's not available
        on your platform, try setting the env var "TZ" to "", calling
        mktime(), and then resetting "TZ". */
+    tm.tm_isdst = 0;
     timestamp = timegm(&tm);
 
     return gli_simplify_time(timestamp, factor);
@@ -245,6 +251,30 @@ glsi32 glk_date_to_simple_time_local(glkdate_t *date, glui32 factor)
 
     return gli_simplify_time(timestamp, factor);
 }
+
+#ifdef NO_TIMEGM_AVAIL
+/* If you have no timegm() function, you can #define NO_TIMEGM_AVAIL to
+   get this definition. */
+
+time_t timegm(struct tm *tm)
+{
+    time_t res;
+    char *origtz;
+
+    origtz = getenv("TZ");
+    setenv("TZ", "", 1);
+    tzset();
+    res = mktime(tm);
+    if (origtz)
+        setenv("TZ", origtz, 1);
+    else
+        unsetenv("TZ");
+    tzset();
+
+    return res;
+}
+
+#endif /* NO_TIMEGM_AVAIL */
 
 
 #endif /* GLK_MODULE_DATETIME */
