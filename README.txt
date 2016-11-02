@@ -1,6 +1,6 @@
 RemGlk: remote-procedure-call implementation of the Glk IF API
 
-RemGlk Library: version 0.2.2.
+RemGlk Library: version 0.2.3.
 Designed by Andrew Plotkin <erkyrath@eblong.com>
 <http://eblong.com/zarf/glk/remglk/docs.html>
 
