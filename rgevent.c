@@ -81,7 +81,10 @@ void glk_select(event_t *event)
                 win->inputgen = 0;
                 gli_event_store(evtype_CharInput, win, val, 0);
                 break;
-            /* ### */
+
+            case dtag_Timer:
+                gli_event_store(evtype_Timer, NULL, 0, 0);
+                break;
 
             default:
                 /* Ignore the event. */

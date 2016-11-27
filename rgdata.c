@@ -1058,6 +1058,14 @@ data_event_t *data_event_read()
             gli_fatal_error("data: Char input struct has no value");
         input->charvalue = data_raw_str_char(dat);
     }
+    else if (data_raw_string_is(dat, "timer")) {
+        input->dtag = dtag_Timer;
+
+        dat = data_raw_struct_field(rawdata, "gen");
+        if (!dat)
+            gli_fatal_error("data: Timer input struct has no gen");
+        input->gen = data_raw_int_value(dat);
+    }
     else if (data_raw_string_is(dat, "specialresponse")) {
         input->dtag = dtag_SpecialResponse;
 
