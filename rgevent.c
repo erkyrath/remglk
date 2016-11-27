@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include "glk.h"
 #include "remglk.h"
@@ -18,6 +19,8 @@ static event_t *curevent = NULL;
 
 static glui32 timing_msec; /* The current timed-event request, exactly as
     passed to glk_request_timer_events(). */
+static struct timeval timing_start; /* When the current timer started
+    or last fired. */
 
 /* Set up the input system. This is called from main(). */
 void gli_initialize_events()
@@ -83,6 +86,7 @@ void glk_select(event_t *event)
                 break;
 
             case dtag_Timer:
+                gettimeofday(&timing_start, NULL);
                 gli_event_store(evtype_Timer, NULL, 0, 0);
                 break;
 
@@ -101,22 +105,10 @@ void glk_select(event_t *event)
 
 void glk_select_poll(event_t *event)
 {
-    int firsttime = TRUE;
-    
     curevent = event;
     gli_event_clearevent(curevent);
-    
-    gli_windows_update(NULL, TRUE);
-    
-    /* Now we check, once, all the stuff that glk_select() checks
-        periodically. This includes rearrange events and timer events. 
-       Yes, this looks like a loop, but that's just so we can use
-        continue; it executes exactly once. */
-        
-    while (firsttime) {
-        firsttime = FALSE;
 
-    }
+    /* We can only sensibly check for unfired timer events. */    
 
     curevent = NULL;
 }
@@ -139,9 +131,45 @@ void glk_request_timer_events(glui32 millisecs)
     if (!pref_timersupport)
         return;
     timing_msec = millisecs;
+    gettimeofday(&timing_start, NULL);
 }
 
+/* Return the current timer request interval, or 0 if the timer is off. */
 glui32 gli_current_timer_request()
 {
     return timing_msec;
+}
+
+/* Set timing_start to now. */
+void gli_timer_request_set_start()
+{
+    gettimeofday(&timing_start, NULL);
+}
+
+/* Work out how many milliseconds it has been since timing_start.
+   If there is no timer, returns -1. */
+glsi32 gli_timer_request_since_start()
+{
+    struct timeval tv;
+
+    if (!pref_timersupport)
+        return -1;
+    if (!timing_msec)
+        return -1;
+
+    gettimeofday(&tv, NULL);
+
+    if (tv.tv_sec < timing_start.tv_sec) {
+        return 0;
+    }
+    else if (tv.tv_sec == timing_start.tv_sec) {
+        if (tv.tv_usec < timing_start.tv_usec)
+            return 0;
+        return (tv.tv_usec - timing_start.tv_usec) / 1000;
+    }
+    else {
+        glsi32 res = (tv.tv_sec - timing_start.tv_sec) * 1000;
+        res += ((tv.tv_usec - timing_start.tv_usec) / 1000);
+        return res;
+    }
 }
