@@ -17,15 +17,21 @@
     event. When not inside a glk_select() call, this will be NULL. */
 static event_t *curevent = NULL; 
 
-static glui32 timing_msec; /* The current timed-event request, exactly as
-    passed to glk_request_timer_events(). */
-static struct timeval timing_start; /* When the current timer started
-    or last fired. */
+/* The current timed-event request, exactly as passed to
+   glk_request_timer_events(). */
+static glui32 timing_msec; 
+/* The last timing value that was sent out. (0 means null was sent.) */
+static glui32 last_timing_msec;
+/* When the current timer started or last fired. */
+static struct timeval timing_start; 
+
+static glsi32 gli_timer_request_since_start(void);
 
 /* Set up the input system. This is called from main(). */
 void gli_initialize_events()
 {
     timing_msec = 0;
+    last_timing_msec = 0;
 }
 
 void glk_select(event_t *event)
@@ -108,7 +114,17 @@ void glk_select_poll(event_t *event)
     curevent = event;
     gli_event_clearevent(curevent);
 
-    /* We can only sensibly check for unfired timer events. */    
+    /* We can only sensibly check for unfired timer events. */
+    if (timing_msec) {
+        glsi32 time = gli_timer_request_since_start();
+        if (time >= 0 && time >= timing_msec) {
+            gettimeofday(&timing_start, NULL);
+            /* Resend timer request at next update. */
+            last_timing_msec = 0;
+            /* Call it a timer event. */
+            curevent->type = evtype_Timer;
+        }
+    }
 
     curevent = NULL;
 }
@@ -134,21 +150,24 @@ void glk_request_timer_events(glui32 millisecs)
     gettimeofday(&timing_start, NULL);
 }
 
-/* Return the current timer request interval, or 0 if the timer is off. */
-glui32 gli_current_timer_request()
+/* Return whether the timer request has changed since the last call.
+   If so, also return the request value as *msec. */
+int gli_timer_need_update(glui32 *msec)
 {
-    return timing_msec;
-}
-
-/* Set timing_start to now. */
-void gli_timer_request_set_start()
-{
-    gettimeofday(&timing_start, NULL);
+    if (last_timing_msec != timing_msec) {
+        *msec = timing_msec;
+        last_timing_msec = timing_msec;
+        return TRUE;
+    }
+    else {
+        *msec = 0;
+        return FALSE;
+    }
 }
 
 /* Work out how many milliseconds it has been since timing_start.
    If there is no timer, returns -1. */
-glsi32 gli_timer_request_since_start()
+static glsi32 gli_timer_request_since_start()
 {
     struct timeval tv;
 
