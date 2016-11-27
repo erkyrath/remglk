@@ -160,6 +160,8 @@ int main(int argc, char *argv[])
             pref_screenheight = val;
         else if (extract_value(argc, argv, "stderr", ex_Bool, &ix, &val, FALSE))
             pref_stderr = val;
+        else if (extract_value(argc, argv, "timersupport", ex_Bool, &ix, &val, FALSE))
+            pref_timersupport = val;
         else {
             printf("%s: unknown option: %s\n", argv[0], argv[ix]);
             errflag = TRUE;
@@ -193,6 +195,7 @@ int main(int argc, char *argv[])
         printf("  -revgrid BOOL: reverse text in grid (status) windows (default 'no')\n");
         printf("  -border BOOL: force borders/no borders between windows\n");
         printf("  -defprompt BOOL: provide defaults for file prompts (default 'yes')\n");
+        printf("  -timersupport BOOL: declare support for timer events (default 'no')\n");
         printf("  -stderr BOOL: send errors to stderr rather than stdout (default 'no')\n");
         printf("  -version: display Glk library version\n");
         printf("  -help: display this list\n");
