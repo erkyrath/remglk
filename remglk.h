@@ -169,6 +169,7 @@ extern int pref_stderr;
 extern int pref_printversion;
 extern int pref_screenwidth;
 extern int pref_screenheight;
+extern int pref_timersupport;
 
 /* Declarations of library internal functions. */
 

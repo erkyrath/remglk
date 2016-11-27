@@ -64,7 +64,7 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
             return FALSE;
             
         case gestalt_Timer: 
-            return FALSE; /* ### for now */
+            return pref_timersupport;
 
         case gestalt_Graphics:
         case gestalt_GraphicsTransparency:

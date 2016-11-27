@@ -19,6 +19,7 @@ int pref_stderr = FALSE;
 int pref_fixedmetrics = FALSE;
 int pref_screenwidth = 80;
 int pref_screenheight = 50;
+int pref_timersupport = FALSE;
 
 /* Some constants for my wacky little command-line option parser. */
 #define ex_Void (0)

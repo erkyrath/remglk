@@ -136,6 +136,8 @@ void gli_event_store(glui32 type, window_t *win, glui32 val1, glui32 val2)
 
 void glk_request_timer_events(glui32 millisecs)
 {
+    if (!pref_timersupport)
+        return;
     timing_msec = millisecs;
 }
 
