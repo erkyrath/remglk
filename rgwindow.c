@@ -25,6 +25,9 @@ static glui32 tagcounter = 0;
 /* Linked list of all windows */
 static window_t *gli_windowlist = NULL; 
 
+/* The last timing value that was sent out. (0 means null was sent.) */
+static glui32 last_timing_msec;
+
 /* For use by gli_print_spaces() */
 #define NUMSPACES (16)
 static char spacebuffer[NUMSPACES+1];
@@ -54,6 +57,7 @@ void gli_initialize_windows(data_metrics_t *newmetrics)
     tagcounter = (random() % 15) + 16;
     gli_rootwin = NULL;
     gli_focuswin = NULL;
+    last_timing_msec = 0;
     
     /* Build a convenient array of spaces. */
     for (ix=0; ix<NUMSPACES; ix++)
@@ -850,6 +854,13 @@ void gli_windows_update(data_specialreq_t *special, int newgeneration)
             update->useinputs = TRUE;
             gen_list_append(&update->inputs, dat);
         }
+    }
+
+    glui32 timing_msec = gli_current_timer_request();
+    if (last_timing_msec != timing_msec) {
+        update->includetimer = TRUE;
+        update->timer = timing_msec;
+        last_timing_msec = timing_msec;
     }
 
     update->specialreq = special;

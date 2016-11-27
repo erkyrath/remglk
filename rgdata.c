@@ -1094,6 +1094,8 @@ data_update_t *data_update_alloc()
     dat->gen = 0;
     dat->usewindows = FALSE;
     dat->useinputs = FALSE;
+    dat->includetimer = FALSE;
+    dat->timer = 0;
     dat->disable = FALSE;
     dat->specialreq = NULL;
 
@@ -1179,6 +1181,14 @@ void data_update_print(data_update_t *dat)
     if (dat->specialreq) {
         printf(",\n \"specialinput\":\n");
         data_specialreq_print(dat->specialreq);
+    }
+
+    if (dat->includetimer) {
+        printf(",\n \"timer\":");
+        if (!dat->timer)
+            printf("null");
+        else
+            printf("%d", dat->timer);
     }
 
     printf("}\n");

@@ -76,6 +76,8 @@ struct data_update_struct {
     gen_list_t contents; /* data_content_t */
     int useinputs;
     gen_list_t inputs; /* data_event_t */
+    int includetimer;
+    glui32 timer;
     data_specialreq_t *specialreq;
     int disable;
 };

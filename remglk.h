@@ -188,6 +188,7 @@ extern glui32 gli_parse_utf8(unsigned char *buf, glui32 buflen,
 
 extern void gli_initialize_events(void);
 extern void gli_event_store(glui32 type, window_t *win, glui32 val1, glui32 val2);
+extern glui32 gli_current_timer_request(void);
 
 extern void gli_initialize_windows(data_metrics_t *metrics);
 extern void gli_fast_exit(void);
