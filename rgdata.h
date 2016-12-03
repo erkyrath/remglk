@@ -59,9 +59,9 @@ struct data_metrics_struct {
 /* data_supportcaps_t: List of I/O capabilities of the client. */
 struct data_supportcaps_struct {
     int timer;
+    int hyperlinks;
     int graphics;
     int sound;
-    int hyperlinks;
 };
 
 /* data_event_t: Represents an input event (either the initial setup event,

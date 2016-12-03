@@ -933,6 +933,11 @@ data_supportcaps_t *data_supportcaps_alloc()
 {
     data_supportcaps_t *supportcaps = (data_supportcaps_t *)malloc(sizeof(data_supportcaps_t));
 
+    supportcaps->timer = FALSE;
+    supportcaps->hyperlinks = FALSE;
+    supportcaps->graphics = FALSE;
+    supportcaps->sound = FALSE;
+
     return supportcaps;
 }
 
