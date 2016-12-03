@@ -969,6 +969,18 @@ static data_supportcaps_t *data_supportcaps_parse(data_raw_t *rawdata)
     return supportcaps;
 }
 
+void data_supportcaps_print(data_supportcaps_t *supportcaps)
+{
+    /* This displays very verbosely, and not in JSON-readable format. */
+
+    printf("{\n");   
+    printf("  timer: %d\n", supportcaps->timer);
+    printf("  hyperlinks: %d\n", supportcaps->hyperlinks);
+    printf("  graphics: %d\n", supportcaps->graphics);
+    printf("  sound: %d\n", supportcaps->sound);
+    printf("}\n");   
+}
+
 void data_event_free(data_event_t *data)
 {
     data->dtag = dtag_Unknown;
