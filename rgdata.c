@@ -948,8 +948,23 @@ void data_supportcaps_free(data_supportcaps_t *supportcaps)
 
 static data_supportcaps_t *data_supportcaps_parse(data_raw_t *rawdata)
 {
-    data_raw_t *dat;
     data_supportcaps_t *supportcaps = data_supportcaps_alloc();
+
+    if (rawdata->type == rawtyp_List) {
+        int ix;
+        for (ix=0; ix<rawdata->count; ix++) {
+            data_raw_t *dat = rawdata->list[ix];
+
+            if (data_raw_string_is(dat, "timer"))
+                supportcaps->timer = TRUE;
+            if (data_raw_string_is(dat, "hyperlinks"))
+                supportcaps->hyperlinks = TRUE;
+            if (data_raw_string_is(dat, "graphics"))
+                supportcaps->graphics = TRUE;
+            if (data_raw_string_is(dat, "sound"))
+                supportcaps->sound = TRUE;
+        }
+    }
 
     return supportcaps;
 }
@@ -1031,7 +1046,6 @@ data_event_t *data_event_read()
 
         dat = data_raw_struct_field(rawdata, "support");
         if (dat) {
-            fprintf(stderr, "### got support\n");
             input->supportcaps = data_supportcaps_parse(dat);
         }
     }
