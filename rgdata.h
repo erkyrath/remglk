@@ -38,6 +38,7 @@ typedef struct gen_list_struct {
 } gen_list_t;
 
 typedef struct data_event_struct data_event_t;
+typedef struct data_supportcaps_struct data_supportcaps_t;
 typedef struct data_update_struct data_update_t;
 typedef struct data_window_struct data_window_t;
 typedef struct data_input_struct data_input_t;
@@ -55,6 +56,14 @@ struct data_metrics_struct {
     glui32 buffermarginx, buffermarginy;
 };
 
+/* data_supportcaps_t: List of I/O capabilities of the client. */
+struct data_supportcaps_struct {
+    int timer;
+    int graphics;
+    int sound;
+    int hyperlinks;
+};
+
 /* data_event_t: Represents an input event (either the initial setup event,
    or user input). */
 struct data_event_struct {
@@ -66,6 +75,7 @@ struct data_event_struct {
     glui32 linelen;
     glui32 terminator;
     data_metrics_t *metrics;
+    data_supportcaps_t *supportcaps;
 };
 
 /* data_update_t: Represents a complete output update, including what
@@ -152,6 +162,10 @@ extern void gen_list_append(gen_list_t *list, void *val);
 extern data_metrics_t *data_metrics_alloc(int width, int height);
 extern void data_metrics_free(data_metrics_t *metrics);
 extern void data_metrics_print(data_metrics_t *metrics);
+
+extern data_supportcaps_t *data_supportcaps_alloc(void);
+extern void data_supportcaps_free(data_supportcaps_t *supportcaps);
+extern void data_supportcaps_print(data_supportcaps_t *supportcaps);
 
 extern data_event_t *data_event_read(void);
 extern void data_event_free(data_event_t *data);

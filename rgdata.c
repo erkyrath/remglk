@@ -929,6 +929,26 @@ void data_metrics_print(data_metrics_t *metrics)
     printf("}\n");   
 }
 
+data_supportcaps_t *data_supportcaps_alloc()
+{
+    data_supportcaps_t *supportcaps = (data_supportcaps_t *)malloc(sizeof(data_supportcaps_t));
+
+    return supportcaps;
+}
+
+void data_supportcaps_free(data_supportcaps_t *supportcaps)
+{
+    free(supportcaps);
+}
+
+static data_supportcaps_t *data_supportcaps_parse(data_raw_t *rawdata)
+{
+    data_raw_t *dat;
+    data_supportcaps_t *supportcaps = data_supportcaps_alloc();
+
+    return supportcaps;
+}
+
 void data_event_free(data_event_t *data)
 {
     data->dtag = dtag_Unknown;
@@ -940,6 +960,10 @@ void data_event_free(data_event_t *data)
         data_metrics_free(data->metrics);
         data->metrics = NULL;
     }
+    if (data->supportcaps) {
+        data_supportcaps_free(data->supportcaps);
+        data->supportcaps = NULL;
+    }
     free(data);
 }
 
@@ -950,6 +974,10 @@ void data_event_print(data_event_t *data)
             printf("{ \"type\": \"init\", \"gen\": %d, \"metrics\":\n",
                 data->gen);
             data_metrics_print(data->metrics);
+            if (data->supportcaps) {
+                printf(", \"support\":\n");
+                data_supportcaps_print(data->supportcaps);
+            }
             printf("}\n");
             break;
 
@@ -981,6 +1009,7 @@ data_event_t *data_event_read()
     input->linelen = 0;
     input->terminator = 0;
     input->metrics = NULL;
+    input->supportcaps = NULL;
 
     if (data_raw_string_is(dat, "init")) {
         input->dtag = dtag_Init;
@@ -994,6 +1023,12 @@ data_event_t *data_event_read()
         if (!dat)
             gli_fatal_error("data: Init input struct has no metrics");
         input->metrics = data_metrics_parse(dat);
+
+        dat = data_raw_struct_field(rawdata, "support");
+        if (dat) {
+            fprintf(stderr, "### got support\n");
+            input->supportcaps = data_supportcaps_parse(dat);
+        }
     }
     else if (data_raw_string_is(dat, "refresh")) {
         input->dtag = dtag_Refresh;
