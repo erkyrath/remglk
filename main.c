@@ -216,7 +216,13 @@ int main(int argc, char *argv[])
         data_event_t *data = data_event_read();
         if (data->dtag != dtag_Init)
             gli_fatal_error("First input event must be 'init'");
-        /* Copy them into the permanent structure */
+        if (data->supportcaps) {
+            /* Set the suppport preference flags. (Bit of a layering 
+               violation, but the flags are simple.) */
+            if (data->supportcaps->timer)
+                pref_timersupport = TRUE;
+        }
+        /* Copy the metrics into the permanent structure */
         *metrics = *data->metrics;
         data_event_free(data);
     }
