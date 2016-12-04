@@ -26,6 +26,7 @@ int pref_hyperlinksupport = FALSE;
 #define ex_Void (0)
 #define ex_Int (1)
 #define ex_Bool (2)
+#define ex_Str (3)
 
 static int errflag = FALSE;
 static int inittime = FALSE;
@@ -33,6 +34,9 @@ static int inittime = FALSE;
 static int extract_value(int argc, char *argv[], char *optname, int type,
     int *argnum, int *result, int defval);
 static int string_to_bool(char *str);
+
+#define STRBUFLEN (256)
+static char extracted_string[STRBUFLEN];
 
 int main(int argc, char *argv[])
 {
@@ -161,10 +165,16 @@ int main(int argc, char *argv[])
             pref_screenheight = val;
         else if (extract_value(argc, argv, "stderr", ex_Bool, &ix, &val, FALSE))
             pref_stderr = val;
-        else if (extract_value(argc, argv, "timersupport", ex_Bool, &ix, &val, FALSE))
-            pref_timersupport = val;
-        else if (extract_value(argc, argv, "hyperlinksupport", ex_Bool, &ix, &val, FALSE))
-            pref_hyperlinksupport = val;
+        else if (extract_value(argc, argv, "support", ex_Str, &ix, &val, FALSE)) {
+            if (!strcmp(extracted_string, "timer") || !strcmp(extracted_string, "timers"))
+                pref_timersupport = TRUE;
+            else if (!strcmp(extracted_string, "hyperlink") || !strcmp(extracted_string, "hyperlinks"))
+                pref_hyperlinksupport = TRUE;
+            else {
+                printf("%s: -support value not recognized: %s\n", argv[0], extracted_string);
+                errflag = TRUE;
+            }
+        }
         else {
             printf("%s: unknown option: %s\n", argv[0], argv[ix]);
             errflag = TRUE;
@@ -198,8 +208,7 @@ int main(int argc, char *argv[])
         printf("  -revgrid BOOL: reverse text in grid (status) windows (default 'no')\n");
         printf("  -border BOOL: force borders/no borders between windows\n");
         printf("  -defprompt BOOL: provide defaults for file prompts (default 'yes')\n");
-        printf("  -timersupport BOOL: declare support for timer events (default 'no')\n");
-        printf("  -hyperlinksupport BOOL: declare support for hyperlink events (default 'no')\n");
+        printf("  -support [timer, hyperlink]: declare support for various input features\n");
         printf("  -stderr BOOL: send errors to stderr rather than stdout (default 'no')\n");
         printf("  -version: display Glk library version\n");
         printf("  -help: display this list\n");
@@ -333,6 +342,21 @@ static int extract_value(int argc, char *argv[], char *optname, int type,
             if (val == -1)
                 val = !defval;
             *result = val;
+            return TRUE;
+
+        case ex_Str:
+            if (*cx == '\0') {
+                if ((*argnum)+1 >= argc) {
+                    cx = "";
+                }
+                else {
+                    (*argnum) += 1;
+                    cx = argv[*argnum];
+                }
+            }
+            strncpy(extracted_string, cx, STRBUFLEN-1);
+            extracted_string[STRBUFLEN-1] = '\0';
+            *result = 1;
             return TRUE;
             
     }
