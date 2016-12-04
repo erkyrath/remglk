@@ -138,6 +138,7 @@ struct data_line_struct {
 /* data_span_t: One style-span of text in a data_line_t. */
 struct data_span_struct {
     short style;
+    glui32 hyperlink;
     glui32 *str; /* This will always be a reference to existing data.
                     Do not free. */
     long len;
@@ -189,7 +190,7 @@ extern void data_content_print(data_content_t *data);
 
 extern data_line_t *data_line_alloc(void);
 extern void data_line_free(data_line_t *data);
-extern void data_line_add_span(data_line_t *data, short style, glui32 *str, long len);
+extern void data_line_add_span(data_line_t *data, short style, glui32 hyperlink, glui32 *str, long len);
 extern void data_line_print(data_line_t *data, glui32 wintype);
 
 extern data_specialreq_t *data_specialreq_alloc(glui32 filemode, glui32 filetype);
