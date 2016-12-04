@@ -864,6 +864,23 @@ static void gli_set_style(stream_t *str, glui32 val)
     }
 }
 
+static void gli_set_hyperlink(stream_t *str, glui32 linkval)
+{
+    if (!str || !str->writable)
+        return;
+
+    if (!pref_hyperlinksupport)
+        return;
+    
+    switch (str->type) {
+        case strtype_Window:
+            str->win->hyperlink = linkval;
+            if (str->win->echostr)
+                gli_set_hyperlink(str->win->echostr, linkval);
+            break;
+    }
+}
+
 void gli_stream_echo_line(stream_t *str, char *buf, glui32 len)
 {
     /* This is only used to echo line input to an echo stream. See
@@ -1732,12 +1749,16 @@ glui32 glk_get_buffer_stream(stream_t *str, char *buf, glui32 len)
 
 void glk_set_hyperlink(glui32 linkval)
 {
-    gli_strict_warning("set_hyperlink: hyperlinks not supported.");
+    gli_set_hyperlink(gli_currentstr, linkval);
 }
 
 void glk_set_hyperlink_stream(strid_t str, glui32 linkval)
 {
-    gli_strict_warning("set_hyperlink_stream: hyperlinks not supported.");
+    if (!str) {
+        gli_strict_warning("set_hyperlink_stream: invalid ref");
+        return;
+    }
+    gli_set_hyperlink(str, linkval);
 }
 
 void glk_request_hyperlink_event(winid_t win)

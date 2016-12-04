@@ -20,6 +20,7 @@ int pref_fixedmetrics = FALSE;
 int pref_screenwidth = 80;
 int pref_screenheight = 50;
 int pref_timersupport = FALSE;
+int pref_hyperlinksupport = FALSE;
 
 /* Some constants for my wacky little command-line option parser. */
 #define ex_Void (0)
@@ -162,6 +163,8 @@ int main(int argc, char *argv[])
             pref_stderr = val;
         else if (extract_value(argc, argv, "timersupport", ex_Bool, &ix, &val, FALSE))
             pref_timersupport = val;
+        else if (extract_value(argc, argv, "hyperlinksupport", ex_Bool, &ix, &val, FALSE))
+            pref_hyperlinksupport = val;
         else {
             printf("%s: unknown option: %s\n", argv[0], argv[ix]);
             errflag = TRUE;
@@ -196,6 +199,7 @@ int main(int argc, char *argv[])
         printf("  -border BOOL: force borders/no borders between windows\n");
         printf("  -defprompt BOOL: provide defaults for file prompts (default 'yes')\n");
         printf("  -timersupport BOOL: declare support for timer events (default 'no')\n");
+        printf("  -hyperlinksupport BOOL: declare support for hyperlink events (default 'no')\n");
         printf("  -stderr BOOL: send errors to stderr rather than stdout (default 'no')\n");
         printf("  -version: display Glk library version\n");
         printf("  -help: display this list\n");
@@ -221,6 +225,8 @@ int main(int argc, char *argv[])
                violation, but the flags are simple.) */
             if (data->supportcaps->timer)
                 pref_timersupport = TRUE;
+            if (data->supportcaps->hyperlinks)
+                pref_hyperlinksupport = TRUE;
         }
         /* Copy the metrics into the permanent structure */
         *metrics = *data->metrics;

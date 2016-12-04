@@ -171,6 +171,7 @@ extern int pref_printversion;
 extern int pref_screenwidth;
 extern int pref_screenheight;
 extern int pref_timersupport;
+extern int pref_hyperlinksupport;
 
 /* Declarations of library internal functions. */
 
