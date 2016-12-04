@@ -181,15 +181,36 @@ If you instead entered:
 The metrics object also allows you to specify margins and border spacing, which improve the layout behavior. See below for details.
 <p>
 
-Alternatively, you can specify basic layout information on the command line. If you type:
+You can also include information about what optional features you are prepared to support. (RemGlk needs to know this in order to set appropriate gestalt flags for the game.)
+<p>
+
+<pre class="Sample">
+{ "type": "init", "gen": 0, "metrics": { "width":80, "height":24 },
+  "support": [ "timer" ] }
+</pre>
+<p>
+
+The support field is a list of strings. Currently the only significant value is "timer", indicating that gestalt_Timer will be set and the library will support glk_request_timer_events().
+<p>
+
+<h3>Starting up with no init event</h3>
+
+For some scenarios, often including debugging, you want the application to <em>not</em> wait for an <code>init</code> event. You can request this with the <code>-fixmetrics</code> (or <code>-fm</code>) flag. You can also specify basic layout information on the command line. If you type:
 
 <pre class="Sample">
 glulxe -fm -width 80 -height 50 Advent.ulx
 </pre>
 <p>
 
-...then the application will <em>not</em> wait for an <code>init</code> event. (And you should not enter one.) Instead, the game will start immediately (with an 80x50 "terminal window"), and send its first screenful of output.
+...then the game will start immediately (with an 80x50 "terminal window"), and send its first screenful of output. Your first reply will then be a player command; see below.
 <p>
+
+In <code>-fm</code> mode, you must specify optional features on the command line:
+<p>
+
+<ul>
+<li>Timers: <code>-timersupport yes</code>
+</ul>
 
 <h3>The first screen of output</h3>
 
@@ -296,7 +317,7 @@ All input and output is UTF-8.
 <p>
 
 <hr>
-Last updated November 2, 2016.
+Last updated December 3, 2016.
 <p>
 
 <em><a href="http://eblong.com/zarf/glk/index.html">Glk home page</a></em>
