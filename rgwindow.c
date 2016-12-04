@@ -123,6 +123,7 @@ window_t *gli_new_window(glui32 type, glui32 rock)
     win->echo_line_input = TRUE;
     win->terminate_line_input = 0;
     win->style = style_Normal;
+    win->hyperlink = 0;
 
     win->str = gli_stream_open_window(win);
     win->echostr = NULL;

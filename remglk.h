@@ -78,6 +78,7 @@ struct glk_window_struct {
     glui32 terminate_line_input; /* ditto; this is a bitmask of flags */
 
     glui32 style;
+    glui32 hyperlink;
     
     gidispatch_rock_t disprock;
     window_t *next, *prev; /* in the big linked list of windows */
