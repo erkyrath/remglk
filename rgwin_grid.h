@@ -9,6 +9,7 @@ typedef struct tgline_struct {
     int allocsize; /* this is the allocated size; only width is valid */
     glui32 *chars;
     short *styles;
+    glui32 *links;
     int dirty;
 } tgline_t;
 

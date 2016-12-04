@@ -10,17 +10,10 @@
 #define wd_EndLine (3) /* End of line character */
 #define wd_EndPage (4) /* End of the whole text */
 
-/* One word */
-typedef struct tbword_struct {
-    short type; /* A wd_* constant */
-    short style;
-    long pos; /* Position in the chars array. */
-    long len; /* This is zero for wd_EndLine and wd_EndPage. */
-} tbword_t;
-
-/* One style run */
+/* One style/link run */
 typedef struct tbrun_struct {
     short style;
+    glui32 hyperlink;
     long pos;
 } tbrun_t;
 
@@ -51,6 +44,7 @@ typedef struct window_textbuffer_struct {
     glui32 intermkeys;
     int inmax;
     glui32 origstyle;
+    glui32 orighyperlink;
     gidispatch_rock_t inarrayrock;
 } window_textbuffer_t;
 

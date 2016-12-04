@@ -18,7 +18,7 @@
 #define BUFFER_SLACK (1000)
 
 static long find_style_by_pos(window_textbuffer_t *dwin, long pos);
-static void set_last_run(window_textbuffer_t *dwin, glui32 style);
+static void set_last_run(window_textbuffer_t *dwin, glui32 style, glui32 hyperlink);
 
 window_textbuffer_t *win_textbuffer_create(window_t *win)
 {
@@ -43,6 +43,7 @@ window_textbuffer_t *win_textbuffer_create(window_t *win)
     
     dwin->numruns = 1;
     dwin->runs[0].style = style_Normal;
+    dwin->runs[0].hyperlink = 0;
     dwin->runs[0].pos = 0;
     
     dwin->dirtybeg = -1;
@@ -142,6 +143,7 @@ data_content_t *win_textbuffer_update(window_t *win)
     long snum, cnum, spanstart;
     long nextrunpos;
     short curstyle;
+    glui32 curlink;
 
     if (dwin->dirtybeg == -1) {
         return NULL;
@@ -158,6 +160,7 @@ data_content_t *win_textbuffer_update(window_t *win)
         spanstart = cnum;
         snum = find_style_by_pos(dwin, cnum);
         curstyle = dwin->runs[snum].style;
+        curlink = dwin->runs[snum].hyperlink;
         if (snum+1 < dwin->numruns)
             nextrunpos = dwin->runs[snum+1].pos;
         else
@@ -171,7 +174,7 @@ data_content_t *win_textbuffer_update(window_t *win)
             glui32 ch = dwin->chars[cnum];
             if (ch == '\n') {
                 if (cnum > spanstart) {
-                    data_line_add_span(line, curstyle, dwin->chars+spanstart, cnum-spanstart);
+                    data_line_add_span(line, curstyle, curlink, dwin->chars+spanstart, cnum-spanstart);
                     spanstart = cnum;
                 }
 
@@ -186,12 +189,13 @@ data_content_t *win_textbuffer_update(window_t *win)
 
             while (cnum >= nextrunpos) {
                 if (cnum > spanstart) {
-                    data_line_add_span(line, curstyle, dwin->chars+spanstart, cnum-spanstart);
+                    data_line_add_span(line, curstyle, curlink, dwin->chars+spanstart, cnum-spanstart);
                     spanstart = cnum;
                 }
 
                 snum++;
                 curstyle = dwin->runs[snum].style;
+                curlink = dwin->runs[snum].hyperlink;
                 if (snum+1 < dwin->numruns)
                     nextrunpos = dwin->runs[snum+1].pos;
                 else
@@ -202,7 +206,7 @@ data_content_t *win_textbuffer_update(window_t *win)
         }
 
         if (cnum > spanstart) {
-            data_line_add_span(line, curstyle, dwin->chars+spanstart, cnum-spanstart);
+            data_line_add_span(line, curstyle, curlink, dwin->chars+spanstart, cnum-spanstart);
             spanstart = cnum;
         }
     }
@@ -226,8 +230,9 @@ void win_textbuffer_putchar(window_t *win, glui32 ch)
     
     lx = dwin->numchars;
     
-    if (win->style != dwin->runs[dwin->numruns-1].style) {
-        set_last_run(dwin, win->style);
+    if (win->style != dwin->runs[dwin->numruns-1].style
+        || win->hyperlink != dwin->runs[dwin->numruns-1].hyperlink) {
+        set_last_run(dwin, win->style, win->hyperlink);
     }
     
     dwin->chars[lx] = ch;
@@ -247,13 +252,14 @@ void win_textbuffer_putchar(window_t *win, glui32 ch)
     }
 }
 
-static void set_last_run(window_textbuffer_t *dwin, glui32 style)
+static void set_last_run(window_textbuffer_t *dwin, glui32 style, glui32 hyperlink)
 {
     long lx = dwin->numchars;
     long rx = dwin->numruns-1;
     
     if (dwin->runs[rx].pos == lx) {
         dwin->runs[rx].style = style;
+        dwin->runs[rx].hyperlink = hyperlink;
     }
     else {
         rx++;
@@ -264,6 +270,7 @@ static void set_last_run(window_textbuffer_t *dwin, glui32 style)
         }
         dwin->runs[rx].pos = lx;
         dwin->runs[rx].style = style;
+        dwin->runs[rx].hyperlink = hyperlink;
         dwin->numruns++;
     }
 
@@ -277,6 +284,7 @@ void win_textbuffer_clear(window_t *win)
     dwin->numchars = 0;
     dwin->numruns = 1;
     dwin->runs[0].style = win->style;
+    dwin->runs[0].hyperlink = win->hyperlink;
     dwin->runs[0].pos = 0;
     
     if (dwin->dirtybeg == -1) {
@@ -335,7 +343,9 @@ void win_textbuffer_trim_buffer(window_t *win)
     
     if (snum >= dwin->numruns) {
         short sstyle = dwin->runs[snum].style;
+        glui32 slink = dwin->runs[snum].hyperlink;
         dwin->runs[0].style = sstyle;
+        dwin->runs[0].hyperlink = slink;
         dwin->runs[0].pos = 0;
         dwin->numruns = 1;
     }
@@ -367,8 +377,10 @@ void win_textbuffer_init_line(window_t *win, void *buf, int unicode,
     dwin->inecho = win->echo_line_input;
     dwin->intermkeys = win->terminate_line_input;
     dwin->origstyle = win->style;
+    dwin->orighyperlink = win->hyperlink;
     win->style = style_Input;
-    set_last_run(dwin, win->style);
+    win->hyperlink = 0;
+    set_last_run(dwin, win->style, 0);
     
     if (gli_register_arr) {
         char *typedesc = (dwin->inunicode ? "&+#!Iu" : "&+#!Cn");
@@ -450,7 +462,8 @@ void win_textbuffer_accept_line(window_t *win)
     }
     
     win->style = dwin->origstyle;
-    set_last_run(dwin, win->style);
+    win->hyperlink = dwin->orighyperlink;
+    set_last_run(dwin, win->style, win->hyperlink);
 
     /* ### set termkey */
 
@@ -515,7 +528,8 @@ void win_textbuffer_cancel_line(window_t *win, event_t *ev)
     }
     
     win->style = dwin->origstyle;
-    set_last_run(dwin, win->style);
+    win->hyperlink = dwin->orighyperlink;
+    set_last_run(dwin, win->style, win->hyperlink);
 
     ev->type = evtype_LineInput;
     ev->win = win;
