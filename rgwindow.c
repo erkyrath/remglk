@@ -1322,6 +1322,9 @@ void glk_request_hyperlink_event(winid_t win)
         return;
     }
 
+    if (!pref_hyperlinksupport)
+        return;
+
     switch (win->type) {
         case wintype_TextBuffer:
         case wintype_TextGrid:
@@ -1339,6 +1342,9 @@ void glk_cancel_hyperlink_event(winid_t win)
         gli_strict_warning("cancel_hyperlink_event: invalid ref");
         return;
     }
+
+    if (!pref_hyperlinksupport)
+        return;
 
     switch (win->type) {
         case wintype_TextBuffer:
