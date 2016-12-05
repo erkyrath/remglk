@@ -1327,6 +1327,7 @@ data_input_t *data_input_alloc(glui32 window, glui32 evtype)
     dat->cursorpos = FALSE;
     dat->xpos = -1;
     dat->ypos = -1;
+    dat->hyperlink = FALSE;
 
     return dat;
 }
@@ -1364,6 +1365,10 @@ void data_input_print(data_input_t *dat)
 
     if (dat->cursorpos) {
         printf(", \"xpos\":%d, \"ypos\":%d", dat->xpos, dat->ypos);
+    }
+
+    if (dat->hyperlink) {
+        printf(", \"hyperlink\":true");
     }
 
     printf(" }");

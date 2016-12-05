@@ -848,6 +848,12 @@ void gli_windows_update(data_specialreq_t *special, int newgeneration)
             }
         }
 
+        if (win->hyperlink_request) {
+            if (!dat)
+                dat = data_input_alloc(win->updatetag, evtype_None);
+            dat->hyperlink = TRUE;
+        }
+
         if (dat) {
             update->useinputs = TRUE;
             gen_list_append(&update->inputs, dat);

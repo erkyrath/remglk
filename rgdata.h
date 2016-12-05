@@ -113,6 +113,7 @@ struct data_input_struct {
     glui32 maxlen;
     int cursorpos; /* only for grids */
     glsi32 xpos, ypos; /* only if cursorpos */
+    int hyperlink;
 };
 
 /* data_content_t: Represents the output changes of one window (text
