@@ -1306,3 +1306,16 @@ void glk_window_set_background_color(winid_t win, glui32 color)
 
 #endif /* GLK_MODULE_IMAGE */
 
+#ifdef GLK_MODULE_HYPERLINKS
+
+void glk_request_hyperlink_event(winid_t win)
+{
+    gli_strict_warning("request_hyperlink_event: hyperlinks not supported.");
+}
+
+void glk_cancel_hyperlink_event(winid_t win)
+{
+    gli_strict_warning("cancel_hyperlink_event: hyperlinks not supported.");
+}
+
+#endif /* GLK_MODULE_HYPERLINKS */

@@ -1761,14 +1761,4 @@ void glk_set_hyperlink_stream(strid_t str, glui32 linkval)
     gli_set_hyperlink(str, linkval);
 }
 
-void glk_request_hyperlink_event(winid_t win)
-{
-    gli_strict_warning("request_hyperlink_event: hyperlinks not supported.");
-}
-
-void glk_cancel_hyperlink_event(winid_t win)
-{
-    gli_strict_warning("cancel_hyperlink_event: hyperlinks not supported.");
-}
-
 #endif /* GLK_MODULE_HYPERLINKS */
