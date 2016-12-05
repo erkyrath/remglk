@@ -120,6 +120,7 @@ window_t *gli_new_window(glui32 type, glui32 rock)
     win->line_request = FALSE;
     win->line_request_uni = FALSE;
     win->char_request_uni = FALSE;
+    win->hyperlink_request = FALSE;
     win->echo_line_input = TRUE;
     win->terminate_line_input = 0;
     win->style = style_Normal;
@@ -1310,12 +1311,38 @@ void glk_window_set_background_color(winid_t win, glui32 color)
 
 void glk_request_hyperlink_event(winid_t win)
 {
-    gli_strict_warning("request_hyperlink_event: hyperlinks not supported.");
+    if (!win) {
+        gli_strict_warning("request_hyperlink_event: invalid ref");
+        return;
+    }
+
+    switch (win->type) {
+        case wintype_TextBuffer:
+        case wintype_TextGrid:
+            win->hyperlink_request = TRUE;
+            break;
+        default:
+            gli_strict_warning("request_hyperlink_event: window does not support hyperlink input");
+            break;
+    }
 }
 
 void glk_cancel_hyperlink_event(winid_t win)
 {
-    gli_strict_warning("cancel_hyperlink_event: hyperlinks not supported.");
+    if (!win) {
+        gli_strict_warning("cancel_hyperlink_event: invalid ref");
+        return;
+    }
+
+    switch (win->type) {
+        case wintype_TextBuffer:
+        case wintype_TextGrid:
+            win->hyperlink_request = FALSE;
+            break;
+        default:
+            gli_strict_warning("cancel_hyperlink_event: window does not support hyperlink input");
+            break;
+    }
 }
 
 #endif /* GLK_MODULE_HYPERLINKS */
