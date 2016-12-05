@@ -74,6 +74,7 @@ struct data_event_struct {
     glui32 *linevalue;
     glui32 linelen;
     glui32 terminator;
+    glui32 linkvalue;
     data_metrics_t *metrics;
     data_supportcaps_t *supportcaps;
 };

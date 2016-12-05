@@ -1040,6 +1040,7 @@ data_event_t *data_event_read()
     input->linevalue = NULL;
     input->linelen = 0;
     input->terminator = 0;
+    input->linkvalue = 0;
     input->metrics = NULL;
     input->supportcaps = NULL;
 
@@ -1123,6 +1124,24 @@ data_event_t *data_event_read()
         if (!dat)
             gli_fatal_error("data: Char input struct has no value");
         input->charvalue = data_raw_str_char(dat);
+    }
+    else if (data_raw_string_is(dat, "hyperlink")) {
+        input->dtag = dtag_Hyperlink;
+
+        dat = data_raw_struct_field(rawdata, "gen");
+        if (!dat)
+            gli_fatal_error("data: Hyperlink input struct has no gen");
+        input->gen = data_raw_int_value(dat);
+
+        dat = data_raw_struct_field(rawdata, "window");
+        if (!dat)
+            gli_fatal_error("data: Hyperlink input struct has no window");
+        input->window = data_raw_int_value(dat);
+
+        dat = data_raw_struct_field(rawdata, "value");
+        if (!dat)
+            gli_fatal_error("data: Hyperlink input struct has no value");
+        input->linkvalue = data_raw_int_value(dat);
     }
     else if (data_raw_string_is(dat, "timer")) {
         input->dtag = dtag_Timer;

@@ -91,6 +91,16 @@ void glk_select(event_t *event)
                 gli_event_store(evtype_CharInput, win, val, 0);
                 break;
 
+            case dtag_Hyperlink:
+                win = gli_window_find_by_tag(data->window);
+                if (!win)
+                    break;
+                if (!win->hyperlink_request)
+                    break;
+                win->hyperlink_request = FALSE;
+                gli_event_store(evtype_Hyperlink, win, data->linkvalue, 0);
+                break;
+
             case dtag_Timer:
                 gettimeofday(&timing_start, NULL);
                 gli_event_store(evtype_Timer, NULL, 0, 0);
