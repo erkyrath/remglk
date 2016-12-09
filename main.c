@@ -208,7 +208,7 @@ int main(int argc, char *argv[])
         printf("  -revgrid BOOL: reverse text in grid (status) windows (default 'no')\n");
         printf("  -border BOOL: force borders/no borders between windows\n");
         printf("  -defprompt BOOL: provide defaults for file prompts (default 'yes')\n");
-        printf("  -support [timer, hyperlink]: declare support for various input features\n");
+        printf("  -support [timer, hyperlinks]: declare support for various input features\n");
         printf("  -stderr BOOL: send errors to stderr rather than stdout (default 'no')\n");
         printf("  -version: display Glk library version\n");
         printf("  -help: display this list\n");
