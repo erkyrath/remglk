@@ -1284,7 +1284,7 @@ void data_update_print(data_update_t *dat)
             printf("%d", dat->timer);
     }
 
-    printf("}\n\n");
+    printf("}\n");
 }
 
 data_window_t *data_window_alloc(glui32 window, glui32 type, glui32 rock)

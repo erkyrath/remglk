@@ -869,6 +869,7 @@ void gli_windows_update(data_specialreq_t *special, int newgeneration)
     update->specialreq = special;
 
     data_update_print(update);
+    printf("\n"); /* blank line after stanza */
     fflush(stdout);
 
     data_update_free(update);

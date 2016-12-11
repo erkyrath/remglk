@@ -149,6 +149,7 @@ void gli_display_warning(char *msg)
         print_string_json(msg, stdout);
         printf("}\n");
     }
+    printf("\n"); /* blank line after stanza */
     fflush(stdout);
 }
 
@@ -162,6 +163,7 @@ void gli_display_error(char *msg)
         print_string_json(msg, stdout);
         printf("}\n");
     }
+    printf("\n"); /* blank line after stanza */
     fflush(stdout);
     exit(1);
 }
