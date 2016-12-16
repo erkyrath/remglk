@@ -657,6 +657,7 @@ void glk_window_get_size(window_t *win, glui32 *width, glui32 *height)
 {
     glui32 wid = 0;
     glui32 hgt = 0;
+    glui32 boxwidth, boxheight;
     
     if (!win) {
         gli_strict_warning("window_get_size: invalid ref");
@@ -669,9 +670,16 @@ void glk_window_get_size(window_t *win, glui32 *width, glui32 *height)
             /* always zero */
             break;
         case wintype_TextGrid:
+            boxwidth = win->bbox.right - win->bbox.left;
+            boxheight = win->bbox.bottom - win->bbox.top;
+            wid = ((boxwidth-metrics.gridmarginx) / metrics.gridcharwidth);
+            hgt = ((boxheight-metrics.gridmarginy) / metrics.gridcharheight);
+            break;
         case wintype_TextBuffer:
-            wid = win->bbox.right - win->bbox.left;
-            hgt = win->bbox.bottom - win->bbox.top;
+            boxwidth = win->bbox.right - win->bbox.left;
+            boxheight = win->bbox.bottom - win->bbox.top;
+            wid = ((boxwidth-metrics.buffermarginx) / metrics.buffercharwidth);
+            hgt = ((boxheight-metrics.buffermarginy) / metrics.buffercharheight);
             break;
     }
 
