@@ -779,7 +779,9 @@ static data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
         gli_fatal_error("data: Metrics require height");
     metrics->height = data_raw_int_value(dat);
 
-    /* charwidth/charheight aren't spec, but we accept them as a shortcut. */
+    /* charwidth/charheight aren't spec, but we accept them as a shortcut.
+       (Don't send both charwidth and gridcharwidth, e.g., because the
+       library might ignore the wrong one.) */
     dat = data_raw_struct_field(rawdata, "charwidth");
     if (dat) {
         glsi32 val = data_raw_int_value(dat);
