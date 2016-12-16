@@ -16,7 +16,7 @@
 /* RawType encodes the type of a JSON data element. */
 typedef enum RawType_enum {
     rawtyp_None = 0,
-    rawtyp_Int = 1,
+    rawtyp_Number = 1,
     rawtyp_Str = 2,
     rawtyp_List = 3,
     rawtyp_Struct = 4,
@@ -313,7 +313,7 @@ void data_raw_print(data_raw_t *dat)
     }
 
     switch (dat->type) {
-        case rawtyp_Int:
+        case rawtyp_Number:
             printf("%ld", (long)dat->number);
             return;
         case rawtyp_True:
@@ -375,8 +375,8 @@ static data_raw_t *data_raw_blockread()
 /* Validate that the object is an int, and get its value. */
 static glsi32 data_raw_int_value(data_raw_t *dat)
 {
-    if (dat->type != rawtyp_Int)
-        gli_fatal_error("data: Need int");
+    if (dat->type != rawtyp_Number)
+        gli_fatal_error("data: Need number");
 
     return dat->number;
 }
@@ -501,7 +501,7 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
         /* This accepts "01", which it really shouldn't, but whatever.
            We also ignore the decimal part if found, which means we're
            rounding towards zero. */
-        data_raw_t *dat = data_raw_alloc(rawtyp_Int);
+        data_raw_t *dat = data_raw_alloc(rawtyp_Number);
         while (ch >= '0' && ch <= '9') {
             dat->number = 10 * dat->number + (ch-'0');
             ch = getchar();
@@ -516,7 +516,7 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
     }
 
     if (ch == '-') {
-        data_raw_t *dat = data_raw_alloc(rawtyp_Int);
+        data_raw_t *dat = data_raw_alloc(rawtyp_Number);
         ch = getchar();
         if (!(ch >= '0' && ch <= '9'))
             gli_fatal_error("data: minus must be followed by number");
