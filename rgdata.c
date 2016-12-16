@@ -72,6 +72,7 @@ struct data_raw_struct {
     int keylen;
 
     glsi32 number;
+    double realnumber;
     glui32 *str;
     data_raw_t **list;
     int count;
@@ -261,6 +262,7 @@ static data_raw_t *data_raw_alloc(RawType type)
     dat->key = NULL;
     dat->keylen = 0;
     dat->number = 0;
+    dat->realnumber = 0.0;
     dat->str = NULL;
     dat->list = NULL;
     dat->count = 0;
@@ -314,6 +316,7 @@ void data_raw_print(data_raw_t *dat)
 
     switch (dat->type) {
         case rawtyp_Number:
+            /* We don't need to output floats. */
             printf("%ld", (long)dat->number);
             return;
         case rawtyp_True:
@@ -372,13 +375,22 @@ static data_raw_t *data_raw_blockread()
     return dat;
 }
 
-/* Validate that the object is an int, and get its value. */
+/* Validate that the object is a number, and get its value (as an int). */
 static glsi32 data_raw_int_value(data_raw_t *dat)
 {
     if (dat->type != rawtyp_Number)
         gli_fatal_error("data: Need number");
 
     return dat->number;
+}
+
+/* Validate that the object is a number, and get its value (as a real). */
+static double data_raw_float_value(data_raw_t *dat)
+{
+    if (dat->type != rawtyp_Number)
+        gli_fatal_error("data: Need number");
+
+    return dat->realnumber;
 }
 
 /* Validate that the object is a string, and return its value as a
@@ -507,8 +519,20 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
             ch = getchar();
         }
 
-        while (ch == '.' || (ch >= '0' && ch <= '9'))
+        if (ch == '.') {
+            /* We have to think about real numbers. */
             ch = getchar();
+            long numer = 0;
+            long denom = 1;
+            while (ch >= '0' && ch <= '9') {
+                numer = 10 * numer + (ch-'0');
+                denom *= 10;
+            }
+            dat->realnumber = (double)dat->number + (double)numer / (double)denom;
+        }
+        else {
+            dat->realnumber = (double)dat->number;
+        }
 
         if (ch != EOF)
             ungetc(ch, stdin);
@@ -527,8 +551,20 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
         }
         dat->number = -dat->number;
 
-        while (ch == '.' || (ch >= '0' && ch <= '9'))
+        if (ch == '.') {
+            /* We have to think about real numbers. */
             ch = getchar();
+            long numer = 0;
+            long denom = 1;
+            while (ch >= '0' && ch <= '9') {
+                numer = 10 * numer + (ch-'0');
+                denom *= 10;
+            }
+            dat->realnumber = (double)dat->number - (double)numer / (double)denom;
+        }
+        else {
+            dat->realnumber = (double)dat->number;
+        }
 
         if (ch != EOF)
             ungetc(ch, stdin);
