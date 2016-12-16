@@ -527,6 +527,7 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
             while (ch >= '0' && ch <= '9') {
                 numer = 10 * numer + (ch-'0');
                 denom *= 10;
+                ch = getchar();
             }
             dat->realnumber = (double)dat->number + (double)numer / (double)denom;
         }
@@ -559,6 +560,7 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
             while (ch >= '0' && ch <= '9') {
                 numer = 10 * numer + (ch-'0');
                 denom *= 10;
+                ch = getchar();
             }
             dat->realnumber = (double)dat->number - (double)numer / (double)denom;
         }
