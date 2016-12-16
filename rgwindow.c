@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <math.h>
 
 #include "glk.h"
 #include "remglk.h"
@@ -657,7 +658,7 @@ void glk_window_get_size(window_t *win, glui32 *width, glui32 *height)
 {
     glui32 wid = 0;
     glui32 hgt = 0;
-    glui32 boxwidth, boxheight;
+    int val, boxwidth, boxheight;
     
     if (!win) {
         gli_strict_warning("window_get_size: invalid ref");
@@ -672,14 +673,18 @@ void glk_window_get_size(window_t *win, glui32 *width, glui32 *height)
         case wintype_TextGrid:
             boxwidth = win->bbox.right - win->bbox.left;
             boxheight = win->bbox.bottom - win->bbox.top;
-            wid = ((boxwidth-metrics.gridmarginx) / metrics.gridcharwidth);
-            hgt = ((boxheight-metrics.gridmarginy) / metrics.gridcharheight);
+            val = floor((boxwidth-metrics.gridmarginx) / metrics.gridcharwidth);
+            wid = ((val >= 0) ? val : 0);
+            val = floor((boxheight-metrics.gridmarginy) / metrics.gridcharheight);
+            hgt = ((val >= 0) ? val : 0);
             break;
         case wintype_TextBuffer:
             boxwidth = win->bbox.right - win->bbox.left;
             boxheight = win->bbox.bottom - win->bbox.top;
-            wid = ((boxwidth-metrics.buffermarginx) / metrics.buffercharwidth);
-            hgt = ((boxheight-metrics.buffermarginy) / metrics.buffercharheight);
+            val = floor((boxwidth-metrics.buffermarginx) / metrics.buffercharwidth);
+            wid = ((val >= 0) ? val : 0);
+            val = floor((boxheight-metrics.buffermarginy) / metrics.buffercharheight);
+            hgt = ((val >= 0) ? val : 0);
             break;
     }
 
