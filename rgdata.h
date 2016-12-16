@@ -50,9 +50,9 @@ struct data_metrics_struct {
     glui32 width, height;
     glui32 outspacingx, outspacingy;
     glui32 inspacingx, inspacingy;
-    glui32 gridcharwidth, gridcharheight;
+    double gridcharwidth, gridcharheight;
     glui32 gridmarginx, gridmarginy;
-    glui32 buffercharwidth, buffercharheight;
+    double buffercharwidth, buffercharheight;
     glui32 buffermarginx, buffermarginy;
 };
 

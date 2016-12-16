@@ -385,7 +385,7 @@ static glsi32 data_raw_int_value(data_raw_t *dat)
 }
 
 /* Validate that the object is a number, and get its value (as a real). */
-static double data_raw_float_value(data_raw_t *dat)
+static double data_raw_real_value(data_raw_t *dat)
 {
     if (dat->type != rawtyp_Number)
         gli_fatal_error("data: Need number");
@@ -781,12 +781,12 @@ data_metrics_t *data_metrics_alloc(int width, int height)
     metrics->outspacingy = 0;
     metrics->inspacingx = 0;
     metrics->inspacingy = 0;
-    metrics->gridcharwidth = 1;
-    metrics->gridcharheight = 1;
+    metrics->gridcharwidth = 1.0;
+    metrics->gridcharheight = 1.0;
     metrics->gridmarginx = 0;
     metrics->gridmarginy = 0;
-    metrics->buffercharwidth = 1;
-    metrics->buffercharheight = 1;
+    metrics->buffercharwidth = 1.0;
+    metrics->buffercharheight = 1.0;
     metrics->buffermarginx = 0;
     metrics->buffermarginy = 0;
 
@@ -822,29 +822,29 @@ static data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
        library might ignore the wrong one.) */
     dat = data_raw_struct_field(rawdata, "charwidth");
     if (dat) {
-        glsi32 val = data_raw_int_value(dat);
+        double val = data_raw_real_value(dat);
         metrics->gridcharwidth = val;
         metrics->buffercharwidth = val;
     }
     dat = data_raw_struct_field(rawdata, "charheight");
     if (dat) {
-        glsi32 val = data_raw_int_value(dat);
+        double val = data_raw_real_value(dat);
         metrics->gridcharheight = val;
         metrics->buffercharheight = val;
     }
 
     dat = data_raw_struct_field(rawdata, "gridcharwidth");
     if (dat)
-        metrics->gridcharwidth = data_raw_int_value(dat);
+        metrics->gridcharwidth = data_raw_real_value(dat);
     dat = data_raw_struct_field(rawdata, "gridcharheight");
     if (dat)
-        metrics->gridcharheight = data_raw_int_value(dat);
+        metrics->gridcharheight = data_raw_real_value(dat);
     dat = data_raw_struct_field(rawdata, "buffercharwidth");
     if (dat)
-        metrics->buffercharwidth = data_raw_int_value(dat);
+        metrics->buffercharwidth = data_raw_real_value(dat);
     dat = data_raw_struct_field(rawdata, "buffercharheight");
     if (dat)
-        metrics->buffercharheight = data_raw_int_value(dat);
+        metrics->buffercharheight = data_raw_real_value(dat);
 
     dat = data_raw_struct_field(rawdata, "margin");
     if (dat) {
@@ -963,9 +963,9 @@ void data_metrics_print(data_metrics_t *metrics)
     printf("  size: %ldx%ld\n", (long)metrics->width, (long)metrics->height);
     printf("  outspacing: %ldx%ld\n", (long)metrics->outspacingx, (long)metrics->outspacingy);
     printf("  inspacing: %ldx%ld\n", (long)metrics->inspacingx, (long)metrics->inspacingy);
-    printf("  gridchar: %ldx%ld\n", (long)metrics->gridcharwidth, (long)metrics->gridcharheight);
+    printf("  gridchar: %.2fx%.2f\n", metrics->gridcharwidth, metrics->gridcharheight);
     printf("  gridmargin: %ldx%ld\n", (long)metrics->gridmarginx, (long)metrics->gridmarginy);
-    printf("  bufferchar: %ldx%ld\n", (long)metrics->buffercharwidth, (long)metrics->buffercharheight);
+    printf("  bufferchar: %.2fx%.2f\n", metrics->buffercharwidth, metrics->buffercharheight);
     printf("  buffermargin: %ldx%ld\n", (long)metrics->buffermarginx, (long)metrics->buffermarginy);
     printf("}\n");   
 }
