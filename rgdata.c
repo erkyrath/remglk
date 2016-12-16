@@ -963,9 +963,9 @@ void data_metrics_print(data_metrics_t *metrics)
     printf("  size: %ldx%ld\n", (long)metrics->width, (long)metrics->height);
     printf("  outspacing: %ldx%ld\n", (long)metrics->outspacingx, (long)metrics->outspacingy);
     printf("  inspacing: %ldx%ld\n", (long)metrics->inspacingx, (long)metrics->inspacingy);
-    printf("  gridchar: %.2fx%.2f\n", metrics->gridcharwidth, metrics->gridcharheight);
+    printf("  gridchar: %.1fx%.1f\n", metrics->gridcharwidth, metrics->gridcharheight);
     printf("  gridmargin: %ldx%ld\n", (long)metrics->gridmarginx, (long)metrics->gridmarginy);
-    printf("  bufferchar: %.2fx%.2f\n", metrics->buffercharwidth, metrics->buffercharheight);
+    printf("  bufferchar: %.1fx%.1f\n", metrics->buffercharwidth, metrics->buffercharheight);
     printf("  buffermargin: %ldx%ld\n", (long)metrics->buffermarginx, (long)metrics->buffermarginy);
     printf("}\n");   
 }
