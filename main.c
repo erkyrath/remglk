@@ -205,7 +205,6 @@ int main(int argc, char *argv[])
         printf("  -fixmetrics BOOL: define screen size manually (default 'no')\n");
         printf("  -width NUM: manual screen width (default 80)\n");
         printf("  -height NUM: manual screen height (default 50)\n");
-        printf("  -revgrid BOOL: reverse text in grid (status) windows (default 'no')\n");
         printf("  -border BOOL: force borders/no borders between windows\n");
         printf("  -defprompt BOOL: provide defaults for file prompts (default 'yes')\n");
         printf("  -support [timer, hyperlinks]: declare support for various input features\n");
