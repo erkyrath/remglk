@@ -89,8 +89,8 @@ static int lib_inited = FALSE;
 
 static giblorb_err_t giblorb_initialize(void);
 static giblorb_err_t giblorb_initialize_map(giblorb_map_t *map);
-static giblorb_err_t giblorb_image_get_size_jpeg(unsigned char *ptr, giblorb_auxpict_t *auxpict);
-static giblorb_err_t giblorb_image_get_size_png(unsigned char *ptr, giblorb_auxpict_t *auxpict);
+static giblorb_err_t giblorb_image_get_size_jpeg(unsigned char *ptr, glui32 length, giblorb_auxpict_t *auxpict);
+static giblorb_err_t giblorb_image_get_size_png(unsigned char *ptr, glui32 length, giblorb_auxpict_t *auxpict);
 static void giblorb_qsort(giblorb_resdesc_t **list, int len);
 static giblorb_resdesc_t *giblorb_bsearch(giblorb_resdesc_t *sample, 
     giblorb_resdesc_t **list, int len);
@@ -576,9 +576,9 @@ giblorb_err_t giblorb_load_image_info(giblorb_map_t *map,
             return err;
 
         if (chu->type == giblorb_ID_JPEG)
-            err = giblorb_image_get_size_jpeg(res.data.ptr, auxpict);
+            err = giblorb_image_get_size_jpeg(res.data.ptr, res.length, auxpict);
         else if (chu->type == giblorb_ID_PNG)
-            err = giblorb_image_get_size_png(res.data.ptr, auxpict);
+            err = giblorb_image_get_size_png(res.data.ptr, res.length, auxpict);
         else
             err = giblorb_err_Format;
 
@@ -598,12 +598,67 @@ giblorb_err_t giblorb_load_image_info(giblorb_map_t *map,
     return giblorb_err_None;
 }
 
-static giblorb_err_t giblorb_image_get_size_jpeg(unsigned char *ptr, giblorb_auxpict_t *auxpict)
+static giblorb_err_t giblorb_image_get_size_jpeg(unsigned char *arr, glui32 length, giblorb_auxpict_t *auxpict)
 {
+    int pos = 0;
+    while (pos < length) {
+        if (arr[pos] != 0xFF) {
+            /* error: find_dimensions_jpeg: marker is not 0xFF */
+            return giblorb_err_Format;
+        }
+        while (arr[pos] == 0xFF) 
+            pos += 1;
+        unsigned char marker = arr[pos];
+        pos += 1;
+        if (marker == 0x01 || (marker >= 0xD0 && marker <= 0xD9)) {
+            /* marker type has no data */
+            continue;
+        }
+        int chunklen = (arr[pos+0] << 8) | (arr[pos+1]);
+        if (marker >= 0xC0 && marker <= 0xCF && marker != 0xC8) {
+            if (chunklen < 7) {
+                /* error: find_dimensions_jpeg: SOF block is too small */
+                return giblorb_err_Format;
+            }
+            auxpict->height = (arr[pos+3] << 8) | (arr[pos+4]);
+            auxpict->width  = (arr[pos+5] << 8) | (arr[pos+6]);
+            return giblorb_err_None;
+        }
+        pos += chunklen;
+    }
+
+    /* error: find_dimensions_jpeg: no SOF marker found */
+    return giblorb_err_Format;
 }
 
-static giblorb_err_t giblorb_image_get_size_png(unsigned char *ptr, giblorb_auxpict_t *auxpict)
+static giblorb_err_t giblorb_image_get_size_png(unsigned char *arr, glui32 length, giblorb_auxpict_t *auxpict)
 {
+    int pos = 0;
+    if (length < 8)
+        return giblorb_err_Format;
+    if (arr[0] != 0x89 || arr[1] != 'P' || arr[2] != 'N' || arr[3] != 'G') {
+        /* error: find_dimensions_png: PNG signature does not match */
+        return giblorb_err_Format;
+    }
+    pos += 8;
+    while (pos < length) {
+        glui32 chunklen = giblorb_native4(arr+pos);
+        pos += 4;
+        glui32 chunktype = giblorb_native4(arr+pos);
+        pos += 4;
+        if (chunktype == giblorb_make_id('I', 'H', 'D', 'R')) {
+            auxpict->width = giblorb_native4(arr+pos);
+            pos += 4;
+            auxpict->height = giblorb_native4(arr+pos);
+            pos += 4;
+            return giblorb_err_None;
+        }
+        pos += chunklen;
+        pos += 4; /* skip CRC */
+    }
+
+    /* error: find_dimensions_png: no PNG header block found */
+    return giblorb_err_Format;
 }
 
 /* Sorting and searching. */
