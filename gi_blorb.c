@@ -44,7 +44,8 @@ typedef struct giblorb_chunkdesc_struct {
     
     void *ptr; /* pointer to malloc'd data, if loaded */
     int auxdatnum; /* entry in the auxsound/auxpict array; -1 if none.
-        This only applies to chunks that represent resources;  */
+        This only applies to chunks that represent resources. 
+        (Currently, only images.) */
     
 } giblorb_chunkdesc_t;
 
@@ -60,6 +61,7 @@ typedef struct giblorb_auxpict_struct {
     int loaded;
     glui32 width;
     glui32 height;
+    char *alttext;
 } giblorb_auxpict_t;
 
 /* giblorb_map_t: Holds the complete description of an open Blorb file. */
@@ -340,6 +342,7 @@ static giblorb_err_t giblorb_initialize_map(giblorb_map_t *map)
             auxpict->loaded = FALSE;
             auxpict->width = 0;
             auxpict->height = 0;
+            auxpict->alttext = NULL;
         }
     }
     
@@ -536,6 +539,45 @@ giblorb_err_t giblorb_count_resources(giblorb_map_t *map, glui32 usage,
     if (max)
         *max = maxval;
     
+    return giblorb_err_None;
+}
+
+giblorb_err_t giblorb_load_image_info(giblorb_map_t *map,
+    glui32 resnum, giblorb_image_info_t *res)
+{
+    giblorb_resdesc_t sample;
+    giblorb_resdesc_t *found;
+    
+    sample.usage = giblorb_ID_Pict;
+    sample.resnum = resnum;
+    
+    found = giblorb_bsearch(&sample, map->ressorted, map->numresources);
+    
+    if (!found)
+        return giblorb_err_NotFound;
+    
+    glui32 chunknum = found->chunknum;
+    if (chunknum >= map->numchunks)
+        return giblorb_err_NotFound;
+
+    giblorb_chunkdesc_t *chu = &(map->chunks[chunknum]);
+    if (chu->auxdatnum < 0)
+        return giblorb_err_NotFound;
+
+    giblorb_auxpict_t *auxpict = &(map->auxpict[chu->auxdatnum]);
+    if (!auxpict->loaded) {
+        /*###*/
+        fprintf(stderr, "### image info loading %d\n", resnum);
+        auxpict->width = 77;
+        auxpict->height = 88;
+        auxpict->loaded = TRUE;
+    }
+
+    res->chunktype = chu->type;
+    res->width = auxpict->width;
+    res->height = auxpict->height;
+    res->alttext = auxpict->alttext;
+    fprintf(stderr, "### image info for %d (%x): %dx%d '%s'\n", resnum, res->chunktype, res->width, res->height, res->alttext);
     return giblorb_err_None;
 }
 

@@ -11,6 +11,7 @@
 
 #include "glk.h"
 #include "remglk.h"
+#include "gi_blorb.h"
 #include "rgdata.h"
 #include "rgwin_pair.h"
 #include "rgwin_blank.h"
@@ -1299,8 +1300,26 @@ glui32 glk_image_draw_scaled(winid_t win, glui32 image,
 
 glui32 glk_image_get_info(glui32 image, glui32 *width, glui32 *height)
 {
-    gli_strict_warning("image_get_info: graphics not supported.");
-    return FALSE;
+    if (width)
+        *width = 0;
+    if (height)
+        *height = 0;
+
+    giblorb_map_t *map = giblorb_get_resource_map();
+    if (!map)
+        return FALSE; /* Not running from a blorb file */
+
+    giblorb_image_info_t info;
+    giblorb_err_t err = giblorb_load_image_info(map, image, &info);
+    if (err)
+        return FALSE;
+
+    if (width)
+        *width = info.width;
+    if (height)
+        *height = info.height;
+
+    return TRUE;
 }
 
 void glk_window_flow_break(winid_t win)

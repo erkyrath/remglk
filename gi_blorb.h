@@ -60,6 +60,13 @@ typedef struct giblorb_result_struct {
     glui32 chunktype; /* The type of the chunk. */
 } giblorb_result_t;
 
+typedef struct giblorb_image_info_struct {
+    glui32 chunktype;
+    glui32 width;
+    glui32 height;
+    char *alttext;
+} giblorb_image_info_t;
+
 extern giblorb_err_t giblorb_create_map(strid_t file, 
     giblorb_map_t **newmap);
 extern giblorb_err_t giblorb_destroy_map(giblorb_map_t *map);
@@ -77,6 +84,9 @@ extern giblorb_err_t giblorb_load_resource(giblorb_map_t *map,
     glui32 resnum);
 extern giblorb_err_t giblorb_count_resources(giblorb_map_t *map, 
     glui32 usage, glui32 *num, glui32 *min, glui32 *max);
+
+extern giblorb_err_t giblorb_load_image_info(giblorb_map_t *map,
+    glui32 resnum, giblorb_image_info_t *res);
 
 /* The following functions are part of the Glk library itself, not 
     the Blorb layer (whose code is in gi_blorb.c). These functions 
