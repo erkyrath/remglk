@@ -352,6 +352,11 @@ giblorb_err_t giblorb_destroy_map(giblorb_map_t *map)
     
     if (!map || !map->chunks || map->inited != giblorb_Inited_Magic)
         return giblorb_err_NotAMap;
+
+    if (map->auxpict) {
+        giblorb_free(map->auxpict);
+        map->auxpict = NULL;
+    }
     
     for (ix=0; ix<map->numchunks; ix++) {
         giblorb_chunkdesc_t *chu = &(map->chunks[ix]);
