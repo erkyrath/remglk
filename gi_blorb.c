@@ -89,6 +89,8 @@ static int lib_inited = FALSE;
 
 static giblorb_err_t giblorb_initialize(void);
 static giblorb_err_t giblorb_initialize_map(giblorb_map_t *map);
+static giblorb_err_t giblorb_image_get_size_jpeg(unsigned char *ptr, giblorb_auxpict_t *auxpict);
+static giblorb_err_t giblorb_image_get_size_png(unsigned char *ptr, giblorb_auxpict_t *auxpict);
 static void giblorb_qsort(giblorb_resdesc_t **list, int len);
 static giblorb_resdesc_t *giblorb_bsearch(giblorb_resdesc_t *sample, 
     giblorb_resdesc_t **list, int len);
@@ -568,8 +570,23 @@ giblorb_err_t giblorb_load_image_info(giblorb_map_t *map,
     if (!auxpict->loaded) {
         /*###*/
         fprintf(stderr, "### image info loading %d\n", resnum);
-        auxpict->width = 77;
-        auxpict->height = 88;
+        giblorb_result_t res;
+        giblorb_err_t err = giblorb_load_chunk_by_number(map, giblorb_method_Memory, &res, chunknum);
+        if (err)
+            return err;
+
+        if (chu->type == giblorb_ID_JPEG)
+            err = giblorb_image_get_size_jpeg(res.data.ptr, auxpict);
+        else if (chu->type == giblorb_ID_PNG)
+            err = giblorb_image_get_size_png(res.data.ptr, auxpict);
+        else
+            err = giblorb_err_Format;
+
+        giblorb_unload_chunk(map, chunknum);
+
+        if (err)
+            return err;
+
         auxpict->loaded = TRUE;
     }
 
@@ -579,6 +596,14 @@ giblorb_err_t giblorb_load_image_info(giblorb_map_t *map,
     res->alttext = auxpict->alttext;
     fprintf(stderr, "### image info for %d (%x): %dx%d '%s'\n", resnum, res->chunktype, res->width, res->height, res->alttext);
     return giblorb_err_None;
+}
+
+static giblorb_err_t giblorb_image_get_size_jpeg(unsigned char *ptr, giblorb_auxpict_t *auxpict)
+{
+}
+
+static giblorb_err_t giblorb_image_get_size_png(unsigned char *ptr, giblorb_auxpict_t *auxpict)
+{
 }
 
 /* Sorting and searching. */
