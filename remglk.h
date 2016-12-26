@@ -173,6 +173,7 @@ extern int pref_screenwidth;
 extern int pref_screenheight;
 extern int pref_timersupport;
 extern int pref_hyperlinksupport;
+extern int pref_graphicssupport;
 
 /* Declarations of library internal functions. */
 

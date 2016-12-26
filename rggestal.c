@@ -68,9 +68,14 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
 
         case gestalt_Graphics:
         case gestalt_GraphicsTransparency:
-            return FALSE;
+            return pref_graphicssupport;
             
         case gestalt_DrawImage:
+            if (pref_graphicssupport) {
+                if (val == wintype_TextBuffer)
+                    return TRUE;
+                /*### wintype_Graphics is a separate pref flag */
+            }
             return FALSE;
             
         case gestalt_Unicode:
