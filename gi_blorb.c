@@ -7,7 +7,6 @@
     distributed under the MIT license; see the "LICENSE" file.
 */
 
-#include <stdio.h> /*####*/
 #include "glk.h"
 #include "gi_blorb.h"
 
@@ -334,7 +333,6 @@ static giblorb_err_t giblorb_initialize_map(giblorb_map_t *map)
     }
 
     if (pictcount) {
-        fprintf(stderr, "### pictcount: %d\n", pictcount);
         map->auxpict = (giblorb_auxpict_t *)giblorb_malloc(pictcount 
             * sizeof(giblorb_auxpict_t));
         if (!map->auxpict)
@@ -568,8 +566,6 @@ giblorb_err_t giblorb_load_image_info(giblorb_map_t *map,
 
     giblorb_auxpict_t *auxpict = &(map->auxpict[chu->auxdatnum]);
     if (!auxpict->loaded) {
-        /*###*/
-        fprintf(stderr, "### image info loading %d\n", resnum);
         giblorb_result_t res;
         giblorb_err_t err = giblorb_load_chunk_by_number(map, giblorb_method_Memory, &res, chunknum);
         if (err)
@@ -594,7 +590,6 @@ giblorb_err_t giblorb_load_image_info(giblorb_map_t *map,
     res->width = auxpict->width;
     res->height = auxpict->height;
     res->alttext = auxpict->alttext;
-    fprintf(stderr, "### image info for %d (%x): %dx%d '%s'\n", resnum, res->chunktype, res->width, res->height, res->alttext);
     return giblorb_err_None;
 }
 
