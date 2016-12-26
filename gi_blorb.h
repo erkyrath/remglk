@@ -39,6 +39,8 @@ typedef glui32 giblorb_err_t;
 #define giblorb_ID_ANNO      (giblorb_make_id('A', 'N', 'N', 'O'))
 #define giblorb_ID_TEXT      (giblorb_make_id('T', 'E', 'X', 'T'))
 #define giblorb_ID_BINA      (giblorb_make_id('B', 'I', 'N', 'A'))
+#define giblorb_ID_JPEG      (giblorb_make_id('J', 'P', 'E', 'G'))
+#define giblorb_ID_PNG       (giblorb_make_id('P', 'N', 'G', ' '))
 
 /* giblorb_map_t: Holds the complete description of an open Blorb 
     file. This type is opaque for normal interpreter use. */

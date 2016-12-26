@@ -7,6 +7,7 @@
     distributed under the MIT license; see the "LICENSE" file.
 */
 
+#include <stdio.h> /*####*/
 #include "glk.h"
 #include "gi_blorb.h"
 
@@ -54,6 +55,13 @@ typedef struct giblorb_resdesc_struct {
     glui32 chunknum;
 } giblorb_resdesc_t;
 
+/* giblorb_auxpict_t: Extra information about an image. */
+typedef struct giblorb_auxpict_struct {
+    int loaded;
+    glui32 width;
+    glui32 height;
+} giblorb_auxpict_t;
+
 /* giblorb_map_t: Holds the complete description of an open Blorb file. */
 struct giblorb_map_struct {
     glui32 inited; /* holds giblorb_Inited_Magic if the map structure is 
@@ -67,6 +75,8 @@ struct giblorb_map_struct {
     giblorb_resdesc_t *resources; /* list of resource descriptors */
     giblorb_resdesc_t **ressorted; /* list of pointers to descriptors 
         in map->resources -- sorted by usage and resource number. */
+
+    giblorb_auxpict_t *auxpict;
 };
 
 #define giblorb_Inited_Magic (0xB7012BED) 
@@ -199,8 +209,8 @@ giblorb_err_t giblorb_create_map(strid_t file, giblorb_map_t **newmap)
     map->resolution = NULL;
     map->palettechunk = -1;
     map->palette = NULL;
-    map->auxsound = NULL;
-    map->auxpict = NULL;*/
+    map->auxsound = NULL;*/
+    map->auxpict = NULL;
     
     /* Now we do everything else involved in loading the Blorb file,
         such as building resource lists. */
@@ -227,7 +237,8 @@ static giblorb_err_t giblorb_initialize_map(giblorb_map_t *map)
     char *ptr;
     glui32 len;
     glui32 numres;
-    int gotindex = FALSE; 
+    int gotindex = FALSE;
+    int pictcount = 0;
 
     for (ix=0; ix<map->numchunks; ix++) {
         giblorb_chunkdesc_t *chu = &map->chunks[ix];
@@ -308,7 +319,27 @@ static giblorb_err_t giblorb_initialize_map(giblorb_map_t *map)
                 giblorb_unload_chunk(map, ix);
                 gotindex = TRUE;
                 break;
+
+            case giblorb_ID_JPEG:
+            case giblorb_ID_PNG:
+                chu->auxdatnum = pictcount;
+                pictcount++;
+                break;
             
+        }
+    }
+
+    if (pictcount) {
+        fprintf(stderr, "### pictcount: %d\n", pictcount);
+        map->auxpict = (giblorb_auxpict_t *)giblorb_malloc(pictcount 
+            * sizeof(giblorb_auxpict_t));
+        if (!map->auxpict)
+            return giblorb_err_Alloc;
+        for (ix=0; ix<pictcount; ix++) {
+            giblorb_auxpict_t *auxpict = &(map->auxpict[ix]);
+            auxpict->loaded = FALSE;
+            auxpict->width = 0;
+            auxpict->height = 0;
         }
     }
     
