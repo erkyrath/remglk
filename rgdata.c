@@ -1647,6 +1647,11 @@ data_specialspan_t *data_specialspan_alloc(SpecialType type)
         gli_fatal_error("data: Unable to alloc specialspan structure");
 
     dat->type = type;
+    dat->image = 0;
+    dat->width = 0;
+    dat->height = 0;
+    dat->alignment = 0;
+    dat->alttext = NULL;
 
     return dat;
 }
@@ -1654,6 +1659,7 @@ data_specialspan_t *data_specialspan_alloc(SpecialType type)
 void data_specialspan_free(data_specialspan_t *dat)
 {
     dat->type = specialtype_None;
+    dat->alttext = NULL;
     free(dat);
     return;
 }

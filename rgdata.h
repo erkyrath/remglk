@@ -158,6 +158,11 @@ typedef enum SpecialType_enum {
 /* data_specialspan_t: Extra things that a data_span_t can represent. */
 struct data_specialspan_struct {
     SpecialType type;
+    glui32 image;
+    glui32 width;
+    glui32 height;
+    glui32 alignment;
+    char *alttext; /* Reference to existing data. */
 };
 
 /* data_specialreq_t: A special input request. */
