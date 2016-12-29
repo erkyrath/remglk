@@ -1319,7 +1319,34 @@ glui32 glk_image_draw(winid_t win, glui32 image, glsi32 val1, glsi32 val2)
 glui32 glk_image_draw_scaled(winid_t win, glui32 image, 
     glsi32 val1, glsi32 val2, glui32 width, glui32 height)
 {
-    gli_strict_warning("image_draw_scaled: graphics not supported.");
+    if (!pref_graphicssupport) {
+        gli_strict_warning("image_draw_scaled: graphics not supported.");
+        return FALSE;
+    }
+
+    /* Same as above, except we use the passed-in width and height values */
+
+    giblorb_map_t *map = giblorb_get_resource_map();
+    if (!map)
+        return FALSE; /* Not running from a blorb file */
+
+    giblorb_image_info_t info;
+    giblorb_err_t err = giblorb_load_image_info(map, image, &info);
+    if (err)
+        return FALSE;
+
+    if (win->type == wintype_TextBuffer) {
+        data_specialspan_t *special = data_specialspan_alloc(specialtype_Image);
+        special->image = image;
+        special->width = width;
+        special->height = height;
+        special->alttext = info.alttext;
+        special->alignment = val1;
+        special->hyperlink = win->hyperlink;
+        win_textbuffer_putspecial(win, special);
+        return TRUE;
+    }
+
     return FALSE;
 }
 
