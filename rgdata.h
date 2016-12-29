@@ -162,6 +162,7 @@ struct data_specialspan_struct {
     glui32 width;
     glui32 height;
     glui32 alignment;
+    glui32 hyperlink;
     char *alttext; /* Reference to existing data. */
 };
 

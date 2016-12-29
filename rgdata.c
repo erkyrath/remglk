@@ -1651,6 +1651,7 @@ data_specialspan_t *data_specialspan_alloc(SpecialType type)
     dat->width = 0;
     dat->height = 0;
     dat->alignment = 0;
+    dat->hyperlink = 0;
     dat->alttext = NULL;
 
     return dat;
@@ -1666,10 +1667,39 @@ void data_specialspan_free(data_specialspan_t *dat)
 
 void data_specialspan_print(data_specialspan_t *dat)
 {
+    /* For error cases, this prints an ordinary text span. */
+
     switch (dat->type) {
 
     case specialtype_Image:
-        printf("{\"special\":\"image\"}");
+        printf("{\"special\":\"image\", \"image\":%d, \"width\":%d, \"height\":%d", dat->image, dat->width, dat->height);
+        char *alignment;
+        switch (dat->alignment) {
+        default:
+        case imagealign_InlineUp:
+            alignment = "inlineup";
+            break;
+        case imagealign_InlineDown:
+            alignment = "inlinedown";
+            break;
+        case imagealign_InlineCenter:
+            alignment = "inlinecenter";
+            break;
+        case imagealign_MarginLeft:
+            alignment = "marginleft";
+            break;
+        case imagealign_MarginRight:
+            alignment = "marginright";
+            break;
+        }
+        printf(", \"alignment\":\"%s\"", alignment);
+        if (dat->hyperlink)
+            printf(", \"hyperlink\":\"%s\"", dat->hyperlink);
+        if (dat->alttext) {
+            /* ### not sure what format the alt-text is in yet */
+            printf(", \"alttext\":\"###\"");
+        }
+        printf("}");
         break;
 
     case specialtype_FlowBreak:
