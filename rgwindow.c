@@ -1324,7 +1324,15 @@ glui32 glk_image_get_info(glui32 image, glui32 *width, glui32 *height)
 
 void glk_window_flow_break(winid_t win)
 {
-    gli_strict_warning("window_flow_break: graphics not supported.");
+    if (!win) {
+        gli_strict_warning("flow_break: invalid ref");
+        return;
+    }
+    
+    if (win->type == wintype_TextBuffer) {
+        data_specialspan_t *special = data_specialspan_alloc(specialtype_FlowBreak);
+        win_textbuffer_putspecial(win, special);
+    }
 }
 
 void glk_window_erase_rect(winid_t win, 

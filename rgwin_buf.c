@@ -28,6 +28,10 @@ window_textbuffer_t *win_textbuffer_create(window_t *win)
     dwin->numchars = 0;
     dwin->charssize = 500;
     dwin->chars = (glui32 *)malloc(dwin->charssize * sizeof(glui32));
+
+    dwin->numspecials = 0;
+    dwin->specialssize = 4;
+    dwin->specials = (data_specialspan_t **)malloc(dwin->specialssize * sizeof(data_specialspan_t *));
     
     dwin->numruns = 0;
     dwin->runssize = 40;
@@ -44,6 +48,7 @@ window_textbuffer_t *win_textbuffer_create(window_t *win)
     dwin->numruns = 1;
     dwin->runs[0].style = style_Normal;
     dwin->runs[0].hyperlink = 0;
+    dwin->runs[0].specialnum = -1;
     dwin->runs[0].pos = 0;
     
     dwin->dirtybeg = -1;
@@ -71,6 +76,14 @@ void win_textbuffer_destroy(window_textbuffer_t *dwin)
     if (dwin->runs) {
         free(dwin->runs);
         dwin->runs = NULL;
+    }
+
+    if (dwin->specials) {
+        long px;
+        for (px=0; px<dwin->numspecials; px++)
+            data_specialspan_free(dwin->specials[px]);
+        free(dwin->specials);
+        dwin->specials = NULL;
     }
     
     if (dwin->chars) {
@@ -144,6 +157,7 @@ data_content_t *win_textbuffer_update(window_t *win)
     long nextrunpos;
     short curstyle;
     glui32 curlink;
+    long curspecnum;
 
     if (dwin->dirtybeg == -1) {
         return NULL;
@@ -161,6 +175,7 @@ data_content_t *win_textbuffer_update(window_t *win)
         snum = find_style_by_pos(dwin, cnum);
         curstyle = dwin->runs[snum].style;
         curlink = dwin->runs[snum].hyperlink;
+        curspecnum = dwin->runs[snum].specialnum;
         if (snum+1 < dwin->numruns)
             nextrunpos = dwin->runs[snum+1].pos;
         else
@@ -174,6 +189,7 @@ data_content_t *win_textbuffer_update(window_t *win)
             glui32 ch = dwin->chars[cnum];
             if (ch == '\n') {
                 if (cnum > spanstart) {
+                    /* A specialspan will not be a newline. */
                     data_line_add_span(line, curstyle, curlink, dwin->chars+spanstart, cnum-spanstart);
                     spanstart = cnum;
                 }
@@ -189,13 +205,23 @@ data_content_t *win_textbuffer_update(window_t *win)
 
             while (cnum >= nextrunpos) {
                 if (cnum > spanstart) {
-                    data_line_add_span(line, curstyle, curlink, dwin->chars+spanstart, cnum-spanstart);
+                    if (curspecnum >= 0) {
+                        data_specialspan_t *curspecial = dwin->specials[curspecnum];
+                        if (curspecial->type == specialtype_FlowBreak)
+                            line->flowbreak = TRUE;
+                        else
+                            data_line_add_specialspan(line, curspecial);
+                    }
+                    else {
+                        data_line_add_span(line, curstyle, curlink, dwin->chars+spanstart, cnum-spanstart);
+                    }
                     spanstart = cnum;
                 }
 
                 snum++;
                 curstyle = dwin->runs[snum].style;
                 curlink = dwin->runs[snum].hyperlink;
+                curspecnum = dwin->runs[snum].specialnum;
                 if (snum+1 < dwin->numruns)
                     nextrunpos = dwin->runs[snum+1].pos;
                 else
@@ -206,7 +232,16 @@ data_content_t *win_textbuffer_update(window_t *win)
         }
 
         if (cnum > spanstart) {
-            data_line_add_span(line, curstyle, curlink, dwin->chars+spanstart, cnum-spanstart);
+            if (curspecnum >= 0) {
+                data_specialspan_t *curspecial = dwin->specials[curspecnum];
+                if (curspecial->type == specialtype_FlowBreak)
+                    line->flowbreak = TRUE;
+                else
+                    data_line_add_specialspan(line, curspecial);
+            }
+            else {
+                data_line_add_span(line, curstyle, curlink, dwin->chars+spanstart, cnum-spanstart);
+            }
             spanstart = cnum;
         }
     }
@@ -230,7 +265,8 @@ void win_textbuffer_putchar(window_t *win, glui32 ch)
     
     lx = dwin->numchars;
     
-    if (win->style != dwin->runs[dwin->numruns-1].style
+    if (dwin->runs[dwin->numruns-1].specialnum >= 0
+        || win->style != dwin->runs[dwin->numruns-1].style
         || win->hyperlink != dwin->runs[dwin->numruns-1].hyperlink) {
         set_last_run(dwin, win->style, win->hyperlink);
     }
@@ -252,6 +288,56 @@ void win_textbuffer_putchar(window_t *win, glui32 ch)
     }
 }
 
+void win_textbuffer_putspecial(window_t *win, data_specialspan_t *special)
+{
+    /* Takes ownership of the specialspan object. It will live until the
+       window is cleared or trimmed. */
+
+    window_textbuffer_t *dwin = win->data;
+    long lx, px;
+    
+    if (dwin->numchars >= dwin->charssize) {
+        dwin->charssize *= 2;
+        dwin->chars = (glui32 *)realloc(dwin->chars, 
+            dwin->charssize * sizeof(glui32));
+    }
+    
+    lx = dwin->numchars;
+
+    if (dwin->numspecials > dwin->specialssize) {
+        dwin->specialssize *= 2;
+        dwin->specials = (data_specialspan_t **)realloc(dwin->specials,
+            dwin->specialssize * sizeof(data_specialspan_t *));
+    }
+
+    px = dwin->numspecials;
+    
+    dwin->specials[px] = special;
+    dwin->numspecials++;
+    
+    /* A special is always a new run. */
+    set_last_run(dwin, win->style, win->hyperlink);
+    dwin->runs[dwin->numruns-1].specialnum = px;
+    
+    dwin->chars[lx] = '#';  /* dummy char (not a newline!) */
+    dwin->numchars++;
+
+    if (dwin->dirtybeg == -1) {
+        dwin->dirtybeg = lx;
+        dwin->dirtyend = lx+1;
+        dwin->dirtydelta = 1;
+    }
+    else {
+        if (lx < dwin->dirtybeg)
+            dwin->dirtybeg = lx;
+        if (lx+1 > dwin->dirtyend)
+            dwin->dirtyend = lx+1;
+        dwin->dirtydelta += 1;
+    }
+}
+
+/* If the last (dangling) run is empty, set its style/link attributes.
+   Otherwise, add a new empty run with those attributes. */
 static void set_last_run(window_textbuffer_t *dwin, glui32 style, glui32 hyperlink)
 {
     long lx = dwin->numchars;
@@ -260,6 +346,7 @@ static void set_last_run(window_textbuffer_t *dwin, glui32 style, glui32 hyperli
     if (dwin->runs[rx].pos == lx) {
         dwin->runs[rx].style = style;
         dwin->runs[rx].hyperlink = hyperlink;
+        dwin->runs[rx].specialnum = -1;
     }
     else {
         rx++;
@@ -271,6 +358,7 @@ static void set_last_run(window_textbuffer_t *dwin, glui32 style, glui32 hyperli
         dwin->runs[rx].pos = lx;
         dwin->runs[rx].style = style;
         dwin->runs[rx].hyperlink = hyperlink;
+        dwin->runs[rx].specialnum = -1;
         dwin->numruns++;
     }
 
@@ -280,11 +368,20 @@ void win_textbuffer_clear(window_t *win)
 {
     window_textbuffer_t *dwin = win->data;
     long oldlen = dwin->numchars;
-    
+    long px;
+
+    for (px=0; px<dwin->numspecials; px++) {
+        data_specialspan_free(dwin->specials[px]);
+        dwin->specials[px] = NULL;
+    }
+    dwin->numspecials = 0;
+
     dwin->numchars = 0;
+
     dwin->numruns = 1;
     dwin->runs[0].style = win->style;
     dwin->runs[0].hyperlink = win->hyperlink;
+    dwin->runs[0].specialnum = -1;
     dwin->runs[0].pos = 0;
     
     if (dwin->dirtybeg == -1) {
@@ -302,8 +399,8 @@ void win_textbuffer_clear(window_t *win)
 void win_textbuffer_trim_buffer(window_t *win)
 {
     window_textbuffer_t *dwin = win->data;
-    long snum, cnum;
-    long rx;
+    long snum, cnum, specnum;
+    long rx, px;
     
     if (dwin->numchars <= BUFFER_SIZE + BUFFER_SLACK)
         return; 
@@ -320,7 +417,21 @@ void win_textbuffer_trim_buffer(window_t *win)
         cnum--;
     if (cnum <= 0)
         return;
+
+    /* Find the first stylerun that we will save. */
     snum = find_style_by_pos(dwin, cnum);
+
+    /* Find the first special that we will save. (Perhaps none.) */
+    specnum = dwin->numspecials;
+    if (dwin->numspecials > 0) {
+        for (rx=snum; rx<dwin->numruns; rx++) {
+            if (dwin->runs[rx].specialnum >= 0) {
+                specnum = dwin->runs[rx].specialnum;
+                break;
+            }
+        }
+    }
+    fprintf(stderr, "### trimming at cnum %ld, snum %ld, specnum %ld\n", cnum, snum, specnum); /*###*/
     
     /* trim chars */
     
@@ -338,6 +449,15 @@ void win_textbuffer_trim_buffer(window_t *win)
         dwin->dirtybeg -= cnum;
         dwin->dirtyend -= cnum;
     }
+
+    /* trim specials */
+
+    for (px=0; px<specnum; px++) 
+        data_specialspan_free(dwin->specials[px]);
+    if (dwin->numspecials > specnum)
+        memmove(dwin->specials, &(dwin->specials[specnum]),
+            (dwin->numspecials - specnum) * sizeof(data_specialspan_t *));
+    dwin->numspecials -= specnum;
     
     /* trim runs */
     
@@ -347,6 +467,7 @@ void win_textbuffer_trim_buffer(window_t *win)
         dwin->runs[0].style = sstyle;
         dwin->runs[0].hyperlink = slink;
         dwin->runs[0].pos = 0;
+        dwin->runs[0].specialnum = -1;
         dwin->numruns = 1;
     }
     else {
@@ -356,6 +477,12 @@ void win_textbuffer_trim_buffer(window_t *win)
                 srun2->pos -= cnum;
             else
                 srun2->pos = 0;
+            if (srun2->specialnum >= 0) {
+                if (srun2->specialnum >= specnum)
+                    srun2->specialnum -= specnum;
+                else
+                    srun2->specialnum = -1;
+            }
         }
         memmove(dwin->runs, &(dwin->runs[snum]), 
             (dwin->numruns - snum) * sizeof(tbrun_t));

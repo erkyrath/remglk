@@ -15,6 +15,7 @@ typedef struct tbrun_struct {
     short style;
     glui32 hyperlink;
     long pos;
+    long specialnum;
 } tbrun_t;
 
 typedef struct window_textbuffer_struct {
@@ -23,6 +24,10 @@ typedef struct window_textbuffer_struct {
     glui32 *chars;
     long numchars;
     long charssize;
+
+    data_specialspan_t **specials;
+    long numspecials;
+    long specialssize;
     
     int width, height;
     
@@ -32,7 +37,7 @@ typedef struct window_textbuffer_struct {
         so the old end of the dirty region == (dirtyend - dirtydelta). 
         If dirtybeg == -1, dirtydelta is invalid. */
     
-    tbrun_t *runs;
+    tbrun_t *runs; /* There is always at least one run. */
     long numruns;
     long runssize;
 
@@ -54,6 +59,7 @@ extern void win_textbuffer_rearrange(window_t *win, grect_t *box, data_metrics_t
 extern void win_textbuffer_redraw(window_t *win);
 extern data_content_t *win_textbuffer_update(window_t *win);
 extern void win_textbuffer_putchar(window_t *win, glui32 ch);
+extern void win_textbuffer_putspecial(window_t *win, data_specialspan_t *special);
 extern void win_textbuffer_clear(window_t *win);
 extern void win_textbuffer_trim_buffer(window_t *win);
 extern void win_textbuffer_set_paging(window_t *win, int forcetoend);
