@@ -1618,7 +1618,7 @@ void data_line_print(data_line_t *dat, glui32 wintype)
         for (ix=0; ix<dat->count; ix++) {
             data_span_t *span = &(dat->spans[ix]);
             if (span->special) {
-                printf("{###}");
+                data_specialspan_print(span->special);
             }
             else {
                 char *stylename = name_for_style(span->style);
@@ -1662,6 +1662,25 @@ void data_specialspan_free(data_specialspan_t *dat)
     dat->alttext = NULL;
     free(dat);
     return;
+}
+
+void data_specialspan_print(data_specialspan_t *dat)
+{
+    switch (dat->type) {
+
+    case specialtype_Image:
+        printf("{\"special\":\"image\"}");
+        break;
+
+    case specialtype_FlowBreak:
+        printf("{\"text\":\"[ERROR: data_specialspan_print: flowbreak should have been converted to a line flag]\"}");
+        break;
+
+    default:
+        printf("{\"text\":\"[ERROR: data_specialspan_print: unrecognized special type]\"}");
+        break;
+
+    }
 }
 
 data_specialreq_t *data_specialreq_alloc(glui32 filemode, glui32 filetype)
