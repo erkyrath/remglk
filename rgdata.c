@@ -1633,6 +1633,24 @@ void data_line_print(data_line_t *dat, glui32 wintype)
 
 }
 
+data_specialspan_t *data_specialspan_alloc(SpecialType type)
+{
+    data_specialspan_t *dat = (data_specialspan_t *)malloc(sizeof(data_specialspan_t));
+    if (!dat)
+        gli_fatal_error("data: Unable to alloc specialspan structure");
+
+    dat->type = type;
+
+    return dat;
+}
+
+void data_specialspan_free(data_specialspan_t *dat)
+{
+    dat->type = specialtype_None;
+    free(dat);
+    return;
+}
+
 data_specialreq_t *data_specialreq_alloc(glui32 filemode, glui32 filetype)
 {
     data_specialreq_t *dat = (data_specialreq_t *)malloc(sizeof(data_specialreq_t));
