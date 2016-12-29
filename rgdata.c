@@ -1506,6 +1506,7 @@ data_line_t *data_line_alloc()
         gli_fatal_error("data: Unable to alloc line structure");
 
     dat->append = FALSE;
+    dat->flowbreak = FALSE;
     dat->linenum = 0;
 
     dat->spans = NULL;
@@ -1591,6 +1592,12 @@ void data_line_print(data_line_t *dat, glui32 wintype)
     else {
         if (dat->append) {
             printf("\"append\":true");
+            any = TRUE;
+        }
+        if (dat->flowbreak) {
+            if (any)
+                printf(", ");
+            printf("\"flowbreak\":true");
             any = TRUE;
         }
     }

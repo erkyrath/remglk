@@ -133,6 +133,7 @@ struct data_content_struct {
 struct data_line_struct {
     glui32 linenum;
     int append;
+    int flowbreak;
     data_span_t *spans;
     int count;
     int allocsize;
