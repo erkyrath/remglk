@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "glk.h"
 #include "remglk.h"
+#include "rgdata.h"
 #include "rgwin_grid.h"
 #include "rgwin_buf.h"
 
