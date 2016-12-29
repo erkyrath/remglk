@@ -189,8 +189,13 @@ data_content_t *win_textbuffer_update(window_t *win)
             glui32 ch = dwin->chars[cnum];
             if (ch == '\n') {
                 if (cnum > spanstart) {
-                    /* A specialspan will not be a newline. */
-                    data_line_add_span(line, curstyle, curlink, dwin->chars+spanstart, cnum-spanstart);
+                    if (curspecnum >= 0) {
+                        data_specialspan_t *curspecial = dwin->specials[curspecnum];
+                        data_line_add_specialspan(line, curspecial);
+                    }
+                    else {
+                        data_line_add_span(line, curstyle, curlink, dwin->chars+spanstart, cnum-spanstart);
+                    }
                     spanstart = cnum;
                 }
 
@@ -207,10 +212,7 @@ data_content_t *win_textbuffer_update(window_t *win)
                 if (cnum > spanstart) {
                     if (curspecnum >= 0) {
                         data_specialspan_t *curspecial = dwin->specials[curspecnum];
-                        if (curspecial->type == specialtype_FlowBreak)
-                            line->flowbreak = TRUE;
-                        else
-                            data_line_add_specialspan(line, curspecial);
+                        data_line_add_specialspan(line, curspecial);
                     }
                     else {
                         data_line_add_span(line, curstyle, curlink, dwin->chars+spanstart, cnum-spanstart);
@@ -234,10 +236,7 @@ data_content_t *win_textbuffer_update(window_t *win)
         if (cnum > spanstart) {
             if (curspecnum >= 0) {
                 data_specialspan_t *curspecial = dwin->specials[curspecnum];
-                if (curspecial->type == specialtype_FlowBreak)
-                    line->flowbreak = TRUE;
-                else
-                    data_line_add_specialspan(line, curspecial);
+                data_line_add_specialspan(line, curspecial);
             }
             else {
                 data_line_add_span(line, curstyle, curlink, dwin->chars+spanstart, cnum-spanstart);

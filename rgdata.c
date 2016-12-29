@@ -1556,6 +1556,13 @@ void data_line_add_span(data_line_t *data, short style, glui32 hyperlink, glui32
 
 void data_line_add_specialspan(data_line_t *data, data_specialspan_t *special)
 {
+    /* The flowbreak is a special case. It does not get added as a span;
+       it just sets the flowbreak flag on the line. */
+    if (special->type == specialtype_FlowBreak) {
+        data->flowbreak = TRUE;
+        return;
+    }
+
     if (!data->spans) {
         data->allocsize = 4;
         data->spans = malloc(data->allocsize * sizeof(data_span_t));
