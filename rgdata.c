@@ -1610,13 +1610,18 @@ void data_line_print(data_line_t *dat, glui32 wintype)
         
         for (ix=0; ix<dat->count; ix++) {
             data_span_t *span = &(dat->spans[ix]);
-            char *stylename = name_for_style(span->style);
-            printf("{ \"style\":\"%s\"", stylename);
-            if (span->hyperlink)
-                printf(", \"hyperlink\":%ld", (unsigned long)span->hyperlink);
-            printf(", \"text\":");
-            print_ustring_json(span->str, span->len, stdout);
-            printf("}");
+            if (span->special) {
+                printf("{###}");
+            }
+            else {
+                char *stylename = name_for_style(span->style);
+                printf("{ \"style\":\"%s\"", stylename);
+                if (span->hyperlink)
+                    printf(", \"hyperlink\":%ld", (unsigned long)span->hyperlink);
+                printf(", \"text\":");
+                print_ustring_json(span->str, span->len, stdout);
+                printf("}");
+            }
             if (ix+1 < dat->count)
                 printf(", ");
         }
