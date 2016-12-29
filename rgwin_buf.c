@@ -430,7 +430,6 @@ void win_textbuffer_trim_buffer(window_t *win)
             }
         }
     }
-    fprintf(stderr, "### trimming at cnum %ld, snum %ld, specnum %ld\n", cnum, snum, specnum); /*###*/
     
     /* trim chars */
     
