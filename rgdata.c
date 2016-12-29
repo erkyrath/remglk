@@ -1518,7 +1518,7 @@ data_line_t *data_line_alloc()
 void data_line_free(data_line_t *dat)
 {
     if (dat->spans) {
-        /* Do not free the span strings. */
+        /* Do not free the span strings or specials. */
         free(dat->spans);
         dat->spans = NULL;
     };
@@ -1550,6 +1550,31 @@ void data_line_add_span(data_line_t *data, short style, glui32 hyperlink, glui32
     span->hyperlink = hyperlink;
     span->str = str;
     span->len = len;
+    span->special = NULL;
+}
+
+void data_line_add_specialspan(data_line_t *data, data_specialspan_t *special)
+{
+    if (!data->spans) {
+        data->allocsize = 4;
+        data->spans = malloc(data->allocsize * sizeof(data_span_t));
+    }
+    else {
+        if (data->count >= data->allocsize) {
+            data->allocsize *= 2;
+            data->spans = realloc(data->spans, data->allocsize * sizeof(data_span_t));
+        }
+    }
+
+    if (!data->spans)
+        gli_fatal_error("data: Unable to allocate memory for span buffer");
+
+    data_span_t *span = &(data->spans[data->count++]);
+    span->style = 0;
+    span->hyperlink = 0;
+    span->str = NULL;
+    span->len = 0;
+    span->special = special;
 }
 
 void data_line_print(data_line_t *dat, glui32 wintype)

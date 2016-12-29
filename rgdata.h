@@ -44,6 +44,7 @@ typedef struct data_window_struct data_window_t;
 typedef struct data_input_struct data_input_t;
 typedef struct data_line_struct data_line_t;
 typedef struct data_span_struct data_span_t;
+typedef struct data_specialspan_struct data_specialspan_t;
 
 /* data_metrics_t: Defines the display metrics. */
 struct data_metrics_struct {
@@ -144,6 +145,12 @@ struct data_span_struct {
     glui32 *str; /* This will always be a reference to existing data.
                     Do not free. */
     long len;
+    data_specialspan_t *special; /* Do not free. */
+};
+
+/* data_specialspan_t: Extra things that a data_span_t can represent. */
+struct data_specialspan_struct {
+    int type;
 };
 
 /* data_specialreq_t: A special input request. */
@@ -193,6 +200,7 @@ extern void data_content_print(data_content_t *data);
 extern data_line_t *data_line_alloc(void);
 extern void data_line_free(data_line_t *data);
 extern void data_line_add_span(data_line_t *data, short style, glui32 hyperlink, glui32 *str, long len);
+extern void data_line_add_specialspan(data_line_t *data, data_specialspan_t *special);
 extern void data_line_print(data_line_t *data, glui32 wintype);
 
 extern data_specialreq_t *data_specialreq_alloc(glui32 filemode, glui32 filetype);
