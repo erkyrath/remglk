@@ -149,9 +149,15 @@ struct data_span_struct {
     data_specialspan_t *special; /* Do not free. */
 };
 
+typedef enum SpecialType_enum {
+    specialtype_None = 0,
+    specialtype_FlowBreak = 1,
+    specialtype_Image = 2,
+} SpecialType;
+
 /* data_specialspan_t: Extra things that a data_span_t can represent. */
 struct data_specialspan_struct {
-    int type;
+    SpecialType type;
 };
 
 /* data_specialreq_t: A special input request. */
