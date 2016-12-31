@@ -301,6 +301,33 @@ A human types "go east" into some user interface, which then passes the followin
 The library accepts this, mulls it, and generates a new output update. So it goes.
 <p>
 
+<h3>Referring to resources</h3>
+
+RemGlk supports Blorb-packaged games which include images. (Sound support is on the to-do list.) However, it does not try to encode the image data in the JSON output. Instead, it assumes that the display library (GlkOte) has access to the same images. When the game draws an image, RemGlk sends a JSON stanza which includes the image number and size. (See the <a href="http://eblong.com/zarf/glk/glkote/docs.html">GlkOte documentation</a>.) The display library is then responsible for finding the image with that number.
+<p>
+
+To make this easier, you can configure RemGlk to include an image URL in the stanza.
+Do this with the <code>-resourceurl</code> (or <code>-ru</code>) flag:
+<p>
+
+<pre class="Sample">
+glulxe -ru http://example.com/datadir/ game.gblorb
+</pre>
+<p>
+
+The URL should end with a slash, and should refer to a directory containing image files. RemGlk will send URLs with the format <code>http://example.com/datadir/pict-1.png</code>, <code>http://example.com/datadir/pict-2.jpeg</code>. (Note lower-case, and "jpeg" has an "e".) (This is the same filename convention used by <a href="https://github.com/erkyrath/glk-dev/blob/master/blorbtool.py">blorbtool.py</a> with the <code>giload</code> command.)
+<p>
+
+You may also specify a local pathname with the <code>-resourcedir</code> (or <code>-rd</code>) flag:
+
+<pre class="Sample">
+glulxe -rd path/dir game.gblorb
+</pre>
+<p>
+
+RemGlk will convert the pathname to a <code>file:</code> URL and send it as above.
+<p>
+
 <h2>The Data Format</h2>
 
 <em>I have not written out this documentation in detail yet. Please refer to the <a href="http://eblong.com/zarf/glk/glkote/docs.html">GlkOte documentation</a>. Input what GlkOte outputs, and vice versa.</em>
@@ -322,7 +349,7 @@ When generating output, a complete update JSON update will be followed by a blan
 <p>
 
 <hr>
-Last updated December 9, 2016.
+Last updated December 31, 2016.
 <p>
 
 <em><a href="http://eblong.com/zarf/glk/index.html">Glk home page</a></em>
