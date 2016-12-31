@@ -1304,6 +1304,7 @@ glui32 glk_image_draw(winid_t win, glui32 image, glsi32 val1, glsi32 val2)
     if (win->type == wintype_TextBuffer) {
         data_specialspan_t *special = data_specialspan_alloc(specialtype_Image);
         special->image = image;
+        special->chunktype = info.chunktype;
         special->width = info.width;
         special->height = info.height;
         special->alttext = info.alttext;
@@ -1338,6 +1339,7 @@ glui32 glk_image_draw_scaled(winid_t win, glui32 image,
     if (win->type == wintype_TextBuffer) {
         data_specialspan_t *special = data_specialspan_alloc(specialtype_Image);
         special->image = image;
+        special->chunktype = info.chunktype;
         special->width = width;
         special->height = height;
         special->alttext = info.alttext;
