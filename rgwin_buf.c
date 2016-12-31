@@ -303,7 +303,7 @@ void win_textbuffer_putspecial(window_t *win, data_specialspan_t *special)
     
     lx = dwin->numchars;
 
-    if (dwin->numspecials > dwin->specialssize) {
+    if (dwin->numspecials >= dwin->specialssize) {
         dwin->specialssize *= 2;
         dwin->specials = (data_specialspan_t **)realloc(dwin->specials,
             dwin->specialssize * sizeof(data_specialspan_t *));
