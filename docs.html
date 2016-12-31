@@ -132,13 +132,10 @@ RemGlk does not provide a user interface. Instead, it wraps up the application's
 RemGlk is therefore like CheapGlk, in that it works entirely through input and output streams, and can easily be attached to a bot or web service. However, unlike CheapGlk, RemGlk supports multiple Glk windows and most Glk I/O features. Whatever it's attached to just has to decode the structured output and display it appropriately.
 <p>
 
-RemGlk was designed to complement the <a href="http://eblong.com/zarf/glk/glkote.html">GlkOte</a> Javascript library. GlkOte more or less implements the other half of the job: it accepts game output (as Javascript objects), displays it, and then returns the player's commands in the same format. It should be possible to connect an IF interpreter, RemGlk, and GlkOte to build a complete IF web service.
+RemGlk was designed to complement the <a href="http://eblong.com/zarf/glk/glkote.html">GlkOte</a> Javascript library. GlkOte more or less implements the other half of the job: it accepts game output (as Javascript objects), displays it, and then returns the player's commands in the same format. It is possible to connect an IF interpreter, RemGlk, and GlkOte to build a complete IF web service. (See <a href="https://github.com/erkyrath/remote-if-demo">an experimental implementation of this idea</a>.)
 <p>
 
-<em>Warning: this has not yet been tested in any way. This is an alpha release of RemGlk, and nothing is guaranteed.</em>
-<p>
-
-While this is labelled "release 0.2", I may be fixing bugs and adding features iteratively in the near future. Or not. You are best advised to follow my <a href="http://github.com/erkyrath/remglk/">GitHub repository</a> for updates.
+RemGlk is also used by the <a href="http://eblong.com/zarf/plotex/regtest.html">RegTest</a> testing framework. In this setup, the "display layer" does not actually display anything. It is a Python script which generates test input and verifies the game's output.
 <p>
 
 <h2>Using RemGlk</h2>
