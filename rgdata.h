@@ -159,6 +159,7 @@ typedef enum SpecialType_enum {
 struct data_specialspan_struct {
     SpecialType type;
     glui32 image;
+    glui32 chunktype; /* JPEG or PNG, for images */
     glui32 width;
     glui32 height;
     glui32 alignment;

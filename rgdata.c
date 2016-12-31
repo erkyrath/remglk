@@ -1647,6 +1647,7 @@ data_specialspan_t *data_specialspan_alloc(SpecialType type)
         gli_fatal_error("data: Unable to alloc specialspan structure");
 
     dat->type = type;
+    dat->chunktype = 0;
     dat->image = 0;
     dat->width = 0;
     dat->height = 0;
@@ -1673,6 +1674,16 @@ void data_specialspan_print(data_specialspan_t *dat)
 
     case specialtype_Image:
         printf("{\"special\":\"image\", \"image\":%d, \"width\":%d, \"height\":%d", dat->image, dat->width, dat->height);
+
+        if (pref_resourceurl) {
+            char *suffix = "";
+            if (dat->chunktype == 0x4A504547)
+                suffix = ".jpeg";
+            else if (dat->chunktype == 0x504E4720)
+                suffix = ".png";
+            printf(", \"url\":\"%spict-%d%s\"", pref_resourceurl, dat->image, suffix);
+        }
+
         char *alignment;
         switch (dat->alignment) {
         default:
@@ -1693,8 +1704,9 @@ void data_specialspan_print(data_specialspan_t *dat)
             break;
         }
         printf(", \"alignment\":\"%s\"", alignment);
+
         if (dat->hyperlink)
-            printf(", \"hyperlink\":\"%s\"", dat->hyperlink);
+            printf(", \"hyperlink\":\"%d\"", dat->hyperlink);
         if (dat->alttext) {
             /* ### not sure what format the alt-text is in yet */
             printf(", \"alttext\":\"###\"");
