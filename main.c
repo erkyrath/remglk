@@ -5,6 +5,7 @@
     http://eblong.com/zarf/glk/
 */
 
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,6 +23,7 @@ int pref_screenheight = 50;
 int pref_timersupport = FALSE;
 int pref_hyperlinksupport = FALSE;
 int pref_graphicssupport = FALSE;
+char *pref_resourceurl = NULL;
 
 /* Some constants for my wacky little command-line option parser. */
 #define ex_Void (0)
@@ -35,6 +37,7 @@ static int inittime = FALSE;
 static int extract_value(int argc, char *argv[], char *optname, int type,
     int *argnum, int *result, int defval);
 static int string_to_bool(char *str);
+static char *construct_resourceurl(char *str, int ispath);
 
 #define STRBUFLEN (256)
 static char extracted_string[STRBUFLEN];
@@ -178,6 +181,14 @@ int main(int argc, char *argv[])
                 errflag = TRUE;
             }
         }
+        else if (extract_value(argc, argv, "resourcedir", ex_Str, &ix, &val, FALSE)) 
+            pref_resourceurl = construct_resourceurl(extracted_string, TRUE);
+        else if (extract_value(argc, argv, "rd", ex_Str, &ix, &val, FALSE)) 
+            pref_resourceurl = construct_resourceurl(extracted_string, TRUE);
+        else if (extract_value(argc, argv, "resourceurl", ex_Str, &ix, &val, FALSE)) 
+            pref_resourceurl = construct_resourceurl(extracted_string, FALSE);
+        else if (extract_value(argc, argv, "ru", ex_Str, &ix, &val, FALSE)) 
+            pref_resourceurl = construct_resourceurl(extracted_string, FALSE);
         else {
             printf("%s: unknown option: %s\n", argv[0], argv[ix]);
             errflag = TRUE;
@@ -210,6 +221,8 @@ int main(int argc, char *argv[])
         printf("  -height NUM: manual screen height (default 50)\n");
         printf("  -defprompt BOOL: provide defaults for file prompts (default 'yes')\n");
         printf("  -support [timer, hyperlinks, graphics]: declare support for various input features\n");
+        printf("  -resourceurl STR: URL base for image/sound files\n");
+        printf("  -resourcedir STR: path to image/sound files (used to create file: URLs)\n");
         printf("  -stderr BOOL: send errors to stderr rather than stdout (default 'no')\n");
         printf("  -version: display Glk library version\n");
         printf("  -help: display this list\n");
@@ -383,6 +396,42 @@ static int string_to_bool(char *str)
         return FALSE;
         
     return -1;
+}
+
+/* Given a path or URL (taken from the resourcedir/resourceurl argument),
+   return a (malloced) string containing a URL form. If ispath is
+   true, the path is absolutized and turned into a file: URL. */
+static char *construct_resourceurl(char *str, int ispath)
+{
+    char *res = NULL;
+
+    if (!ispath) {
+        /* We don't append a slash here, because maybe the user wants
+           URLs like http://foo/prefix-pict-1.png. */
+        res = malloc(strlen(str) + 1);
+        if (!res)
+            return NULL;
+        strcpy(res, str);
+    }
+    else {
+        /* This assumes Unix-style pathnames. Sorry. */
+        int len = strlen(str);
+        char *prefix = "";
+        int preslash = FALSE;
+        if (len && str[0] != '/') {
+            prefix = getwd(NULL);
+            preslash = TRUE;
+        }
+        int postslash = FALSE;
+        if (len && str[len-1] != '/')
+            postslash = TRUE;
+        res = malloc(16 + strlen(prefix) + len + 1);
+        if (!res)
+            return NULL;
+        sprintf(res, "file://%s%s%s%s", prefix, (preslash?"/":""), str, (postslash?"/":""));
+    }
+
+    return res;
 }
 
 /* This opens a file for reading or writing. (You cannot open a file
