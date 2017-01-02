@@ -23,6 +23,7 @@ int pref_screenheight = 50;
 int pref_timersupport = FALSE;
 int pref_hyperlinksupport = FALSE;
 int pref_graphicssupport = FALSE;
+int pref_graphicswinsupport = FALSE;
 char *pref_resourceurl = NULL;
 
 /* Some constants for my wacky little command-line option parser. */
@@ -176,6 +177,8 @@ int main(int argc, char *argv[])
                 pref_hyperlinksupport = TRUE;
             else if (!strcmp(extracted_string, "graphics"))
                 pref_graphicssupport = TRUE;
+            else if (!strcmp(extracted_string, "graphicswin"))
+                pref_graphicswinsupport = TRUE;
             else {
                 printf("%s: -support value not recognized: %s\n", argv[0], extracted_string);
                 errflag = TRUE;
@@ -251,6 +254,8 @@ int main(int argc, char *argv[])
                 pref_hyperlinksupport = TRUE;
             if (data->supportcaps->graphics)
                 pref_graphicssupport = TRUE;
+            if (data->supportcaps->graphicswin)
+                pref_graphicswinsupport = TRUE;
         }
         /* Copy the metrics into the permanent structure */
         *metrics = *data->metrics;

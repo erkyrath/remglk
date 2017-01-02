@@ -977,6 +977,7 @@ data_supportcaps_t *data_supportcaps_alloc()
     supportcaps->timer = FALSE;
     supportcaps->hyperlinks = FALSE;
     supportcaps->graphics = FALSE;
+    supportcaps->graphicswin = FALSE;
     supportcaps->sound = FALSE;
 
     return supportcaps;
@@ -1002,6 +1003,8 @@ static data_supportcaps_t *data_supportcaps_parse(data_raw_t *rawdata)
                 supportcaps->hyperlinks = TRUE;
             if (data_raw_string_is(dat, "graphics"))
                 supportcaps->graphics = TRUE;
+            if (data_raw_string_is(dat, "graphicswin"))
+                supportcaps->graphicswin = TRUE;
             if (data_raw_string_is(dat, "sound"))
                 supportcaps->sound = TRUE;
         }
@@ -1018,6 +1021,7 @@ void data_supportcaps_print(data_supportcaps_t *supportcaps)
     printf("  timer: %d\n", supportcaps->timer);
     printf("  hyperlinks: %d\n", supportcaps->hyperlinks);
     printf("  graphics: %d\n", supportcaps->graphics);
+    printf("  graphicswin: %d\n", supportcaps->graphicswin);
     printf("  sound: %d\n", supportcaps->sound);
     printf("}\n");   
 }

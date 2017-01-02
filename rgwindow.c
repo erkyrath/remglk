@@ -222,6 +222,11 @@ winid_t glk_window_open(winid_t splitwin, glui32 method, glui32 size,
         }
     
     }
+
+    if (wintype == wintype_Graphics && !pref_graphicswinsupport) {
+        /* Graphics windows not supported; silently return null */
+        return 0;
+    }
     
     newwin = gli_new_window(wintype, rock);
     if (!newwin) {
