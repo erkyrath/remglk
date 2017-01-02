@@ -1618,7 +1618,7 @@ void data_line_print(data_line_t *dat, glui32 wintype)
         for (ix=0; ix<dat->count; ix++) {
             data_span_t *span = &(dat->spans[ix]);
             if (span->special) {
-                data_specialspan_print(span->special);
+                data_specialspan_print(span->special, wintype_TextBuffer);
             }
             else {
                 char *stylename = name_for_style(span->style);
@@ -1671,7 +1671,7 @@ void data_specialspan_free(data_specialspan_t *dat)
     return;
 }
 
-void data_specialspan_print(data_specialspan_t *dat)
+void data_specialspan_print(data_specialspan_t *dat, glui32 wintype)
 {
     /* For error cases, this prints an ordinary text span. */
 
@@ -1679,6 +1679,8 @@ void data_specialspan_print(data_specialspan_t *dat)
 
     case specialtype_Image:
         printf("{\"special\":\"image\", \"image\":%d, \"width\":%d, \"height\":%d", dat->image, dat->width, dat->height);
+        if (wintype == wintype_Graphics)
+            printf(", \"x\":%d, \"y\":%d", dat->xpos, dat->ypos);
 
         if (pref_resourceurl) {
             char *suffix = "";
