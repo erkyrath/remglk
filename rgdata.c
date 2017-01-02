@@ -1725,6 +1725,24 @@ void data_specialspan_print(data_specialspan_t *dat, glui32 wintype)
         printf("{\"text\":\"[ERROR: data_specialspan_print: flowbreak should have been converted to a line flag]\"}");
         break;
 
+    case specialtype_SetColor:
+        printf("{\"special\":\"setcolor\"");
+        if (dat->hascolor)
+            printf("\"color\":\"#%06X\"", dat->color);
+        printf("}");
+        break;
+
+    case specialtype_Fill:
+        printf("{\"special\":\"fill\"");
+        if (dat->hasdimensions)
+            printf(", \"x\":%d, \"y\":%d", dat->xpos, dat->ypos);
+        if (dat->hasdimensions)
+            printf(", \"width\":%d, \"height\":%d", dat->width, dat->height);
+        if (dat->hascolor)
+            printf("\"color\":\"#%06X\"", dat->color);
+        printf("}");
+        break;
+
     default:
         printf("{\"text\":\"[ERROR: data_specialspan_print: unrecognized special type]\"}");
         break;
