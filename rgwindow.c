@@ -1392,18 +1392,62 @@ void glk_window_flow_break(winid_t win)
 void glk_window_erase_rect(winid_t win, 
     glsi32 left, glsi32 top, glui32 width, glui32 height)
 {
-    gli_strict_warning("window_erase_rect: graphics not supported.");
+    if (!win) {
+        gli_strict_warning("window_erase_rect: invalid ref");
+        return;
+    }
+    if (win->type != wintype_Graphics) {
+        gli_strict_warning("window_erase_rect: not a graphics window");
+        return;
+    }
+
+    data_specialspan_t *special = data_specialspan_alloc(specialtype_Fill);
+    special->hasdimensions = TRUE;
+    special->xpos = left;
+    special->ypos = top;
+    special->width = width;
+    special->height = height;
+    win_textbuffer_putspecial(win, special);
 }
 
 void glk_window_fill_rect(winid_t win, glui32 color, 
     glsi32 left, glsi32 top, glui32 width, glui32 height)
 {
-    gli_strict_warning("window_fill_rect: graphics not supported.");
+    if (!win) {
+        gli_strict_warning("window_fill_rect: invalid ref");
+        return;
+    }
+    if (win->type != wintype_Graphics) {
+        gli_strict_warning("window_fill_rect: not a graphics window");
+        return;
+    }
+
+    data_specialspan_t *special = data_specialspan_alloc(specialtype_Fill);
+    special->hasdimensions = TRUE;
+    special->xpos = left;
+    special->ypos = top;
+    special->width = width;
+    special->height = height;
+    special->hascolor = TRUE;
+    special->color = color;
+    win_textbuffer_putspecial(win, special);
 }
 
 void glk_window_set_background_color(winid_t win, glui32 color)
 {
-    gli_strict_warning("window_set_background_color: graphics not supported.");
+    if (!win) {
+        gli_strict_warning("window_set_background_color: invalid ref");
+        return;
+    }
+    if (win->type != wintype_Graphics) {
+        gli_strict_warning("window_set_background_color: not a graphics window");
+        return;
+    }
+
+    data_specialspan_t *special = data_specialspan_alloc(specialtype_SetColor);
+    special->hascolor = TRUE;
+    special->color = color;
+    win_textbuffer_putspecial(win, special);
 }
 
 #endif /* GLK_MODULE_IMAGE */
