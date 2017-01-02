@@ -817,6 +817,9 @@ void gli_windows_update(data_specialreq_t *special, int newgeneration)
             case wintype_TextBuffer:
                 dat = win_textbuffer_update(win);
                 break;
+            case wintype_Graphics:
+                dat = win_graphics_update(win);
+                break;
         }
 
         if (dat) {
@@ -931,6 +934,9 @@ void gli_window_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
             break;
         case wintype_TextBuffer:
             win_textbuffer_rearrange(win, box, metrics);
+            break;
+        case wintype_Graphics:
+            win_graphics_rearrange(win, box, metrics);
             break;
     }
 }
@@ -1214,6 +1220,9 @@ void glk_window_clear(window_t *win)
             break;
         case wintype_TextGrid:
             win_textgrid_clear(win);
+            break;
+        case wintype_Graphics:
+            win_graphics_clear(win);
             break;
     }
 }
