@@ -238,6 +238,9 @@ winid_t glk_window_open(winid_t splitwin, glui32 method, glui32 size,
         case wintype_TextBuffer:
             newwin->data = win_textbuffer_create(newwin);
             break;
+        case wintype_Graphics:
+            newwin->data = win_graphics_create(newwin);
+            break;
         case wintype_Pair:
             gli_strict_warning("window_open: cannot open pair window directly");
             gli_delete_window(newwin);
@@ -331,6 +334,10 @@ static void gli_window_close(window_t *win, int recurse)
         case wintype_TextGrid: {
             window_textgrid_t *dwin = win->data;
             win_textgrid_destroy(dwin);
+            }
+        case wintype_Graphics: {
+            window_graphics_t *dwin = win->data;
+            win_graphics_destroy(dwin);
             }
             break;
     }
