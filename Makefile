@@ -25,7 +25,7 @@ REMGLK_OBJS = \
 
 REMGLK_HEADERS = \
   remglk.h rgdata.h rgwin_blank.h rgwin_buf.h \
-  rgwin_grid.h rgwin_pair.h gi_dispa.h
+  rgwin_grid.h rgwin_graph.h rgwin_pair.h gi_dispa.h
 
 all: $(GLKLIB) Make.remglk
 

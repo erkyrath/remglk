@@ -17,6 +17,7 @@
 #include "rgwin_blank.h"
 #include "rgwin_grid.h"
 #include "rgwin_buf.h"
+#include "rgwin_graph.h"
 
 /* The update generation number. */
 static glui32 generation = 0;
