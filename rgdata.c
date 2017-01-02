@@ -1651,9 +1651,13 @@ data_specialspan_t *data_specialspan_alloc(SpecialType type)
     dat->image = 0;
     dat->width = 0;
     dat->height = 0;
+    dat->xpos = 0;
+    dat->ypos = 0;
     dat->alignment = 0;
     dat->hyperlink = 0;
     dat->alttext = NULL;
+    dat->hascolor = FALSE;
+    dat->color = 0;
 
     return dat;
 }

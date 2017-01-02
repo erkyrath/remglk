@@ -153,18 +153,24 @@ typedef enum SpecialType_enum {
     specialtype_None = 0,
     specialtype_FlowBreak = 1,
     specialtype_Image = 2,
+    specialtype_SetColor = 3,
 } SpecialType;
 
-/* data_specialspan_t: Extra things that a data_span_t can represent. */
+/* data_specialspan_t: Extra things that a data_span_t can represent.
+   Not all these fields are used for all types. */
 struct data_specialspan_struct {
     SpecialType type;
-    glui32 image;
-    glui32 chunktype; /* JPEG or PNG, for images */
-    glui32 width;
-    glui32 height;
-    glui32 alignment;
-    glui32 hyperlink;
-    char *alttext; /* Reference to existing data. */
+    glui32 image; /* (Image) */
+    glui32 chunktype; /* (Image) JPEG or PNG */
+    glui32 xpos; /* (Image in graphicswin) */
+    glui32 ypos; /* (Image in graphicswin) */
+    glui32 width; /* (Image) */
+    glui32 height /* (Image) */;
+    glui32 alignment; /* (Image in bufferwin) */
+    glui32 hyperlink; /* (Image in bufferwin) */
+    char *alttext; /* (Image) Reference to existing data. */
+    int hascolor; /* (SetColor) */
+    glui32 color; /* (SetColor) */
 };
 
 /* data_specialreq_t: A special input request. */
