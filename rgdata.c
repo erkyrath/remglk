@@ -1649,6 +1649,7 @@ data_specialspan_t *data_specialspan_alloc(SpecialType type)
     dat->type = type;
     dat->chunktype = 0;
     dat->image = 0;
+    dat->hasdimensions = FALSE;
     dat->width = 0;
     dat->height = 0;
     dat->xpos = 0;
