@@ -17,6 +17,10 @@ window_graphics_t *win_graphics_create(window_t *win)
     window_graphics_t *dwin = (window_graphics_t *)malloc(sizeof(window_graphics_t));
     dwin->owner = win;
     
+    dwin->numcontent = 0;
+    dwin->contentsize = 4;
+    dwin->content = (data_specialspan_t **)malloc(dwin->contentsize * sizeof(data_specialspan_t *));
+    
 
     return dwin;
 }

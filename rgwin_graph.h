@@ -7,6 +7,10 @@
 typedef struct window_graphics_struct {
     window_t *owner;
     
+    data_specialspan_t **content;
+    long numcontent;
+    long contentsize;
+    
 } window_graphics_t;
 
 extern window_graphics_t *win_graphics_create(window_t *win);
