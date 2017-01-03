@@ -789,6 +789,8 @@ data_metrics_t *data_metrics_alloc(int width, int height)
     metrics->buffercharheight = 1.0;
     metrics->buffermarginx = 0;
     metrics->buffermarginy = 0;
+    metrics->graphicsmarginx = 0;
+    metrics->graphicsmarginy = 0;
 
     return metrics;
 }
@@ -853,6 +855,8 @@ static data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
         metrics->gridmarginy = val;
         metrics->buffermarginx = val;
         metrics->buffermarginy = val;
+        metrics->graphicsmarginx = val;
+        metrics->graphicsmarginy = val;
     }
 
     dat = data_raw_struct_field(rawdata, "gridmargin");
@@ -869,11 +873,19 @@ static data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
         metrics->buffermarginy = val;
     }
 
+    dat = data_raw_struct_field(rawdata, "graphicsmargin");
+    if (dat) {
+        glsi32 val = data_raw_int_value(dat);
+        metrics->graphicsmarginx = val;
+        metrics->graphicsmarginy = val;
+    }
+
     dat = data_raw_struct_field(rawdata, "marginx");
     if (dat) {
         glsi32 val = data_raw_int_value(dat);
         metrics->gridmarginx = val;
         metrics->buffermarginx = val;
+        metrics->graphicsmarginx = val;
     }
 
     dat = data_raw_struct_field(rawdata, "marginy");
@@ -881,6 +893,7 @@ static data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
         glsi32 val = data_raw_int_value(dat);
         metrics->gridmarginy = val;
         metrics->buffermarginy = val;
+        metrics->graphicsmarginy = val;
     }
 
     dat = data_raw_struct_field(rawdata, "gridmarginx");
@@ -895,6 +908,12 @@ static data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
     dat = data_raw_struct_field(rawdata, "buffermarginy");
     if (dat) 
         metrics->buffermarginy = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "graphicsmarginx");
+    if (dat) 
+        metrics->graphicsmarginx = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "graphicsmarginy");
+    if (dat) 
+        metrics->graphicsmarginy = data_raw_int_value(dat);
 
     dat = data_raw_struct_field(rawdata, "spacing");
     if (dat) {
@@ -967,6 +986,7 @@ void data_metrics_print(data_metrics_t *metrics)
     printf("  gridmargin: %ldx%ld\n", (long)metrics->gridmarginx, (long)metrics->gridmarginy);
     printf("  bufferchar: %.1fx%.1f\n", metrics->buffercharwidth, metrics->buffercharheight);
     printf("  buffermargin: %ldx%ld\n", (long)metrics->buffermarginx, (long)metrics->buffermarginy);
+    printf("  graphicsmargin: %ldx%ld\n", (long)metrics->graphicsmarginx, (long)metrics->graphicsmarginy);
     printf("}\n");   
 }
 

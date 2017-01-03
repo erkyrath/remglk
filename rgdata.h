@@ -55,6 +55,7 @@ struct data_metrics_struct {
     glui32 gridmarginx, gridmarginy;
     double buffercharwidth, buffercharheight;
     glui32 buffermarginx, buffermarginy;
+    glui32 graphicsmarginx, graphicsmarginy;
 };
 
 /* data_supportcaps_t: List of I/O capabilities of the client. */
