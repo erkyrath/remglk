@@ -21,6 +21,20 @@ window_graphics_t *win_graphics_create(window_t *win)
     dwin->contentsize = 4;
     dwin->content = (data_specialspan_t **)malloc(dwin->contentsize * sizeof(data_specialspan_t *));
     
-
     return dwin;
+}
+
+void win_graphics_destroy(window_graphics_t *dwin)
+{
+    dwin->owner = NULL;
+    
+    if (dwin->content) {
+        long px;
+        for (px=0; px<dwin->numcontent; px++)
+            data_specialspan_free(dwin->content[px]);
+        free(dwin->content);
+        dwin->content = NULL;
+    }
+    
+    free(dwin);
 }
