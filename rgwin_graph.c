@@ -38,3 +38,43 @@ void win_graphics_destroy(window_graphics_t *dwin)
     
     free(dwin);
 }
+
+void win_graphics_clear(window_t *win)
+{
+    window_graphics_t *dwin = win->data;
+
+    /* If the background color has been set, we must retain that entry.
+       (The last setcolor, if there are several.) */
+
+    data_specialspan_t *setcolspan = NULL;
+
+    /* Discard all the content entries, except for the last setcolor. */
+    long px;
+    for (px=0; px<dwin->numcontent; px++) {
+        data_specialspan_t *span = dwin->content[px];
+        dwin->content[px] = NULL;
+
+        if (span->type == specialtype_SetColor) {
+            if (setcolspan)
+                data_specialspan_free(setcolspan);
+            setcolspan = span;
+        }
+        else {
+            data_specialspan_free(span);
+        }
+    }
+
+    dwin->numcontent = 0;
+
+    /* Put back the setcolor (if found). Note that contentsize is at
+       least 4. */
+    if (setcolspan) {
+        dwin->content[dwin->numcontent] = setcolspan;
+        dwin->numcontent++;
+    }
+
+    /* Clear to background color. */
+    data_specialspan_t *fillspan = data_specialspan_alloc(specialtype_Fill);
+    dwin->content[dwin->numcontent] = fillspan;
+    dwin->numcontent++;
+}
