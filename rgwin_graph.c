@@ -20,6 +20,9 @@ window_graphics_t *win_graphics_create(window_t *win)
     dwin->numcontent = 0;
     dwin->contentsize = 4;
     dwin->content = (data_specialspan_t **)malloc(dwin->contentsize * sizeof(data_specialspan_t *));
+
+    dwin->graphwidth = 0;
+    dwin->graphheight = 0;
     
     return dwin;
 }
@@ -78,3 +81,20 @@ void win_graphics_clear(window_t *win)
     dwin->content[dwin->numcontent] = fillspan;
     dwin->numcontent++;
 }
+
+void win_graphics_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
+{
+    window_graphics_t *dwin = win->data;
+    dwin->owner->bbox = *box;
+
+    int width = box->right - box->left;
+    int height = box->bottom - box->top;
+
+    dwin->graphwidth = width - metrics->graphicsmarginx;
+    if (dwin->graphwidth < 0)
+        dwin->graphwidth = 0;
+    dwin->graphheight = height - metrics->graphicsmarginy;
+    if (dwin->graphheight < 0)
+        dwin->graphheight = 0;
+}
+

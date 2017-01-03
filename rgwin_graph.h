@@ -11,6 +11,7 @@ typedef struct window_graphics_struct {
     long numcontent;
     long contentsize;
     
+    int graphwidth, graphheight;
 } window_graphics_t;
 
 extern window_graphics_t *win_graphics_create(window_t *win);
