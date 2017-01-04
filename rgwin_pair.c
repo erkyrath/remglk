@@ -99,6 +99,12 @@ void win_pair_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
                         else
                             split = dwin->size * metrics->gridcharheight + metrics->gridmarginy;
                         break;
+                    case wintype_Graphics:
+                        if (dwin->vertical)
+                            split = dwin->size + metrics->graphicsmarginx;
+                        else
+                            split = dwin->size + metrics->graphicsmarginy;
+                        break;
                     default:
                         split = 0;
                         break;
