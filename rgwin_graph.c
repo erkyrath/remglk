@@ -115,3 +115,11 @@ data_content_t *win_graphics_update(window_t *win)
 
     return dat;
 }
+
+void win_graphics_trim_buffer(window_t *win)
+{
+    window_graphics_t *dwin = win->data;
+
+    /*###*/
+}
+

@@ -1011,6 +1011,9 @@ void gli_windows_trim_buffers()
             case wintype_TextBuffer:
                 win_textbuffer_trim_buffer(win);
                 break;
+            case wintype_Graphics:
+                win_graphics_trim_buffer(win);
+                break;
         }
     }
 }

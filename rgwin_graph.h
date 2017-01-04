@@ -20,3 +20,4 @@ extern void win_graphics_rearrange(window_t *win, grect_t *box, data_metrics_t *
 extern void win_graphics_redraw(window_t *win);
 extern data_content_t *win_graphics_update(window_t *win);
 extern void win_graphics_clear(window_t *win);
+extern void win_graphics_trim_buffer(window_t *win);
