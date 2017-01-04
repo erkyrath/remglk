@@ -124,8 +124,9 @@ struct data_input_struct {
    updates). */
 struct data_content_struct {
     glui32 window;
-    glui32 type;
-    gen_list_t lines; /* data_line_t */
+    glui32 type; /* window type */
+    gen_list_t lines; /* data_line_t (for text windows), or
+                         data_specialspan_t (for graphics windows) */
     int clear;
 };
 

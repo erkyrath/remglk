@@ -1384,6 +1384,9 @@ void data_window_print(data_window_t *dat)
         case wintype_TextBuffer:
             typename = "buffer";
             break;
+        case wintype_Graphics:
+            typename = "graphics";
+            break;
         default:
             typename = "unknown";
             break;
@@ -1392,6 +1395,8 @@ void data_window_print(data_window_t *dat)
     printf(" { \"id\":%d, \"type\":\"%s\", \"rock\":%d,\n", dat->window, typename, dat->rock);
     if (dat->type == wintype_TextGrid)
         printf("   \"gridwidth\":%d, \"gridheight\":%d,\n", dat->gridwidth, dat->gridheight);
+    if (dat->type == wintype_Graphics)
+        printf("   \"graphwidth\":%d, \"graphheight\":%d,\n", dat->gridwidth, dat->gridheight);
     printf("   \"left\":%d, \"top\":%d, \"width\":%d, \"height\":%d }",
         dat->size.left, dat->size.top, dat->size.right-dat->size.left, dat->size.bottom-dat->size.top);
 }
@@ -1503,6 +1508,10 @@ void data_content_print(data_content_t *dat)
         linelabel = "lines";
         printf(" {\"id\":%d", dat->window);
     }
+    else if (dat->type == wintype_Graphics) {
+        linelabel = "draw";
+        printf(" {\"id\":%d", dat->window);
+    }
     else {
         gli_fatal_error("data: Unknown window type in content_print");
     }
@@ -1510,12 +1519,23 @@ void data_content_print(data_content_t *dat)
     if (dat->lines.count) {
         printf(", \"%s\": [\n", linelabel);
 
-        data_line_t **linelist = (data_line_t **)(dat->lines.list);
-        for (ix=0; ix<dat->lines.count; ix++) {
-            data_line_print(linelist[ix], dat->type);
-            if (ix+1 < dat->lines.count)
-                printf(",");
-            printf("\n");
+        if (dat->type != wintype_Graphics) {
+            data_line_t **linelist = (data_line_t **)(dat->lines.list);
+            for (ix=0; ix<dat->lines.count; ix++) {
+                data_line_print(linelist[ix], dat->type);
+                if (ix+1 < dat->lines.count)
+                    printf(",");
+                printf("\n");
+            }
+        }
+        else {
+            data_specialspan_t **speciallist = (data_specialspan_t **)(dat->lines.list);
+            for (ix=0; ix<dat->lines.count; ix++) {
+                data_specialspan_print(speciallist[ix], dat->type);
+                if (ix+1 < dat->lines.count)
+                    printf(",");
+                printf("\n");
+            }
         }
         printf(" ]");
     }
