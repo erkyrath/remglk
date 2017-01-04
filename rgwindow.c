@@ -1443,7 +1443,7 @@ void glk_window_erase_rect(winid_t win,
     special->ypos = top;
     special->width = width;
     special->height = height;
-    win_textbuffer_putspecial(win, special);
+    win_graphics_putspecial(win, special);
 }
 
 void glk_window_fill_rect(winid_t win, glui32 color, 
@@ -1466,7 +1466,7 @@ void glk_window_fill_rect(winid_t win, glui32 color,
     special->height = height;
     special->hascolor = TRUE;
     special->color = color;
-    win_textbuffer_putspecial(win, special);
+    win_graphics_putspecial(win, special);
 }
 
 void glk_window_set_background_color(winid_t win, glui32 color)
@@ -1483,7 +1483,7 @@ void glk_window_set_background_color(winid_t win, glui32 color)
     data_specialspan_t *special = data_specialspan_alloc(specialtype_SetColor);
     special->hascolor = TRUE;
     special->color = color;
-    win_textbuffer_putspecial(win, special);
+    win_graphics_putspecial(win, special);
 }
 
 #endif /* GLK_MODULE_IMAGE */

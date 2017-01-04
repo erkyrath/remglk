@@ -98,6 +98,20 @@ void win_graphics_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics
         dwin->graphheight = 0;
 }
 
+void win_graphics_putspecial(window_t *win, data_specialspan_t *span)
+{
+    window_graphics_t *dwin = win->data;
+
+    if (dwin->numcontent >= dwin->contentsize) {
+        dwin->contentsize *= 2;
+        dwin->content = (data_specialspan_t **)realloc(dwin->content,
+            dwin->contentsize * sizeof(data_specialspan_t *));
+    }
+    
+    dwin->content[dwin->numcontent] = span;
+    dwin->numcontent++;
+}
+
 data_content_t *win_graphics_update(window_t *win)
 {
     window_graphics_t *dwin = win->data;

@@ -18,6 +18,7 @@ extern window_graphics_t *win_graphics_create(window_t *win);
 extern void win_graphics_destroy(window_graphics_t *dwin);
 extern void win_graphics_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics);
 extern void win_graphics_redraw(window_t *win);
+extern void win_graphics_putspecial(window_t *win, data_specialspan_t *span);
 extern data_content_t *win_graphics_update(window_t *win);
 extern void win_graphics_clear(window_t *win);
 extern void win_graphics_trim_buffer(window_t *win);
