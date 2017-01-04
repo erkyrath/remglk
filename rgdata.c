@@ -1777,7 +1777,7 @@ void data_specialspan_print(data_specialspan_t *dat, glui32 wintype)
     case specialtype_SetColor:
         printf("{\"special\":\"setcolor\"");
         if (dat->hascolor)
-            printf("\"color\":\"#%06X\"", dat->color);
+            printf(", \"color\":\"#%06X\"", dat->color);
         printf("}");
         break;
 
@@ -1788,7 +1788,7 @@ void data_specialspan_print(data_specialspan_t *dat, glui32 wintype)
         if (dat->hasdimensions)
             printf(", \"width\":%d, \"height\":%d", dat->width, dat->height);
         if (dat->hascolor)
-            printf("\"color\":\"#%06X\"", dat->color);
+            printf(", \"color\":\"#%06X\"", dat->color);
         printf("}");
         break;
 
