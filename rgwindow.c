@@ -823,6 +823,11 @@ void gli_windows_update(data_specialreq_t *special, int newgeneration)
                 dat->gridwidth = dwin->width;
                 dat->gridheight = dwin->height;
             }
+            if (win->type == wintype_Graphics) {
+                window_graphics_t *dwin = win->data;
+                dat->gridwidth = dwin->graphwidth;
+                dat->gridheight = dwin->graphheight;
+            }
             gen_list_append(&update->windows, dat);
         }
     }

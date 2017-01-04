@@ -98,3 +98,20 @@ void win_graphics_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics
         dwin->graphheight = 0;
 }
 
+data_content_t *win_graphics_update(window_t *win)
+{
+    window_graphics_t *dwin = win->data;
+
+    data_content_t *dat = NULL;
+
+    if (dwin->numcontent) {
+        long px;
+        dat = data_content_alloc(win->updatetag, win->type);
+        for (px=0; px<dwin->numcontent; px++) {
+            data_specialspan_t *span = dwin->content[px];
+            gen_list_append(&dat->lines, span);
+        }
+    }
+
+    return dat;
+}
