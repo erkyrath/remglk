@@ -121,12 +121,12 @@ struct data_input_struct {
 };
 
 /* data_content_t: Represents the output changes of one window (text
-   updates). */
+   updates). Also used for graphics window updates, because that was
+   easiest. */
 struct data_content_struct {
     glui32 window;
     glui32 type; /* window type */
-    gen_list_t lines; /* data_line_t (for text windows), or
-                         data_specialspan_t (for graphics windows) */
+    gen_list_t lines; /* data_line_t */
     int clear;
 };
 

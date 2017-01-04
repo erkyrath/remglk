@@ -1529,14 +1529,19 @@ void data_content_print(data_content_t *dat)
             }
         }
         else {
-            data_specialspan_t **speciallist = (data_specialspan_t **)(dat->lines.list);
-            for (ix=0; ix<dat->lines.count; ix++) {
-                data_specialspan_print(speciallist[ix], dat->type);
-                if (ix+1 < dat->lines.count)
-                    printf(",");
-                printf("\n");
+            /* The specialspans are passed as the contents of a single
+               data_line_t. */
+            if (dat->lines.count == 1) {
+                data_line_t *line = dat->lines.list[0];
+                for (ix=0; ix<line->count; ix++) {
+                    data_specialspan_print(line->spans[ix].special, dat->type);
+                    if (ix+1 < line->count)
+                        printf(",");
+                    printf("\n");
+                }
             }
         }
+
         printf(" ]");
     }
 

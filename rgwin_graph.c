@@ -107,9 +107,12 @@ data_content_t *win_graphics_update(window_t *win)
     if (dwin->numcontent) {
         long px;
         dat = data_content_alloc(win->updatetag, win->type);
+        data_line_t *line = data_line_alloc();
+        gen_list_append(&dat->lines, line);
+
         for (px=0; px<dwin->numcontent; px++) {
             data_specialspan_t *span = dwin->content[px];
-            gen_list_append(&dat->lines, span);
+            data_line_add_specialspan(line, span);
         }
     }
 
