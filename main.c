@@ -222,7 +222,7 @@ int main(int argc, char *argv[])
         printf("  -fixmetrics BOOL: define screen size manually (default 'no')\n");
         printf("  -width NUM: manual screen width (default 80)\n");
         printf("  -height NUM: manual screen height (default 50)\n");
-        printf("  -support [timer, hyperlinks, graphics]: declare support for various input features\n");
+        printf("  -support [timer, hyperlinks, graphics, graphicswin]: declare support for various input features\n");
         printf("  -resourceurl STR: URL base for image/sound files\n");
         printf("  -resourcedir STR: path to image/sound files (used to create file: URLs)\n");
         printf("  -stderr BOOL: send errors to stderr rather than stdout (default 'no')\n");
