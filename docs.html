@@ -42,6 +42,11 @@ ul {
   padding-left: 24px;
 }
 
+ul.WrapIndent {
+  padding-left: 48px;
+  text-indent: -24px;
+}
+
 li {
   margin-top: 2px;
 }
@@ -190,7 +195,7 @@ You can also include information about what optional features you are prepared t
 The support field is a list of strings. Currently the recognized values are:
 <p>
 
-<ul>
+<ul class="WrapIndent">
 <li><code>"timer"</code>: gestalt_Timer will be set; the library will support glk_request_timer_events().
 <li><code>"hyperlinks"</code>: gestalt_Hyperlinks and gestalt_HyperlinkInput will be set; the library will support glk_set_hyperlink() and glk_request_hyperlink_event().
 <li><code>"graphics"</code>: gestalt_Graphics and gestalt_GraphicsTransparency will be set. (Support for transparent PNGs is taken for granted.) gestalt_DrawImage will return true for text-buffer windows. The library will support all image functions.
