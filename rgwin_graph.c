@@ -142,6 +142,54 @@ void win_graphics_trim_buffer(window_t *win)
 {
     window_graphics_t *dwin = win->data;
 
-    /*###*/
+    /* If a whole-window fill command has been sent, we're going to drop
+       all commands before it. Except that we save the last setcolor
+       of the trimmed range. */
+
+    long px;
+    long lastfill = -1;
+    for (px=0; px<dwin->updatemark; px++) {
+        data_specialspan_t *span = dwin->content[px];
+        if (span->type == specialtype_Fill && !span->hasdimensions) {
+            lastfill = px;
+        }
+    }
+
+    if (lastfill <= 0)
+        return;
+
+    data_specialspan_t *lastsetcol = NULL;
+    for (px=0; px<lastfill; px++) {
+        data_specialspan_t *span = dwin->content[px];
+        dwin->content[px] = NULL;
+        if (span->type == specialtype_SetColor) {
+            if (lastsetcol)
+                data_specialspan_free(lastsetcol);
+            lastsetcol = span;
+        }
+        else {
+            data_specialspan_free(span);
+        }
+    }
+
+    if (lastfill <= 1 && lastsetcol)
+        return;
+    
+    long delta = (dwin->numcontent - lastfill);
+    if (!lastsetcol) {
+        memmove(dwin->content, &dwin->content[lastfill],
+            (dwin->numcontent-lastfill) * sizeof(data_specialspan_t *));
+    }
+    else {
+        delta -= 1;
+        dwin->content[0] = lastsetcol;
+        memmove(&dwin->content[1], &dwin->content[lastfill],
+            (dwin->numcontent-lastfill) * sizeof(data_specialspan_t *));
+    }
+    fprintf(stderr, "### graf buffer trimmed starting at %ld, delta %ld, setcol %d\n", lastfill, delta, (lastsetcol != NULL));
+
+    dwin->numcontent -= delta;
+    if (dwin->updatemark >= lastfill)
+        dwin->updatemark -= delta;
 }
 
