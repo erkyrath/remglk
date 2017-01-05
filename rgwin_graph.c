@@ -21,6 +21,8 @@ window_graphics_t *win_graphics_create(window_t *win)
     dwin->contentsize = 4;
     dwin->content = (data_specialspan_t **)malloc(dwin->contentsize * sizeof(data_specialspan_t *));
 
+    dwin->updatemark = 0;
+
     dwin->graphwidth = 0;
     dwin->graphheight = 0;
     
@@ -68,6 +70,7 @@ void win_graphics_clear(window_t *win)
     }
 
     dwin->numcontent = 0;
+    dwin->updatemark = 0;
 
     /* Put back the setcolor (if found). Note that contentsize is at
        least 4. */
@@ -118,16 +121,18 @@ data_content_t *win_graphics_update(window_t *win)
 
     data_content_t *dat = NULL;
 
-    if (dwin->numcontent) {
+    if (dwin->numcontent > dwin->updatemark) {
         long px;
         dat = data_content_alloc(win->updatetag, win->type);
         data_line_t *line = data_line_alloc();
         gen_list_append(&dat->lines, line);
 
-        for (px=0; px<dwin->numcontent; px++) {
+        for (px=dwin->updatemark; px<dwin->numcontent; px++) {
             data_specialspan_t *span = dwin->content[px];
             data_line_add_specialspan(line, span);
         }
+
+        dwin->updatemark = dwin->numcontent;
     }
 
     return dat;

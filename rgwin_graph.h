@@ -10,6 +10,8 @@ typedef struct window_graphics_struct {
     data_specialspan_t **content;
     long numcontent;
     long contentsize;
+
+    long updatemark;
     
     int graphwidth, graphheight;
 } window_graphics_t;
