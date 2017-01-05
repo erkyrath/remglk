@@ -1353,6 +1353,18 @@ glui32 glk_image_draw(winid_t win, glui32 image, glsi32 val1, glsi32 val2)
         win_textbuffer_putspecial(win, special);
         return TRUE;
     }
+    else if (win->type == wintype_Graphics) {
+        data_specialspan_t *special = data_specialspan_alloc(specialtype_Image);
+        special->image = image;
+        special->chunktype = info.chunktype;
+        special->width = info.width;
+        special->height = info.height;
+        special->xpos = val1;
+        special->ypos = val2;
+        special->alttext = info.alttext;
+        win_graphics_putspecial(win, special);
+        return TRUE;
+    }
 
     return FALSE;
 }
@@ -1386,6 +1398,18 @@ glui32 glk_image_draw_scaled(winid_t win, glui32 image,
         special->alignment = val1;
         special->hyperlink = win->hyperlink;
         win_textbuffer_putspecial(win, special);
+        return TRUE;
+    }
+    else if (win->type == wintype_Graphics) {
+        data_specialspan_t *special = data_specialspan_alloc(specialtype_Image);
+        special->image = image;
+        special->chunktype = info.chunktype;
+        special->width = width;
+        special->height = height;
+        special->xpos = val1;
+        special->ypos = val2;
+        special->alttext = info.alttext;
+        win_graphics_putspecial(win, special);
         return TRUE;
     }
 

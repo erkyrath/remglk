@@ -74,7 +74,8 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
             if (pref_graphicssupport) {
                 if (val == wintype_TextBuffer)
                     return TRUE;
-                /*### wintype_Graphics is a separate pref flag */
+                if (val == wintype_Graphics && pref_graphicswinsupport)
+                    return TRUE;
             }
             return FALSE;
             
