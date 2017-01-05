@@ -1740,26 +1740,28 @@ void data_specialspan_print(data_specialspan_t *dat, glui32 wintype)
             printf(", \"url\":\"%spict-%d%s\"", pref_resourceurl, dat->image, suffix);
         }
 
-        char *alignment;
-        switch (dat->alignment) {
-        default:
-        case imagealign_InlineUp:
-            alignment = "inlineup";
-            break;
-        case imagealign_InlineDown:
-            alignment = "inlinedown";
-            break;
-        case imagealign_InlineCenter:
-            alignment = "inlinecenter";
-            break;
-        case imagealign_MarginLeft:
-            alignment = "marginleft";
-            break;
-        case imagealign_MarginRight:
-            alignment = "marginright";
-            break;
+        if (wintype != wintype_Graphics) {
+            char *alignment;
+            switch (dat->alignment) {
+            default:
+            case imagealign_InlineUp:
+                alignment = "inlineup";
+                break;
+            case imagealign_InlineDown:
+                alignment = "inlinedown";
+                break;
+            case imagealign_InlineCenter:
+                alignment = "inlinecenter";
+                break;
+            case imagealign_MarginLeft:
+                alignment = "marginleft";
+                break;
+            case imagealign_MarginRight:
+                alignment = "marginright";
+                break;
+            }
+            printf(", \"alignment\":\"%s\"", alignment);
         }
-        printf(", \"alignment\":\"%s\"", alignment);
 
         if (dat->hyperlink)
             printf(", \"hyperlink\":\"%d\"", dat->hyperlink);
