@@ -339,7 +339,7 @@ RemGlk will convert the pathname to a <code>file:</code> URL and send it as abov
 Prior to version 0.2.1, this library used <code>contents</code> and <code>inputs</code> as the names of the top-level data fields, rather than the correct <code>content</code> and <code>input</code>. The prior version also omitted the <code>xpos</code> and <code>ypos</code> fields for grid window input.
 <p>
 
-As of version 0.2.2, the library accepts noninteger numbers but rounds them (towards zero) to integers.
+As of version 0.2.2, the library accepts noninteger numbers. If the field expects an integer, the values will be rounded (towards zero). As of 0.2.4, some of the fields in the metrics object expect non-integer numbers.
 <p>
 
 A note on <a href="http://json.org/">JSON</a>: this is a strict (in both senses) subset of Javascript's data literal format. The biggest differences are: you always use double quotes, never single quotes; strings are always quoted, but numbers never are; an object (dictionary) always has quotes around its keys.
@@ -352,7 +352,7 @@ When generating output, a complete update JSON update will be followed by a blan
 <p>
 
 <hr>
-Last updated December 31, 2016.
+Last updated January 5, 2017.
 <p>
 
 <em><a href="http://eblong.com/zarf/glk/index.html">Glk home page</a></em>
