@@ -1149,6 +1149,18 @@ data_event_t *data_event_read()
 
         input->metrics = data_metrics_parse(dat);
     }
+    else if (data_raw_string_is(dat, "redraw")) {
+        input->dtag = dtag_Redraw;
+
+        dat = data_raw_struct_field(rawdata, "gen");
+        if (!dat)
+            gli_fatal_error("data: Redraw input struct has no gen");
+        input->gen = data_raw_int_value(dat);
+
+        dat = data_raw_struct_field(rawdata, "window");
+        if (dat)
+            input->window = data_raw_int_value(dat);
+    }
     else if (data_raw_string_is(dat, "line")) {
         input->dtag = dtag_Line;
 
