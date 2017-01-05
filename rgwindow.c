@@ -936,6 +936,10 @@ void gli_windows_refresh(glui32 fromgen)
             window_textgrid_t *dwin = win->data;
             dwin->alldirty = TRUE;
         }
+        else if (win->type == wintype_Graphics) {
+            window_graphics_t *dwin = win->data;
+            dwin->updatemark = 0;
+        }
     }
 }
 
