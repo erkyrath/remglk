@@ -172,9 +172,6 @@ void win_graphics_trim_buffer(window_t *win)
         }
     }
 
-    if (lastfill <= 1 && lastsetcol)
-        return;
-    
     long delta = (dwin->numcontent - lastfill);
     if (!lastsetcol) {
         memmove(dwin->content, &dwin->content[lastfill],
@@ -186,7 +183,6 @@ void win_graphics_trim_buffer(window_t *win)
         memmove(&dwin->content[1], &dwin->content[lastfill],
             (dwin->numcontent-lastfill) * sizeof(data_specialspan_t *));
     }
-    fprintf(stderr, "### graf buffer trimmed starting at %ld, delta %ld, setcol %d\n", lastfill, delta, (lastsetcol != NULL));
 
     dwin->numcontent -= delta;
     if (dwin->updatemark >= lastfill)
