@@ -40,7 +40,7 @@ static int extract_value(int argc, char *argv[], char *optname, int type,
 static int string_to_bool(char *str);
 static char *construct_resourceurl(char *str, int ispath);
 
-#define STRBUFLEN (256)
+#define STRBUFLEN (512)
 static char extracted_string[STRBUFLEN];
 
 int main(int argc, char *argv[])
@@ -419,11 +419,12 @@ static char *construct_resourceurl(char *str, int ispath)
     }
     else {
         /* This assumes Unix-style pathnames. Sorry. */
+        char prefix[STRBUFLEN];
+        prefix[0] = '\0';
         int len = strlen(str);
-        char *prefix = "";
         int preslash = FALSE;
         if (len && str[0] != '/') {
-            prefix = getwd(NULL);
+            getcwd(prefix, STRBUFLEN);
             preslash = TRUE;
         }
         int postslash = FALSE;
