@@ -61,6 +61,14 @@ void glk_select(event_t *event)
                 gli_windows_metrics_change(data->metrics);
                 break;
 
+            case dtag_Redraw:
+                if (data->window)
+                    win = gli_window_find_by_tag(data->window);
+                else
+                    win = NULL;
+                gli_event_store(evtype_Redraw, win, 0, 0);
+                break;
+
             case dtag_Line:
                 win = gli_window_find_by_tag(data->window);
                 if (!win)
