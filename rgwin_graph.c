@@ -155,8 +155,9 @@ void win_graphics_trim_buffer(window_t *win)
         }
     }
 
-    if (lastfill <= 0)
+    if (lastfill <= 0) {
         return;
+    }
 
     data_specialspan_t *lastsetcol = NULL;
     for (px=0; px<lastfill; px++) {
@@ -172,20 +173,25 @@ void win_graphics_trim_buffer(window_t *win)
         }
     }
 
-    long delta = (dwin->numcontent - lastfill);
+    long delta;
     if (!lastsetcol) {
-        memmove(dwin->content, &dwin->content[lastfill],
-            (dwin->numcontent-lastfill) * sizeof(data_specialspan_t *));
+        delta = lastfill;
+        if (lastfill > 0 && lastfill < dwin->numcontent)
+            memmove(dwin->content, &dwin->content[lastfill],
+                (dwin->numcontent-lastfill) * sizeof(data_specialspan_t *));
     }
     else {
-        delta -= 1;
+        delta = lastfill-1;
         dwin->content[0] = lastsetcol;
-        memmove(&dwin->content[1], &dwin->content[lastfill],
-            (dwin->numcontent-lastfill) * sizeof(data_specialspan_t *));
+        if (lastfill > 1 && lastfill < dwin->numcontent)
+            memmove(&dwin->content[1], &dwin->content[lastfill],
+                (dwin->numcontent-lastfill) * sizeof(data_specialspan_t *));
     }
 
     dwin->numcontent -= delta;
     if (dwin->updatemark >= lastfill)
         dwin->updatemark -= delta;
+    else
+        dwin->updatemark = 0;
 }
 
