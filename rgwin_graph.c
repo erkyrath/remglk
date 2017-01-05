@@ -77,6 +77,7 @@ void win_graphics_clear(window_t *win)
     if (setcolspan) {
         dwin->content[dwin->numcontent] = setcolspan;
         dwin->numcontent++;
+        dwin->updatemark++;
     }
 
     /* Clear to background color. */
