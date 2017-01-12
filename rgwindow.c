@@ -341,6 +341,7 @@ static void gli_window_close(window_t *win, int recurse)
             window_textgrid_t *dwin = win->data;
             win_textgrid_destroy(dwin);
             }
+            break;
         case wintype_Graphics: {
             window_graphics_t *dwin = win->data;
             win_graphics_destroy(dwin);
