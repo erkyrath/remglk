@@ -4,12 +4,6 @@
     http://eblong.com/zarf/glk/
 */
 
-/* Word types. */
-#define wd_Text (1) /* Nonwhite characters */
-#define wd_Blank (2) /* White (space) characters */
-#define wd_EndLine (3) /* End of line character */
-#define wd_EndPage (4) /* End of the whole text */
-
 /* One style/link run */
 typedef struct tbrun_struct {
     short style;
