@@ -929,8 +929,7 @@ void gli_windows_refresh(glui32 fromgen)
     for (win=gli_windowlist; win; win=win->next) {
         if (win->type == wintype_TextBuffer) {
             window_textbuffer_t *dwin = win->data;
-            dwin->dirtybeg = 0;
-            dwin->dirtyend = dwin->numchars;
+            dwin->updatemark = 0;
         }
         else if (win->type == wintype_TextGrid) {
             window_textgrid_t *dwin = win->data;

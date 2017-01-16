@@ -25,7 +25,7 @@ typedef struct window_textbuffer_struct {
     
     int width, height;
     
-    long dirtybeg, dirtyend; /* Range of text that has changed. */
+    long updatemark;
     
     tbrun_t *runs; /* There is always at least one run. */
     long numruns;

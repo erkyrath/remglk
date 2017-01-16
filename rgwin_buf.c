@@ -50,9 +50,8 @@ window_textbuffer_t *win_textbuffer_create(window_t *win)
     dwin->runs[0].hyperlink = 0;
     dwin->runs[0].specialnum = -1;
     dwin->runs[0].pos = 0;
-    
-    dwin->dirtybeg = -1;
-    dwin->dirtyend = -1;
+
+    dwin->updatemark = 0;
     
     dwin->width = -1;
     dwin->height = -1;
@@ -104,20 +103,6 @@ void win_textbuffer_rearrange(window_t *win, grect_t *box, data_metrics_t *metri
 
     dwin->width = box->right - box->left;
     dwin->height = box->bottom - box->top;
-    
-    if (oldwid != dwin->width) {
-        /* Set dirty region to the whole (or visible?). */
-        if (dwin->dirtybeg == -1) {
-            dwin->dirtybeg = 0;
-            dwin->dirtyend = dwin->numchars;
-        }
-        else {
-            dwin->dirtybeg = 0;
-            dwin->dirtyend = dwin->numchars;
-        }
-    }
-    else if (oldhgt != dwin->height) {
-    }
 }
 
 /* Find the last stylerun for which pos >= style.pos. We know run[0].pos == 0,
@@ -156,18 +141,18 @@ data_content_t *win_textbuffer_update(window_t *win)
     glui32 curlink;
     long curspecnum;
 
-    if (dwin->dirtybeg == -1) {
+    if (dwin->updatemark >= dwin->numchars) {
         return NULL;
     }
 
     data_content_t *dat = data_content_alloc(win->updatetag, win->type);
 
     /* ### not exactly the right test */
-    if (dwin->dirtybeg == 0)
+    if (dwin->updatemark == 0)
         dat->clear = TRUE;
 
-    if (dwin->dirtybeg < dwin->dirtyend) {
-        cnum = dwin->dirtybeg;
+    if (TRUE) {
+        cnum = dwin->updatemark;
         spanstart = cnum;
         snum = find_style_by_pos(dwin, cnum);
         curstyle = dwin->runs[snum].style;
@@ -182,7 +167,7 @@ data_content_t *win_textbuffer_update(window_t *win)
         gen_list_append(&dat->lines, line);
         line->append = TRUE;
 
-        while (cnum < dwin->dirtyend) {
+        while (cnum < dwin->numchars) {
             glui32 ch = dwin->chars[cnum];
             if (ch == '\n') {
                 if (cnum > spanstart) {
@@ -242,8 +227,7 @@ data_content_t *win_textbuffer_update(window_t *win)
         }
     }
 
-    dwin->dirtybeg = -1;
-    dwin->dirtyend = -1;
+    dwin->updatemark = dwin->numchars;
 
     return dat;
 }
@@ -269,17 +253,6 @@ void win_textbuffer_putchar(window_t *win, glui32 ch)
     
     dwin->chars[lx] = ch;
     dwin->numchars++;
-    
-    if (dwin->dirtybeg == -1) {
-        dwin->dirtybeg = lx;
-        dwin->dirtyend = lx+1;
-    }
-    else {
-        if (lx < dwin->dirtybeg)
-            dwin->dirtybeg = lx;
-        if (lx+1 > dwin->dirtyend)
-            dwin->dirtyend = lx+1;
-    }
 }
 
 void win_textbuffer_putspecial(window_t *win, data_specialspan_t *special)
@@ -315,17 +288,6 @@ void win_textbuffer_putspecial(window_t *win, data_specialspan_t *special)
     
     dwin->chars[lx] = '#';  /* dummy char (not a newline!) */
     dwin->numchars++;
-
-    if (dwin->dirtybeg == -1) {
-        dwin->dirtybeg = lx;
-        dwin->dirtyend = lx+1;
-    }
-    else {
-        if (lx < dwin->dirtybeg)
-            dwin->dirtybeg = lx;
-        if (lx+1 > dwin->dirtyend)
-            dwin->dirtyend = lx+1;
-    }
 }
 
 /* If the last (dangling) run is empty, set its style/link attributes.
@@ -376,14 +338,7 @@ void win_textbuffer_clear(window_t *win)
     dwin->runs[0].specialnum = -1;
     dwin->runs[0].pos = 0;
     
-    if (dwin->dirtybeg == -1) {
-        dwin->dirtybeg = 0;
-        dwin->dirtyend = 0;
-    }
-    else {
-        dwin->dirtybeg = 0;
-        dwin->dirtyend = 0;
-    }
+    dwin->updatemark = 0;
 }
 
 void win_textbuffer_trim_buffer(window_t *win)
@@ -396,11 +351,12 @@ void win_textbuffer_trim_buffer(window_t *win)
         return; 
         
     /* We need to knock BUFFER_SLACK chars off the beginning of the buffer, if
-        such are conveniently available. */
+        such are conveniently available. (We protect characters that have
+        never been sent in an update.) */
         
     cnum = dwin->numchars - BUFFER_SIZE;
-    if (dwin->dirtybeg != -1 && cnum > dwin->dirtybeg)
-        cnum = dwin->dirtybeg;
+    if (cnum > dwin->updatemark)
+        cnum = dwin->updatemark;
     
     /* Back up to the previous newline. */
     while (cnum > 0 && dwin->chars[cnum-1] != '\n')
@@ -429,15 +385,8 @@ void win_textbuffer_trim_buffer(window_t *win)
             (dwin->numchars - cnum) * sizeof(glui32));
     dwin->numchars -= cnum;
 
-    if (dwin->dirtybeg == -1) {
-        /* nothing dirty; leave it that way. */
-    }
-    else {
-        /* dirty region is after the chunk; quietly slide it back. We already
-            know that (dwin->dirtybeg >= cnum). */
-        dwin->dirtybeg -= cnum;
-        dwin->dirtyend -= cnum;
-    }
+    /* We already know that updatemark >= cnum. */
+    dwin->updatemark -= cnum;
 
     /* trim specials */
 
