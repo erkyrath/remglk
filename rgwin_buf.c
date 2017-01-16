@@ -106,8 +106,7 @@ void win_textbuffer_rearrange(window_t *win, grect_t *box, data_metrics_t *metri
     dwin->height = box->bottom - box->top;
     
     if (oldwid != dwin->width) {
-        /* Set dirty region to the whole (or visible?), and
-            delta should indicate that the whole old region is changed. */
+        /* Set dirty region to the whole (or visible?). */
         if (dwin->dirtybeg == -1) {
             dwin->dirtybeg = 0;
             dwin->dirtyend = dwin->numchars;
