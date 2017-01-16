@@ -931,7 +931,6 @@ void gli_windows_refresh(glui32 fromgen)
             window_textbuffer_t *dwin = win->data;
             dwin->dirtybeg = 0;
             dwin->dirtyend = dwin->numchars;
-            dwin->dirtydelta = 0;
         }
         else if (win->type == wintype_TextGrid) {
             window_textgrid_t *dwin = win->data;

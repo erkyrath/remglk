@@ -53,7 +53,6 @@ window_textbuffer_t *win_textbuffer_create(window_t *win)
     
     dwin->dirtybeg = -1;
     dwin->dirtyend = -1;
-    dwin->dirtydelta = -1;
     
     dwin->width = -1;
     dwin->height = -1;
@@ -112,7 +111,6 @@ void win_textbuffer_rearrange(window_t *win, grect_t *box, data_metrics_t *metri
         if (dwin->dirtybeg == -1) {
             dwin->dirtybeg = 0;
             dwin->dirtyend = dwin->numchars;
-            dwin->dirtydelta = 0;
         }
         else {
             dwin->dirtybeg = 0;
@@ -276,14 +274,12 @@ void win_textbuffer_putchar(window_t *win, glui32 ch)
     if (dwin->dirtybeg == -1) {
         dwin->dirtybeg = lx;
         dwin->dirtyend = lx+1;
-        dwin->dirtydelta = 1;
     }
     else {
         if (lx < dwin->dirtybeg)
             dwin->dirtybeg = lx;
         if (lx+1 > dwin->dirtyend)
             dwin->dirtyend = lx+1;
-        dwin->dirtydelta += 1;
     }
 }
 
@@ -324,14 +320,12 @@ void win_textbuffer_putspecial(window_t *win, data_specialspan_t *special)
     if (dwin->dirtybeg == -1) {
         dwin->dirtybeg = lx;
         dwin->dirtyend = lx+1;
-        dwin->dirtydelta = 1;
     }
     else {
         if (lx < dwin->dirtybeg)
             dwin->dirtybeg = lx;
         if (lx+1 > dwin->dirtyend)
             dwin->dirtyend = lx+1;
-        dwin->dirtydelta += 1;
     }
 }
 
@@ -386,12 +380,10 @@ void win_textbuffer_clear(window_t *win)
     if (dwin->dirtybeg == -1) {
         dwin->dirtybeg = 0;
         dwin->dirtyend = 0;
-        dwin->dirtydelta = -oldlen;
     }
     else {
         dwin->dirtybeg = 0;
         dwin->dirtyend = 0;
-        dwin->dirtydelta -= oldlen;
     }
 }
 

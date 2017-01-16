@@ -26,10 +26,6 @@ typedef struct window_textbuffer_struct {
     int width, height;
     
     long dirtybeg, dirtyend; /* Range of text that has changed. */
-    long dirtydelta; /* The amount the text has grown/shrunk since the
-        last update. Also the amount the dirty region has grown/shrunk;
-        so the old end of the dirty region == (dirtyend - dirtydelta). 
-        If dirtybeg == -1, dirtydelta is invalid. */
     
     tbrun_t *runs; /* There is always at least one run. */
     long numruns;
