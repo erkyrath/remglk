@@ -321,7 +321,6 @@ static void set_last_run(window_textbuffer_t *dwin, glui32 style, glui32 hyperli
 void win_textbuffer_clear(window_t *win)
 {
     window_textbuffer_t *dwin = win->data;
-    long oldlen = dwin->numchars;
     long px;
 
     for (px=0; px<dwin->numspecials; px++) {
