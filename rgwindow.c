@@ -852,6 +852,7 @@ void gli_windows_update(data_specialreq_t *special, int newgeneration)
         }
     }
 
+    update->useinputs = TRUE;
     for (win=gli_windowlist; win; win=win->next) {
         data_input_t *dat = NULL;
         if (win->char_request) {
@@ -897,7 +898,6 @@ void gli_windows_update(data_specialreq_t *special, int newgeneration)
         }
 
         if (dat) {
-            update->useinputs = TRUE;
             gen_list_append(&update->inputs, dat);
         }
     }
