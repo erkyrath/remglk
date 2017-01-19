@@ -133,6 +133,9 @@ void glk_select_poll(event_t *event)
     gli_event_clearevent(curevent);
 
     /* We can only sensibly check for unfired timer events. */
+    /* ### This is not consistent with the modern understanding that
+       the display layer handles timer events. Might want to just rip
+       all this timing code out entirely. */
     if (timing_msec) {
         glsi32 time = gli_timer_request_since_start();
         if (time >= 0 && time >= timing_msec) {
