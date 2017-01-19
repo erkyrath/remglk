@@ -10,7 +10,7 @@
 #include "gi_dispa.h"
 #include "gi_debug.h"
 
-#define LIBRARY_VERSION "0.2.1"
+#define LIBRARY_VERSION "0.2.5"
 
 /* We define our own TRUE and FALSE and NULL, because ANSI
     is a strange world. */
@@ -74,11 +74,13 @@ struct glk_window_struct {
     int line_request_uni;
     int char_request;
     int char_request_uni;
+    int hyperlink_request;
 
     int echo_line_input; /* applies to future line inputs, not the current */
     glui32 terminate_line_input; /* ditto; this is a bitmask of flags */
 
     glui32 style;
+    glui32 hyperlink;
     
     gidispatch_rock_t disprock;
     window_t *next, *prev; /* in the big linked list of windows */
@@ -170,6 +172,11 @@ extern int pref_stderr;
 extern int pref_printversion;
 extern int pref_screenwidth;
 extern int pref_screenheight;
+extern int pref_timersupport;
+extern int pref_hyperlinksupport;
+extern int pref_graphicssupport;
+extern int pref_graphicswinsupport;
+extern char *pref_resourceurl;
 
 #if GIDEBUG_LIBRARY_SUPPORT
 /* Has the user requested debug support? */
@@ -196,6 +203,7 @@ extern glui32 gli_parse_utf8(unsigned char *buf, glui32 buflen,
 
 extern void gli_initialize_events(void);
 extern void gli_event_store(glui32 type, window_t *win, glui32 val1, glui32 val2);
+extern int gli_timer_need_update(glui32 *msec);
 
 extern void gli_initialize_windows(data_metrics_t *metrics);
 extern void gli_fast_exit(void);
@@ -207,7 +215,8 @@ extern window_t *gli_new_window(glui32 type, glui32 rock);
 extern void gli_delete_window(window_t *win);
 extern window_t *gli_window_iterate_treeorder(window_t *win);
 extern void gli_window_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics);
-extern void gli_windows_update(data_specialreq_t *special);
+extern void gli_windows_update(data_specialreq_t *special, int newgeneration);
+extern void gli_windows_refresh(glui32 fromgen);
 extern void gli_windows_metrics_change(data_metrics_t *newmetrics);
 extern void gli_windows_trim_buffers(void);
 extern void gli_window_put_char(window_t *win, glui32 ch);

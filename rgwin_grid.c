@@ -64,6 +64,10 @@ void win_textgrid_destroy(window_textgrid_t *dwin)
                 free(ln->styles);
                 ln->styles = NULL;
             }
+            if (ln->links) {
+                free(ln->links);
+                ln->links = NULL;
+            }
         }
         
         free(dwin->lines);
@@ -79,8 +83,8 @@ void win_textgrid_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics
     window_textgrid_t *dwin = win->data;
     dwin->owner->bbox = *box;
     
-    newwid = (((box->right - box->left) - 2*metrics->gridmarginx) / metrics->gridcharwidth);
-    newhgt = (((box->bottom - box->top) - 2*metrics->gridmarginy) / metrics->gridcharheight);
+    newwid = (((box->right - box->left) - metrics->gridmarginx) / metrics->gridcharwidth);
+    newhgt = (((box->bottom - box->top) - metrics->gridmarginy) / metrics->gridcharheight);
     
     if (dwin->lines == NULL) {
         dwin->linessize = (newhgt+1);
@@ -106,6 +110,7 @@ void win_textgrid_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics
                 for (ix=0; ix<ln->allocsize; ix++) {
                     ln->chars[ix] = ' ';
                     ln->styles[ix] = style_Normal;
+                    ln->links[ix] = 0;
                 }
             }
         }
@@ -118,6 +123,8 @@ void win_textgrid_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics
                     ln->allocsize * sizeof(glui32));
                 ln->styles = (short *)realloc(ln->styles, 
                     ln->allocsize * sizeof(short));
+                ln->links = (glui32 *)realloc(ln->links, 
+                    ln->allocsize * sizeof(glui32));
                 if (!ln->chars || !ln->styles) {
                     dwin->lines = NULL;
                     return;
@@ -125,6 +132,7 @@ void win_textgrid_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics
                 for (ix=oldval; ix<ln->allocsize; ix++) {
                     ln->chars[ix] = ' ';
                     ln->styles[ix] = style_Normal;
+                    ln->links[ix] = 0;
                 }
             }
         }
@@ -146,13 +154,15 @@ static void init_lines(window_textgrid_t *dwin, int beg, int end, int linewid)
         ln->dirty = TRUE;
         ln->chars = (glui32 *)malloc(ln->allocsize * sizeof(glui32));
         ln->styles = (short *)malloc(ln->allocsize * sizeof(short));
-        if (!ln->chars || !ln->styles) {
+        ln->links = (glui32 *)malloc(ln->allocsize * sizeof(glui32));
+        if (!ln->chars || !ln->styles || !ln->links) {
             dwin->lines = NULL;
             return;
         }
         for (ix=0; ix<ln->allocsize; ix++) {
             ln->chars[ix] = ' ';
             ln->styles[ix] = style_Normal;
+            ln->links[ix] = 0;
         }
     }
 }
@@ -162,6 +172,7 @@ data_content_t *win_textgrid_update(window_t *win)
     int jx, ix;
     int spanstart;
     short curstyle;
+    glui32 curlink;
     window_textgrid_t *dwin = win->data;
 
     if (!dwin->lines) {
@@ -184,19 +195,21 @@ data_content_t *win_textgrid_update(window_t *win)
         line->linenum = jx;
 
         curstyle = -1;
+        curlink = 0;
         spanstart = 0;
         for (ix=0; ix<dwin->width; ix++) {
-            if (ln->styles[ix] != curstyle) {
+            if (ln->styles[ix] != curstyle || ln->links[ix] != curlink) {
                 if (ix > spanstart) {
-                    data_line_add_span(line, curstyle, ln->chars+spanstart, ix-spanstart);
+                    data_line_add_span(line, curstyle, curlink, ln->chars+spanstart, ix-spanstart);
                     spanstart = ix;
                 }
 
                 curstyle = ln->styles[ix];
+                curlink = ln->links[ix];
             }
         }
         if (ix > spanstart) {
-            data_line_add_span(line, curstyle, ln->chars+spanstart, ix-spanstart);
+            data_line_add_span(line, curstyle, curlink, ln->chars+spanstart, ix-spanstart);
             spanstart = ix;
         }
 
@@ -238,6 +251,7 @@ void win_textgrid_putchar(window_t *win, glui32 ch)
     
     ln->chars[dwin->curx] = ch;
     ln->styles[dwin->curx] = win->style;
+    ln->links[dwin->curx] = win->hyperlink;
     
     dwin->curx++;
     /* We can leave the cursor outside the window, since it will be
@@ -254,6 +268,7 @@ void win_textgrid_clear(window_t *win)
         for (ix=0; ix<dwin->width; ix++) {
             ln->chars[ix] = ' ';
             ln->styles[ix] = style_Normal;
+            ln->links[ix] = 0;
         }
         ln->dirty = TRUE;
     }

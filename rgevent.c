@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include "glk.h"
 #include "remglk.h"
@@ -16,13 +17,21 @@
     event. When not inside a glk_select() call, this will be NULL. */
 static event_t *curevent = NULL; 
 
-static glui32 timing_msec; /* The current timed-event request, exactly as
-    passed to glk_request_timer_events(). */
+/* The current timed-event request, exactly as passed to
+   glk_request_timer_events(). */
+static glui32 timing_msec; 
+/* The last timing value that was sent out. (0 means null was sent.) */
+static glui32 last_timing_msec;
+/* When the current timer started or last fired. */
+static struct timeval timing_start; 
+
+static glsi32 gli_timer_request_since_start(void);
 
 /* Set up the input system. This is called from main(). */
 void gli_initialize_events()
 {
     timing_msec = 0;
+    last_timing_msec = 0;
 }
 
 void glk_select(event_t *event)
@@ -33,19 +42,34 @@ void glk_select(event_t *event)
     if (gli_debugger)
         gidebug_announce_cycle(gidebug_cycle_InputWait);
 
-    gli_windows_update(NULL);
+    gli_windows_update(NULL, TRUE);
     
     while (curevent->type == evtype_None) {
         data_event_t *data = data_event_read();
         window_t *win = NULL;
         glui32 val;
 
-        if (data->gen != gli_window_current_generation())
+        if (data->gen != gli_window_current_generation() && data->dtag != dtag_Refresh)
             gli_fatal_error("Input generation number does not match.");
 
         switch (data->dtag) {
+            case dtag_Refresh:
+                /* Repeat the current display state and keep waiting for
+                   a (real) event. */
+                gli_windows_refresh(data->gen);
+                gli_windows_update(NULL, FALSE);
+                break;
+
             case dtag_Arrange:
                 gli_windows_metrics_change(data->metrics);
+                break;
+
+            case dtag_Redraw:
+                if (data->window)
+                    win = gli_window_find_by_tag(data->window);
+                else
+                    win = NULL;
+                gli_event_store(evtype_Redraw, win, 0, 0);
                 break;
 
             case dtag_Line:
@@ -77,7 +101,21 @@ void glk_select(event_t *event)
                 win->inputgen = 0;
                 gli_event_store(evtype_CharInput, win, val, 0);
                 break;
-            /* ### */
+
+            case dtag_Hyperlink:
+                win = gli_window_find_by_tag(data->window);
+                if (!win)
+                    break;
+                if (!win->hyperlink_request)
+                    break;
+                win->hyperlink_request = FALSE;
+                gli_event_store(evtype_Hyperlink, win, data->linkvalue, 0);
+                break;
+
+            case dtag_Timer:
+                gettimeofday(&timing_start, NULL);
+                gli_event_store(evtype_Timer, NULL, 0, 0);
+                break;
 
             default:
                 /* Ignore the event. */
@@ -97,21 +135,22 @@ void glk_select(event_t *event)
 
 void glk_select_poll(event_t *event)
 {
-    int firsttime = TRUE;
-    
     curevent = event;
     gli_event_clearevent(curevent);
-    
-    gli_windows_update(NULL);
-    
-    /* Now we check, once, all the stuff that glk_select() checks
-        periodically. This includes rearrange events and timer events. 
-       Yes, this looks like a loop, but that's just so we can use
-        continue; it executes exactly once. */
-        
-    while (firsttime) {
-        firsttime = FALSE;
 
+    /* We can only sensibly check for unfired timer events. */
+    /* ### This is not consistent with the modern understanding that
+       the display layer handles timer events. Might want to just rip
+       all this timing code out entirely. */
+    if (timing_msec) {
+        glsi32 time = gli_timer_request_since_start();
+        if (time >= 0 && time >= timing_msec) {
+            gettimeofday(&timing_start, NULL);
+            /* Resend timer request at next update. */
+            last_timing_msec = 0;
+            /* Call it a timer event. */
+            curevent->type = evtype_Timer;
+        }
     }
 
     curevent = NULL;
@@ -132,6 +171,51 @@ void gli_event_store(glui32 type, window_t *win, glui32 val1, glui32 val2)
 
 void glk_request_timer_events(glui32 millisecs)
 {
+    if (!pref_timersupport)
+        return;
     timing_msec = millisecs;
-    /* ### */
+    gettimeofday(&timing_start, NULL);
+}
+
+/* Return whether the timer request has changed since the last call.
+   If so, also return the request value as *msec. */
+int gli_timer_need_update(glui32 *msec)
+{
+    if (last_timing_msec != timing_msec) {
+        *msec = timing_msec;
+        last_timing_msec = timing_msec;
+        return TRUE;
+    }
+    else {
+        *msec = 0;
+        return FALSE;
+    }
+}
+
+/* Work out how many milliseconds it has been since timing_start.
+   If there is no timer, returns -1. */
+static glsi32 gli_timer_request_since_start()
+{
+    struct timeval tv;
+
+    if (!pref_timersupport)
+        return -1;
+    if (!timing_msec)
+        return -1;
+
+    gettimeofday(&tv, NULL);
+
+    if (tv.tv_sec < timing_start.tv_sec) {
+        return 0;
+    }
+    else if (tv.tv_sec == timing_start.tv_sec) {
+        if (tv.tv_usec < timing_start.tv_usec)
+            return 0;
+        return (tv.tv_usec - timing_start.tv_usec) / 1000;
+    }
+    else {
+        glsi32 res = (tv.tv_sec - timing_start.tv_sec) * 1000;
+        res += ((tv.tv_usec - timing_start.tv_usec) / 1000);
+        return res;
+    }
 }

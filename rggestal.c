@@ -64,13 +64,19 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
             return FALSE;
             
         case gestalt_Timer: 
-            return FALSE; /* ### for now */
+            return pref_timersupport;
 
         case gestalt_Graphics:
         case gestalt_GraphicsTransparency:
-            return FALSE;
+            return pref_graphicssupport;
             
         case gestalt_DrawImage:
+            if (pref_graphicssupport) {
+                if (val == wintype_TextBuffer)
+                    return TRUE;
+                if (val == wintype_Graphics && pref_graphicswinsupport)
+                    return TRUE;
+            }
             return FALSE;
             
         case gestalt_Unicode:
@@ -84,7 +90,11 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
         case gestalt_SoundNotify: 
         case gestalt_SoundMusic:
             return FALSE;
-  
+
+        case gestalt_Hyperlinks: 
+        case gestalt_HyperlinkInput:
+            return pref_hyperlinksupport;
+ 
         case gestalt_LineInputEcho:
             return TRUE;
 

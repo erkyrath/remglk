@@ -5,6 +5,7 @@
     http://eblong.com/zarf/glk/
 */
 
+#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -19,6 +20,11 @@ int pref_stderr = FALSE;
 int pref_fixedmetrics = FALSE;
 int pref_screenwidth = 80;
 int pref_screenheight = 50;
+int pref_timersupport = FALSE;
+int pref_hyperlinksupport = FALSE;
+int pref_graphicssupport = FALSE;
+int pref_graphicswinsupport = FALSE;
+char *pref_resourceurl = NULL;
 #if GIDEBUG_LIBRARY_SUPPORT
 int gli_debugger = FALSE;
 #endif /* GIDEBUG_LIBRARY_SUPPORT */
@@ -27,6 +33,7 @@ int gli_debugger = FALSE;
 #define ex_Void (0)
 #define ex_Int (1)
 #define ex_Bool (2)
+#define ex_Str (3)
 
 static int errflag = FALSE;
 static int inittime = FALSE;
@@ -34,6 +41,10 @@ static int inittime = FALSE;
 static int extract_value(int argc, char *argv[], char *optname, int type,
     int *argnum, int *result, int defval);
 static int string_to_bool(char *str);
+static char *construct_resourceurl(char *str, int ispath);
+
+#define STRBUFLEN (512)
+static char extracted_string[STRBUFLEN];
 
 int main(int argc, char *argv[])
 {
@@ -162,6 +173,28 @@ int main(int argc, char *argv[])
             pref_screenheight = val;
         else if (extract_value(argc, argv, "stderr", ex_Bool, &ix, &val, FALSE))
             pref_stderr = val;
+        else if (extract_value(argc, argv, "support", ex_Str, &ix, &val, FALSE)) {
+            if (!strcmp(extracted_string, "timer") || !strcmp(extracted_string, "timers"))
+                pref_timersupport = TRUE;
+            else if (!strcmp(extracted_string, "hyperlink") || !strcmp(extracted_string, "hyperlinks"))
+                pref_hyperlinksupport = TRUE;
+            else if (!strcmp(extracted_string, "graphics"))
+                pref_graphicssupport = TRUE;
+            else if (!strcmp(extracted_string, "graphicswin"))
+                pref_graphicswinsupport = TRUE;
+            else {
+                printf("%s: -support value not recognized: %s\n", argv[0], extracted_string);
+                errflag = TRUE;
+            }
+        }
+        else if (extract_value(argc, argv, "resourcedir", ex_Str, &ix, &val, FALSE)) 
+            pref_resourceurl = construct_resourceurl(extracted_string, TRUE);
+        else if (extract_value(argc, argv, "rd", ex_Str, &ix, &val, FALSE)) 
+            pref_resourceurl = construct_resourceurl(extracted_string, TRUE);
+        else if (extract_value(argc, argv, "resourceurl", ex_Str, &ix, &val, FALSE)) 
+            pref_resourceurl = construct_resourceurl(extracted_string, FALSE);
+        else if (extract_value(argc, argv, "ru", ex_Str, &ix, &val, FALSE)) 
+            pref_resourceurl = construct_resourceurl(extracted_string, FALSE);
 #if GIDEBUG_LIBRARY_SUPPORT
         else if (extract_value(argc, argv, "D", ex_Void, &ix, &val, FALSE))
             gli_debugger = val;
@@ -196,9 +229,9 @@ int main(int argc, char *argv[])
         printf("  -fixmetrics BOOL: define screen size manually (default 'no')\n");
         printf("  -width NUM: manual screen width (default 80)\n");
         printf("  -height NUM: manual screen height (default 50)\n");
-        printf("  -revgrid BOOL: reverse text in grid (status) windows (default 'no')\n");
-        printf("  -border BOOL: force borders/no borders between windows\n");
-        printf("  -defprompt BOOL: provide defaults for file prompts (default 'yes')\n");
+        printf("  -support [timer, hyperlinks, graphics, graphicswin]: declare support for various input features\n");
+        printf("  -resourceurl STR: URL base for image/sound files\n");
+        printf("  -resourcedir STR: path to image/sound files (used to create file: URLs)\n");
         printf("  -stderr BOOL: send errors to stderr rather than stdout (default 'no')\n");
 #if GIDEBUG_LIBRARY_SUPPORT
         printf("  -D: turn on debug console\n");
@@ -222,7 +255,19 @@ int main(int argc, char *argv[])
         data_event_t *data = data_event_read();
         if (data->dtag != dtag_Init)
             gli_fatal_error("First input event must be 'init'");
-        /* Copy them into the permanent structure */
+        if (data->supportcaps) {
+            /* Set the suppport preference flags. (Bit of a layering 
+               violation, but the flags are simple.) */
+            if (data->supportcaps->timer)
+                pref_timersupport = TRUE;
+            if (data->supportcaps->hyperlinks)
+                pref_hyperlinksupport = TRUE;
+            if (data->supportcaps->graphics)
+                pref_graphicssupport = TRUE;
+            if (data->supportcaps->graphicswin)
+                pref_graphicswinsupport = TRUE;
+        }
+        /* Copy the metrics into the permanent structure */
         *metrics = *data->metrics;
         data_event_free(data);
     }
@@ -332,6 +377,21 @@ static int extract_value(int argc, char *argv[], char *optname, int type,
                 val = !defval;
             *result = val;
             return TRUE;
+
+        case ex_Str:
+            if (*cx == '\0') {
+                if ((*argnum)+1 >= argc) {
+                    cx = "";
+                }
+                else {
+                    (*argnum) += 1;
+                    cx = argv[*argnum];
+                }
+            }
+            strncpy(extracted_string, cx, STRBUFLEN-1);
+            extracted_string[STRBUFLEN-1] = '\0';
+            *result = 1;
+            return TRUE;
             
     }
     
@@ -354,6 +414,43 @@ static int string_to_bool(char *str)
         return FALSE;
         
     return -1;
+}
+
+/* Given a path or URL (taken from the resourcedir/resourceurl argument),
+   return a (malloced) string containing a URL form. If ispath is
+   true, the path is absolutized and turned into a file: URL. */
+static char *construct_resourceurl(char *str, int ispath)
+{
+    char *res = NULL;
+
+    if (!ispath) {
+        /* We don't append a slash here, because maybe the user wants
+           URLs like http://foo/prefix-pict-1.png. */
+        res = malloc(strlen(str) + 1);
+        if (!res)
+            return NULL;
+        strcpy(res, str);
+    }
+    else {
+        /* This assumes Unix-style pathnames. Sorry. */
+        char prefix[STRBUFLEN];
+        prefix[0] = '\0';
+        int len = strlen(str);
+        int preslash = FALSE;
+        if (len && str[0] != '/') {
+            getcwd(prefix, STRBUFLEN);
+            preslash = TRUE;
+        }
+        int postslash = FALSE;
+        if (len && str[len-1] != '/')
+            postslash = TRUE;
+        res = malloc(16 + strlen(prefix) + len + 1);
+        if (!res)
+            return NULL;
+        sprintf(res, "file://%s%s%s%s", prefix, (preslash?"/":""), str, (postslash?"/":""));
+    }
+
+    return res;
 }
 
 /* This opens a file for reading or writing. (You cannot open a file

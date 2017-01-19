@@ -42,6 +42,11 @@ ul {
   padding-left: 24px;
 }
 
+ul.WrapIndent {
+  padding-left: 48px;
+  text-indent: -24px;
+}
+
 li {
   margin-top: 2px;
 }
@@ -102,10 +107,16 @@ dt {
 
 <h1>RemGlk: remote-procedure-call implementation of the Glk IF API</h1>
 
-<em>RemGlk version 0.2.1</em><br>
+<em>RemGlk version 0.2.5</em><br>
 
 <em>Designed by Andrew Plotkin (erkyrath@eblong.com)<br>
-<a href="http://eblong.com/zarf/glk/index.html">Glk home page)</a></em>
+<a href="http://eblong.com/zarf/glk/index.html">(Glk home page)</a></em>
+<p>
+
+The RemGlk library is copyright 2012-17 by Andrew Plotkin. The
+GiDispa, and GiBlorb libraries, as well as the glk.h header file, are
+copyright 1998-2017 by Andrew Plotkin. They are distributed under the
+<a href="LICENSE">MIT license</a>.
 <p>
 
 This documentation is licensed under a 
@@ -126,13 +137,10 @@ RemGlk does not provide a user interface. Instead, it wraps up the application's
 RemGlk is therefore like CheapGlk, in that it works entirely through input and output streams, and can easily be attached to a bot or web service. However, unlike CheapGlk, RemGlk supports multiple Glk windows and most Glk I/O features. Whatever it's attached to just has to decode the structured output and display it appropriately.
 <p>
 
-RemGlk was designed to complement the <a href="http://eblong.com/zarf/glk/glkote.html">GlkOte</a> Javascript library. GlkOte more or less implements the other half of the job: it accepts game output (as Javascript objects), displays it, and then returns the player's commands in the same format. It should be possible to connect an IF interpreter, RemGlk, and GlkOte to build a complete IF web service.
+RemGlk was designed to complement the <a href="http://eblong.com/zarf/glk/glkote.html">GlkOte</a> Javascript library. GlkOte more or less implements the other half of the job: it accepts game output (as Javascript objects), displays it, and then returns the player's commands in the same format. It is possible to connect an IF interpreter, RemGlk, and GlkOte to build a complete IF web service. (See <a href="https://github.com/erkyrath/remote-if-demo">an experimental implementation of this idea</a>.)
 <p>
 
-<em>Warning: this has not yet been tested in any way. This is an alpha release of RemGlk, and nothing is guaranteed.</em>
-<p>
-
-While this is labelled "release 0.2", I may be fixing bugs and adding features iteratively in the near future. Or not. You are best advised to follow my <a href="http://github.com/erkyrath/remglk/">GitHub repository</a> for updates.
+RemGlk is also used by the <a href="http://eblong.com/zarf/plotex/regtest.html">RegTest</a> testing framework. In this setup, the "display layer" does not actually display anything. It is a Python script which generates test input and verifies the game's output.
 <p>
 
 <h2>Using RemGlk</h2>
@@ -175,14 +183,38 @@ If you instead entered:
 The metrics object also allows you to specify margins and border spacing, which improve the layout behavior. See below for details.
 <p>
 
-Alternatively, you can specify basic layout information on the command line. If you type:
+You can also include information about what optional features you are prepared to support. (RemGlk needs to know this in order to set appropriate gestalt flags for the game.)
+<p>
+
+<pre class="Sample">
+{ "type": "init", "gen": 0, "metrics": { "width":80, "height":24 },
+  "support": [ "timer", "hyperlinks" ] }
+</pre>
+<p>
+
+The support field is a list of strings. Currently the recognized values are:
+<p>
+
+<ul class="WrapIndent">
+<li><code>"timer"</code>: gestalt_Timer will be set; the library will support glk_request_timer_events().
+<li><code>"hyperlinks"</code>: gestalt_Hyperlinks and gestalt_HyperlinkInput will be set; the library will support glk_set_hyperlink() and glk_request_hyperlink_event().
+<li><code>"graphics"</code>: gestalt_Graphics and gestalt_GraphicsTransparency will be set. (Support for transparent PNGs is taken for granted.) gestalt_DrawImage will return true for text-buffer windows. The library will support all image functions.
+<li><code>"graphicswin"</code>: graphics windows can be opened; gestalt_DrawImage will return true for graphics windows.
+</ul>
+
+<h3>Starting up with no init event</h3>
+
+For some scenarios, often including debugging, you want the application to <em>not</em> wait for an <code>init</code> event. You can request this with the <code>-fixmetrics</code> (or <code>-fm</code>) flag. You can also specify basic layout information on the command line. If you type:
 
 <pre class="Sample">
 glulxe -fm -width 80 -height 50 Advent.ulx
 </pre>
 <p>
 
-...then the application will <em>not</em> wait for an <code>init</code> event. (And you should not enter one.) Instead, the game will start immediately (with an 80x50 "terminal window"), and send its first screenful of output.
+...then the game will start immediately (with an 80x50 "terminal window"), and send its first screenful of output. Your first reply will then be a player command; see below.
+<p>
+
+In <code>-fm</code> mode, you must specify optional features on the command line. Use the <code>-support</code> argument with one of the support strings listed above (<code>-support timer</code>, <code>-support hyperlinks</code>, etc.).
 <p>
 
 <h3>The first screen of output</h3>
@@ -265,11 +297,38 @@ A human types "go east" into some user interface, which then passes the followin
 <p>
 
 <pre class="Sample">
-{ "type":"line", "gen":1, "window":22, "value":"go east"}
+{ "type":"line", "gen":1, "window":22, "value":"go east" }
 </pre>
 <p>
 
 The library accepts this, mulls it, and generates a new output update. So it goes.
+<p>
+
+<h3>Referring to resources</h3>
+
+RemGlk supports Blorb-packaged games which include images. (Sound support is on the to-do list.) However, it does not try to encode the image data in the JSON output. Instead, it assumes that the display library (GlkOte) has access to the same images. When the game draws an image, RemGlk sends a JSON stanza which includes the image number and size. (See the <a href="http://eblong.com/zarf/glk/glkote/docs.html">GlkOte documentation</a>.) The display library is then responsible for finding the image with that number.
+<p>
+
+To make this easier, you can configure RemGlk to include an image URL in the stanza.
+Do this with the <code>-resourceurl</code> (or <code>-ru</code>) flag:
+<p>
+
+<pre class="Sample">
+glulxe -ru http://example.com/datadir/ game.gblorb
+</pre>
+<p>
+
+The URL should end with a slash, and should refer to a directory containing image files. RemGlk will send URLs with the format <code>http://example.com/datadir/pict-1.png</code>, <code>http://example.com/datadir/pict-2.jpeg</code>. (Note lower-case, and "jpeg" has an "e".) (This is the same filename convention used by <a href="https://github.com/erkyrath/glk-dev/blob/master/blorbtool.py">blorbtool.py</a> with the <code>giload</code> command.)
+<p>
+
+You may also specify a local pathname with the <code>-resourcedir</code> (or <code>-rd</code>) flag:
+
+<pre class="Sample">
+glulxe -rd path/dir game.gblorb
+</pre>
+<p>
+
+RemGlk will convert the pathname to a <code>file:</code> URL and send it as above.
 <p>
 
 <h2>The Data Format</h2>
@@ -280,14 +339,20 @@ The library accepts this, mulls it, and generates a new output update. So it goe
 Prior to version 0.2.1, this library used <code>contents</code> and <code>inputs</code> as the names of the top-level data fields, rather than the correct <code>content</code> and <code>input</code>. The prior version also omitted the <code>xpos</code> and <code>ypos</code> fields for grid window input.
 <p>
 
+As of version 0.2.2, the library accepts noninteger numbers. If the field expects an integer, the values will be rounded (towards zero). As of 0.2.4, some of the fields in the metrics object expect non-integer numbers.
+<p>
+
 A note on <a href="http://json.org/">JSON</a>: this is a strict (in both senses) subset of Javascript's data literal format. The biggest differences are: you always use double quotes, never single quotes; strings are always quoted, but numbers never are; an object (dictionary) always has quotes around its keys.
 <p>
 
 All input and output is UTF-8.
 <p>
 
+When generating output, a complete update JSON update will be followed by a blank line (two newlines in a row). You can use this as a hint for breaking the output stream into stanzas. (But RemGlk does not require you to follow this convention when sending it input JSON objects.)
+<p>
+
 <hr>
-Last updated January 27, 2014.
+Last updated January 16, 2017.
 <p>
 
 <em><a href="http://eblong.com/zarf/glk/index.html">Glk home page</a></em>

@@ -19,11 +19,13 @@ typedef enum DTag_enum {
     dtag_Unknown = 0,
     dtag_Init = 1,
     dtag_Refresh = 2,
-    dtag_Line = 2,
-    dtag_Char = 3,
-    dtag_Arrange = 4,
-    dtag_Hyperlink = 5,
-    dtag_SpecialResponse = 6,
+    dtag_Line = 3,
+    dtag_Char = 4,
+    dtag_Arrange = 5,
+    dtag_Redraw = 6,
+    dtag_Hyperlink = 7,
+    dtag_Timer = 8,
+    dtag_SpecialResponse = 9,
 } DTag;
 
 /* gen_list_t: A boring little structure which holds a dynamic list of
@@ -37,21 +39,33 @@ typedef struct gen_list_struct {
 } gen_list_t;
 
 typedef struct data_event_struct data_event_t;
+typedef struct data_supportcaps_struct data_supportcaps_t;
 typedef struct data_update_struct data_update_t;
 typedef struct data_window_struct data_window_t;
 typedef struct data_input_struct data_input_t;
 typedef struct data_line_struct data_line_t;
 typedef struct data_span_struct data_span_t;
+typedef struct data_specialspan_struct data_specialspan_t;
 
 /* data_metrics_t: Defines the display metrics. */
 struct data_metrics_struct {
     glui32 width, height;
     glui32 outspacingx, outspacingy;
     glui32 inspacingx, inspacingy;
-    glui32 gridcharwidth, gridcharheight;
+    double gridcharwidth, gridcharheight;
     glui32 gridmarginx, gridmarginy;
-    glui32 buffercharwidth, buffercharheight;
+    double buffercharwidth, buffercharheight;
     glui32 buffermarginx, buffermarginy;
+    glui32 graphicsmarginx, graphicsmarginy;
+};
+
+/* data_supportcaps_t: List of I/O capabilities of the client. */
+struct data_supportcaps_struct {
+    int timer;
+    int hyperlinks;
+    int graphics;
+    int graphicswin;
+    int sound;
 };
 
 /* data_event_t: Represents an input event (either the initial setup event,
@@ -64,7 +78,9 @@ struct data_event_struct {
     glui32 *linevalue;
     glui32 linelen;
     glui32 terminator;
+    glui32 linkvalue;
     data_metrics_t *metrics;
+    data_supportcaps_t *supportcaps;
 };
 
 /* data_update_t: Represents a complete output update, including what
@@ -76,6 +92,8 @@ struct data_update_struct {
     gen_list_t contents; /* data_content_t */
     int useinputs;
     gen_list_t inputs; /* data_event_t */
+    int includetimer;
+    glui32 timer;
     data_specialreq_t *specialreq;
     gen_list_t debuglines; /* char* (null-terminated UTF8) */
     int disable;
@@ -101,13 +119,15 @@ struct data_input_struct {
     glui32 maxlen;
     int cursorpos; /* only for grids */
     glsi32 xpos, ypos; /* only if cursorpos */
+    int hyperlink;
 };
 
 /* data_content_t: Represents the output changes of one window (text
-   updates). */
+   updates). Also used for graphics window updates, because that was
+   easiest. */
 struct data_content_struct {
     glui32 window;
-    glui32 type;
+    glui32 type; /* window type */
     gen_list_t lines; /* data_line_t */
     int clear;
 };
@@ -118,6 +138,7 @@ struct data_content_struct {
 struct data_line_struct {
     glui32 linenum;
     int append;
+    int flowbreak;
     data_span_t *spans;
     int count;
     int allocsize;
@@ -126,9 +147,37 @@ struct data_line_struct {
 /* data_span_t: One style-span of text in a data_line_t. */
 struct data_span_struct {
     short style;
+    glui32 hyperlink;
     glui32 *str; /* This will always be a reference to existing data.
                     Do not free. */
     long len;
+    data_specialspan_t *special; /* Do not free. */
+};
+
+typedef enum SpecialType_enum {
+    specialtype_None = 0,
+    specialtype_FlowBreak = 1,
+    specialtype_Image = 2,
+    specialtype_SetColor = 3,
+    specialtype_Fill = 4,
+} SpecialType;
+
+/* data_specialspan_t: Extra things that a data_span_t can represent.
+   Not all these fields are used for all types. */
+struct data_specialspan_struct {
+    SpecialType type;
+    glui32 image; /* (Image) */
+    glui32 chunktype; /* (Image) JPEG or PNG */
+    int hasdimensions; /* (Fill) */
+    glui32 xpos; /* (Fill, Image in graphicswin) */
+    glui32 ypos; /* (Fill, Image in graphicswin) */
+    glui32 width; /* (Fill, Image) */
+    glui32 height /* (Fill, Image) */;
+    glui32 alignment; /* (Image in bufferwin) */
+    glui32 hyperlink; /* (Image in bufferwin) */
+    char *alttext; /* (Image) Reference to existing data. */
+    int hascolor; /* (SetColor, Fill) */
+    glui32 color; /* (SetColor, Fill) */
 };
 
 /* data_specialreq_t: A special input request. */
@@ -153,6 +202,10 @@ extern data_metrics_t *data_metrics_alloc(int width, int height);
 extern void data_metrics_free(data_metrics_t *metrics);
 extern void data_metrics_print(data_metrics_t *metrics);
 
+extern data_supportcaps_t *data_supportcaps_alloc(void);
+extern void data_supportcaps_free(data_supportcaps_t *supportcaps);
+extern void data_supportcaps_print(data_supportcaps_t *supportcaps);
+
 extern data_event_t *data_event_read(void);
 extern void data_event_free(data_event_t *data);
 extern void data_event_print(data_event_t *data);
@@ -175,8 +228,13 @@ extern void data_content_print(data_content_t *data);
 
 extern data_line_t *data_line_alloc(void);
 extern void data_line_free(data_line_t *data);
-extern void data_line_add_span(data_line_t *data, short style, glui32 *str, long len);
+extern void data_line_add_span(data_line_t *data, short style, glui32 hyperlink, glui32 *str, long len);
+extern void data_line_add_specialspan(data_line_t *data, data_specialspan_t *special);
 extern void data_line_print(data_line_t *data, glui32 wintype);
+
+extern data_specialspan_t *data_specialspan_alloc(SpecialType type);
+extern void data_specialspan_free(data_specialspan_t *data);
+extern void data_specialspan_print(data_specialspan_t *dat, glui32 wintype);
 
 extern data_specialreq_t *data_specialreq_alloc(glui32 filemode, glui32 filetype);
 extern void data_specialreq_free(data_specialreq_t *data);
