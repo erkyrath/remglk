@@ -117,6 +117,32 @@ void glk_select(event_t *event)
                 gli_event_store(evtype_Timer, NULL, 0, 0);
                 break;
 
+            case dtag_DebugInput:
+                if (gli_debugger) {
+                    /* If debug support is compiled in *and* turned on:
+                       process the command, send an update, and
+                       continue the glk_select. */
+                    /* Convert linevalue to UTF-8. We do this in a
+                       lazy way; we alloc the largest possible buffer. */
+                    int len = 4*data->linelen+4;
+                    char *allocbuf = malloc(len);
+                    char *ptr = allocbuf;
+                    int ptrix = 0;
+                    int cmdix = 0;
+                    while (cmdix < data->linelen) {
+                        ptrix += gli_encode_utf8(data->linevalue[cmdix], ptr+ptrix, len-ptrix);
+                        cmdix++;
+                    }
+                    *(ptr+ptrix) = '\0';
+                    gidebug_perform_command(allocbuf);
+                    free(allocbuf);
+
+                    gli_event_clearevent(curevent);
+                    gli_windows_update(NULL, TRUE);
+                    break;
+                }
+                /* ...else fall through to default behavior. */
+
             default:
                 /* Ignore the event. (The constant is not defined by Glk;
                    we use it to represent any event whose textual name
