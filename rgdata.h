@@ -26,6 +26,7 @@ typedef enum DTag_enum {
     dtag_Hyperlink = 7,
     dtag_Timer = 8,
     dtag_SpecialResponse = 9,
+    dtag_DebugInput = 10,
 } DTag;
 
 /* gen_list_t: A boring little structure which holds a dynamic list of

@@ -1286,6 +1286,20 @@ data_event_t *data_event_read()
             input->linelen = dat->count;
         }
     }
+    else if (data_raw_string_is(dat, "debuginput")) {
+        input->dtag = dtag_DebugInput;
+
+        dat = data_raw_struct_field(rawdata, "gen");
+        if (!dat)
+            gli_fatal_error("data: Debug input struct has no gen");
+        input->gen = data_raw_int_value(dat);
+
+        dat = data_raw_struct_field(rawdata, "value");
+        if (!dat)
+            gli_fatal_error("data: Debug input struct has no value");
+        input->linevalue = data_raw_str_dup(dat);
+        input->linelen = dat->count;
+    }
     else {
         /* Unrecognized event type. Let it go through; glk_select will
            ignore it. */
