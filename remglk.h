@@ -200,6 +200,7 @@ extern int gli_msgin_getchar(char *prompt, int hilite);
 extern void gli_putchar_utf8(glui32 val, FILE *fl);
 extern glui32 gli_parse_utf8(unsigned char *buf, glui32 buflen,
     glui32 *out, glui32 outlen);
+extern int gli_encode_utf8(glui32 val, char *buf, int len);
 
 extern void gli_initialize_events(void);
 extern void gli_event_store(glui32 type, window_t *win, glui32 val1, glui32 val2);
