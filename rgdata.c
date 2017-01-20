@@ -1118,6 +1118,8 @@ void data_event_print(data_event_t *data)
             printf("}\n");
             break;
 
+        /* ### Never got around to implementing the rest of this, did I... */
+
         default:
             printf("{? unknown dtag %d}\n", data->dtag);
             break;
