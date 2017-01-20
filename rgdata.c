@@ -1287,7 +1287,14 @@ data_event_t *data_event_read()
         }
     }
     else {
-        gli_fatal_error("data: Input struct has unknown type");
+        /* Unrecognized event type. Let it go through; glk_select will
+           ignore it. */
+        input->dtag = dtag_Unknown;
+
+        dat = data_raw_struct_field(rawdata, "gen");
+        if (!dat)
+            gli_fatal_error("data: ??? input struct has no gen");
+        input->gen = data_raw_int_value(dat);
     }
 
     /*### partials support */

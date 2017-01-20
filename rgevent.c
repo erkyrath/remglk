@@ -118,7 +118,10 @@ void glk_select(event_t *event)
                 break;
 
             default:
-                /* Ignore the event. */
+                /* Ignore the event. (The constant is not defined by Glk;
+                   we use it to represent any event whose textual name
+                   is unrecognized.) */
+                gli_event_store(0x7FFFFFFF, NULL, 0, 0);
                 break;
         }
 
