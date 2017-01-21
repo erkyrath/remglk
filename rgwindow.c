@@ -912,7 +912,11 @@ void gli_windows_update(data_specialreq_t *special, int newgeneration)
 
 #if GIDEBUG_LIBRARY_SUPPORT
     extern gen_list_t debug_output_cache;
-    gen_list_move_all(&update->debuglines, &debug_output_cache);
+    for (ix=0; ix<debug_output_cache.count; ix++) {
+        gen_list_append(&debug_output_cache, update->debuglines.list[ix]);
+        update->debuglines.list[ix] = NULL;
+    }
+    update->debuglines.count = 0;
 #endif /* GIDEBUG_LIBRARY_SUPPORT */
 
     data_update_print(update);

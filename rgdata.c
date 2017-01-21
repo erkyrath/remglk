@@ -279,19 +279,6 @@ void gen_list_append(gen_list_t *list, void *val)
     list->list[list->count++] = val;
 }
 
-/* Transfer all entries from one list to another. The pointers in
-   the source list are cleared and count is set to zero. This is
-   not a very useful utility. */
-void gen_list_move_all(gen_list_t *dest, gen_list_t *src)
-{
-    int ix;
-    for (ix=0; ix<src->count; ix++) {
-        gen_list_append(dest, src->list[ix]);
-        src->list[ix] = NULL;
-    }
-    src->count = 0;
-}
-
 static data_raw_t *data_raw_alloc(RawType type)
 {
     data_raw_t *dat = malloc(sizeof(data_raw_t));
