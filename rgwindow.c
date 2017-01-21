@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include <math.h>
 
@@ -789,6 +790,23 @@ static glui32 *dup_buffer(void *buf, int len, int unicode)
     return res;
 }
 
+#if GIDEBUG_LIBRARY_SUPPORT
+
+/* A cache of debug lines generated this cycle. */
+static gen_list_t debug_output_cache = { NULL, 0, 0 };
+
+void gidebug_output(char *text)
+{
+    /* Send a line of text to the "debug console", if the user has
+       requested debugging mode. */
+    if (gli_debugger) {
+        gen_list_append(&debug_output_cache, strdup(text));
+    }
+}
+
+#endif /* GIDEBUG_LIBRARY_SUPPORT */
+
+
 /* This constructs an update object for the library state. (It's in
    rgwindow.c because most of the work is window-related.)
 
@@ -911,12 +929,11 @@ void gli_windows_update(data_specialreq_t *special, int newgeneration)
     update->specialreq = special;
 
 #if GIDEBUG_LIBRARY_SUPPORT
-    extern gen_list_t debug_output_cache;
     for (ix=0; ix<debug_output_cache.count; ix++) {
-        gen_list_append(&debug_output_cache, update->debuglines.list[ix]);
-        update->debuglines.list[ix] = NULL;
+        gen_list_append(&update->debuglines, debug_output_cache.list[ix]);
+        debug_output_cache.list[ix] = NULL;
     }
-    update->debuglines.count = 0;
+    debug_output_cache.count = 0;
 #endif /* GIDEBUG_LIBRARY_SUPPORT */
 
     data_update_print(update);
