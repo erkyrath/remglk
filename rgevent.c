@@ -26,6 +26,7 @@ static glui32 last_timing_msec;
 static struct timeval timing_start; 
 
 static glsi32 gli_timer_request_since_start(void);
+static char *alloc_utf_buffer(glui32 *ustr, int ulen);
 
 /* Set up the input system. This is called from main(). */
 void gli_initialize_events()
@@ -122,18 +123,7 @@ void glk_select(event_t *event)
                     /* If debug support is compiled in *and* turned on:
                        process the command, send an update, and
                        continue the glk_select. */
-                    /* Convert linevalue to UTF-8. We do this in a
-                       lazy way; we alloc the largest possible buffer. */
-                    int len = 4*data->linelen+4;
-                    char *allocbuf = malloc(len);
-                    char *ptr = allocbuf;
-                    int ptrix = 0;
-                    int cmdix = 0;
-                    while (cmdix < data->linelen) {
-                        ptrix += gli_encode_utf8(data->linevalue[cmdix], ptr+ptrix, len-ptrix);
-                        cmdix++;
-                    }
-                    *(ptr+ptrix) = '\0';
+                    char *allocbuf = alloc_utf_buffer(data->linevalue, data->linelen);
                     gidebug_perform_command(allocbuf);
                     free(allocbuf);
 
@@ -184,6 +174,74 @@ void glk_select_poll(event_t *event)
 
     curevent = NULL;
 }
+
+/* Convert an array of Unicode chars to (null-terminated) UTF-8.
+   The caller should free this after use.
+*/
+static char *alloc_utf_buffer(glui32 *ustr, int ulen)
+{
+    /* We do this in a lazy way; we alloc the largest possible buffer. */
+    int len = 4*ulen+4;
+    char *buf = malloc(len);
+    if (!buf)
+        return NULL;
+
+    char *ptr = buf;
+    int ix = 0;
+    int cx = 0;
+    while (cx < ulen) {
+        ix += gli_encode_utf8(ustr[cx], ptr+ix, len-ix);
+        cx++;
+    }
+
+    *(ptr+ix) = '\0';
+    return buf;
+}
+
+#if GIDEBUG_LIBRARY_SUPPORT
+
+/* Block and wait for debug commands. The library will accept debug commands
+   until gidebug_perform_command() returns nonzero.
+
+   This behaves a lot like glk_select(), except that it only handles debug
+   input, not any of the standard event types.
+*/
+void gidebug_pause()
+{
+    if (!gli_debugger)
+        return;
+
+    gidebug_announce_cycle(gidebug_cycle_DebugPause);
+
+    char *allocbuf;
+    int unpause = FALSE;
+
+    while (!unpause) {
+        gli_windows_update(NULL, TRUE);
+
+        data_event_t *data = data_event_read();
+
+        if (data->gen != gli_window_current_generation() && data->dtag != dtag_Refresh)
+            gli_fatal_error("Input generation number does not match.");
+
+        switch (data->dtag) {
+            case dtag_DebugInput:
+                allocbuf = alloc_utf_buffer(data->linevalue, data->linelen);
+                unpause = gidebug_perform_command(allocbuf);
+                free(allocbuf);
+                break;
+
+            default:
+                /* Ignore all non-debug events. */
+                break;
+        }
+        
+    }    
+    
+    gidebug_announce_cycle(gidebug_cycle_DebugUnpause);
+}
+
+#endif /* GIDEBUG_LIBRARY_SUPPORT */
 
 /* Various modules can call this to indicate that an event has occurred.
     This doesn't try to queue events, but since a single keystroke or

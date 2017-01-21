@@ -187,17 +187,6 @@ void gidebug_output(char *text)
     }
 }
 
-/* Block and wait for debug commands. The library will accept debug commands
-   until gidebug_perform_command() returns nonzero.
-
-   This behaves a lot like glk_select(), except that it only handles debug
-   input, not any of the standard event types.
-*/
-void gidebug_pause()
-{
-    /*###*/
-}
-
 #endif /* GIDEBUG_LIBRARY_SUPPORT */
 
 #ifdef NO_MEMMOVE
