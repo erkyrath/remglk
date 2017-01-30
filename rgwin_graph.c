@@ -52,6 +52,7 @@ void win_graphics_clear(window_t *win)
        (The last setcolor, if there are several.) */
 
     data_specialspan_t *setcolspan = NULL;
+    int setcolmarked = FALSE;
 
     /* Discard all the content entries, except for the last setcolor. */
     long px;
@@ -63,6 +64,7 @@ void win_graphics_clear(window_t *win)
             if (setcolspan)
                 data_specialspan_free(setcolspan);
             setcolspan = span;
+            setcolmarked = (px >= dwin->updatemark);
         }
         else {
             data_specialspan_free(span);
@@ -77,7 +79,8 @@ void win_graphics_clear(window_t *win)
     if (setcolspan) {
         dwin->content[dwin->numcontent] = setcolspan;
         dwin->numcontent++;
-        dwin->updatemark++;
+        if (!setcolmarked)
+            dwin->updatemark++;
     }
 
     /* Clear to background color. */
