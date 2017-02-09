@@ -293,6 +293,7 @@ strid_t glk_stream_open_file(fileref_t *fref, glui32 fmode,
         return 0;
     }
     
+    str->isbinary = !fref->textmode;
     str->file = fl;
     str->lastop = 0;
     
