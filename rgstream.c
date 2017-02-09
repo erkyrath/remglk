@@ -774,7 +774,7 @@ static void gli_put_char_uni(stream_t *str, glui32 ch)
 
 static void gli_put_buffer(stream_t *str, char *buf, glui32 len)
 {
-    char *cx;
+    unsigned char *cx;
     glui32 lx;
     
     if (!str || !str->writable)
@@ -832,7 +832,7 @@ static void gli_put_buffer(stream_t *str, char *buf, glui32 len)
                 gli_strict_warning("put_buffer: window has pending line request");
                 break;
             }
-            for (lx=0, cx=buf; lx<len; lx++, cx++) {
+            for (lx=0, cx=(unsigned char *)buf; lx<len; lx++, cx++) {
                 gli_window_put_char(str->win, *cx);
             }
             if (str->win->echostr)
