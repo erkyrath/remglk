@@ -1,6 +1,6 @@
 /* main.c: Top-level source file
         for RemGlk, remote-procedure-call implementation of the Glk API.
-    Glk API which this implements: version 0.7.4.
+    Glk API which this implements: version 0.7.5.
     Designed by Andrew Plotkin <erkyrath@eblong.com>
     http://eblong.com/zarf/glk/
 */
