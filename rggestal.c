@@ -69,6 +69,9 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
         case gestalt_Graphics:
         case gestalt_GraphicsTransparency:
             return pref_graphicssupport;
+
+        case gestalt_GraphicsCharInput:
+            return FALSE;
             
         case gestalt_DrawImage:
             if (pref_graphicssupport) {
