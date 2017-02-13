@@ -1,4 +1,4 @@
-/* gi_dispa.c: Dispatch layer for Glk API, version 0.7.4.
+/* gi_dispa.c: Dispatch layer for Glk API, version 0.7.5.
     Designed by Andrew Plotkin <erkyrath@eblong.com>
     http://eblong.com/zarf/glk/
 
@@ -67,6 +67,7 @@ static gidispatch_intconst_t intconstant_table[] = {
     { "gestalt_DateTime", (20) },
     { "gestalt_DrawImage", (7) },
     { "gestalt_Graphics", (6) },
+    { "gestalt_GraphicsCharInput", (23) },
     { "gestalt_GraphicsTransparency", (14) },
     { "gestalt_HyperlinkInput", (12) },
     { "gestalt_Hyperlinks", (11) },
