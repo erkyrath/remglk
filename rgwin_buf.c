@@ -52,6 +52,7 @@ window_textbuffer_t *win_textbuffer_create(window_t *win)
     dwin->runs[0].pos = 0;
 
     dwin->updatemark = 0;
+    dwin->startclear = FALSE;
     
     dwin->width = -1;
     dwin->height = -1;
@@ -141,16 +142,15 @@ data_content_t *win_textbuffer_update(window_t *win)
     glui32 curlink;
     long curspecnum;
 
-    if (dwin->updatemark >= dwin->numchars) {
+    if (dwin->updatemark >= dwin->numchars && !dwin->startclear) {
         return NULL;
     }
 
     data_content_t *dat = data_content_alloc(win->updatetag, win->type);
-
-    /* ### not exactly the right test */
-    if (dwin->updatemark == 0)
+    
+    if (dwin->startclear)
         dat->clear = TRUE;
-
+    
     if (TRUE) {
         cnum = dwin->updatemark;
         spanstart = cnum;
@@ -228,6 +228,7 @@ data_content_t *win_textbuffer_update(window_t *win)
     }
 
     dwin->updatemark = dwin->numchars;
+    dwin->startclear = FALSE;
 
     return dat;
 }
@@ -338,6 +339,7 @@ void win_textbuffer_clear(window_t *win)
     dwin->runs[0].pos = 0;
     
     dwin->updatemark = 0;
+    dwin->startclear = TRUE;
 }
 
 void win_textbuffer_trim_buffer(window_t *win)
