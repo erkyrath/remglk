@@ -1,6 +1,6 @@
 RemGlk: remote-procedure-call implementation of the Glk IF API
 
-RemGlk Library: version 0.2.6.
+RemGlk Library: version 0.2.7.
 Designed by Andrew Plotkin <erkyrath@eblong.com>
 <http://eblong.com/zarf/glk/remglk/docs.html>
 
@@ -31,3 +31,24 @@ The RemGlk documentation is licensed under a Creative Commons
 Attribution-Noncommercial-Share Alike 3.0 Unported License.
 See <http://creativecommons.org/licenses/by-nc-sa/3.0>
 
+
+* How to build/install
+
+RemGlk uses the autoconf toolset, so building/installation should be as
+easy as:
+
+    autoreconf --force --install
+    ./configure
+    make install
+
+or, on one line:
+
+    autoreconf --force --install && ./configure && make install
+
+On most systems, as a regular user, you'll end up with the include
+files in /usr/local/include/remglk/*.h, and the library in
+/usr/local/lib/remglk/libremglk.a.  If you're consuming this library
+from another autoconf-using tool, you can magically find the paths
+with:
+
+    PKG_CHECK_MODULES([remglk])
