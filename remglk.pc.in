@@ -1,0 +1,11 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+includedir=@includedir@
+libdir=@libdir@
+
+Name: @PACKAGE_NAME@
+Description: Remote-procedure-call implementation of the Glk IF API
+Version: @PACKAGE_VERSION@
+URL: @PACKAGE_URL@
+Cflags: -I${includedir}/@PACKAGE_NAME@
+Libs: -L${libdir}/@PACKAGE_NAME@ -lremglk
