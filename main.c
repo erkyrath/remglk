@@ -456,13 +456,12 @@ static char *construct_resourceurl(char *str, int ispath)
 /* This opens a file for reading or writing. (You cannot open a file
    for appending using this call.)
 
-   This should be used only by glkunix_startup_code(). 
+   This should be used only by glkunix_startup_code() and the
+   glkunix_autosave system.
 */
 strid_t glkunix_stream_open_pathname_gen(char *pathname, glui32 writemode,
     glui32 textmode, glui32 rock)
 {
-    if (!inittime)
-        return 0;
     return gli_stream_open_pathname(pathname, (writemode != 0), (textmode != 0), rock);
 }
 
