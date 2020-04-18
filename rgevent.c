@@ -15,7 +15,10 @@
 
 /* A pointer to the place where the pending glk_select() will store its
     event. When not inside a glk_select() call, this will be NULL. */
-static event_t *curevent = NULL; 
+static event_t *curevent = NULL;
+
+/* The autosave code needs to peek at this. */
+static glui32 last_event_type;
 
 /* The current timed-event request, exactly as passed to
    glk_request_timer_events(). */
@@ -33,6 +36,7 @@ void gli_initialize_events()
 {
     timing_msec = 0;
     last_timing_msec = 0;
+    last_event_type = 0xFFFFFFFF;
 }
 
 void glk_select(event_t *event)
@@ -146,6 +150,7 @@ void glk_select(event_t *event)
     
     /* An event has occurred; glk_select() is over. */
     gli_windows_trim_buffers();
+    last_event_type = curevent->type;
     curevent = NULL;
 
     if (gli_debugger)
@@ -254,6 +259,13 @@ void gli_event_store(glui32 type, window_t *win, glui32 val1, glui32 val2)
         curevent->val1 = val1;
         curevent->val2 = val2;
     }
+}
+
+/* Peek at the last Glk event to come in. Returns 0xFFFFFFFF if we just
+   started up. */
+glui32 glkunix_get_last_event_type()
+{
+    return last_event_type;
 }
 
 void glk_request_timer_events(glui32 millisecs)
