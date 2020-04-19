@@ -11,8 +11,10 @@
 
 #define SERIAL_VERSION (1)
 
-void library_state_print(FILE *fl)
+void glkunix_save_library_state(strid_t file)
 {
+    FILE *fl = file->file;
+    
     fprintf(fl, "{\"type\":\"autosave\", \"version\":%d", SERIAL_VERSION);
 
     //### metrics

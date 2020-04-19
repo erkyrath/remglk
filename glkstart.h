@@ -67,6 +67,7 @@ extern strid_t glkunix_stream_open_pathname(char *pathname, glui32 textmode,
 /* defined in unixstrt.c */
 extern void glkunix_do_autosave(glui32 eventaddr);
 
+extern void glkunix_save_library_state(strid_t file);
 extern glui32 glkunix_get_last_event_type(void);
 extern glui32 glkunix_window_get_updatetag(winid_t win);
 extern winid_t glkunix_window_find_by_updatetag(glui32 tag);
