@@ -58,6 +58,13 @@ extern strid_t glkunix_stream_open_pathname_gen(char *pathname,
 extern strid_t glkunix_stream_open_pathname(char *pathname, glui32 textmode, 
     glui32 rock);
 
+typedef struct glkunix_serialize_context_struct *glkunix_serialize_context_t;
+typedef int (*glkunix_serialize_object_f)(glkunix_serialize_context_t, void *);
+
+void glkunix_serialize_uint32(glkunix_serialize_context_t, char *, glui32);
+void glkunix_serialize_object(glkunix_serialize_context_t, char *, glkunix_serialize_object_f, void *);
+void glkunix_serialize_object_array(glkunix_serialize_context_t, char *, glkunix_serialize_object_f, glui32, size_t, void *);
+
 /* This library offers the hooks necessary for an interpreter to
    implement autosave. */
 #define GLKUNIX_AUTOSAVE_FEATURES (1)
@@ -67,7 +74,7 @@ extern strid_t glkunix_stream_open_pathname(char *pathname, glui32 textmode,
 /* defined in unixstrt.c */
 extern void glkunix_do_autosave(glui32 eventaddr);
 
-extern void glkunix_save_library_state(strid_t file);
+extern void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_state_func, void *extra_state_rock);
 extern glui32 glkunix_get_last_event_type(void);
 extern glui32 glkunix_window_get_updatetag(winid_t win);
 extern winid_t glkunix_window_find_by_updatetag(glui32 tag);

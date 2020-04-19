@@ -12,6 +12,7 @@
 #include "glk.h"
 #include "remglk.h"
 #include "rgdata.h"
+#include "glkstart.h"
 
 /* RawType encodes the type of a JSON data element. */
 typedef enum RawType_enum {
@@ -1949,5 +1950,66 @@ void data_specialreq_print(data_specialreq_t *dat)
         print_string_json(dat->gameid, stdout);
     }
     printf(" }");
+}
+
+void glkunix_serialize_object_root(FILE *file, glkunix_serialize_context_t ctx, glkunix_serialize_object_f func, void *rock)
+{
+    ctx->file = file;
+    ctx->count = 0;
+
+    fprintf(ctx->file, "{\n");
+    func(ctx, rock);
+    fprintf(ctx->file, "\n}");
+}
+
+void glkunix_serialize_uint32(glkunix_serialize_context_t ctx, char *key, glui32 val)
+{
+    if (ctx->count) {
+        fprintf(ctx->file, ", ");
+    }
+
+    fprintf(ctx->file, "\"%s\":\"%ld\"", key, (long)val);
+
+    ctx->count++;
+}
+
+void glkunix_serialize_object(glkunix_serialize_context_t ctx, char *key, glkunix_serialize_object_f func, void *rock)
+{
+    if (ctx->count) {
+        fprintf(ctx->file, ", ");
+    }
+
+    fprintf(ctx->file, "\"%s\":{\n", key);
+    func(ctx, rock);
+    fprintf(ctx->file, "\n}");
+
+    ctx->count++;
+}
+
+void glkunix_serialize_object_array(glkunix_serialize_context_t ctx, char *key, glkunix_serialize_object_f func, glui32 count, size_t size, void *array)
+{
+    char *charray = array;
+    glui32 ix;
+    
+    if (ctx->count) {
+        fprintf(ctx->file, ", ");
+    }
+
+    fprintf(ctx->file, "\"%s\":[\n", key);
+    
+    for (ix=0; ix<count; ix++) {
+        char *el = charray + ix*size;
+        struct glkunix_serialize_context_struct subctx;
+        
+        if (ix > 0) {
+            fprintf(ctx->file, ", ");
+        }
+
+        glkunix_serialize_object_root(ctx->file, &subctx, func, el);
+    }
+    
+    fprintf(ctx->file, "\n]");
+
+    ctx->count++;
 }
 

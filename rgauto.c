@@ -8,10 +8,12 @@
 
 #include "glk.h"
 #include "remglk.h"
+#include "rgdata.h"
+#include "glkstart.h"
 
 #define SERIAL_VERSION (1)
 
-void glkunix_save_library_state(strid_t file)
+void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_state_func, void *extra_state_rock)
 {
     FILE *fl = file->file;
     
@@ -33,7 +35,11 @@ void glkunix_save_library_state(strid_t file)
         fprintf(fl, ",\n\"currentstrtag\":%ld", (long)gli_currentstr->updatetag);
     }
 
-    //### the extra stuff
+    if (extra_state_func) {
+        struct glkunix_serialize_context_struct ctx;
+        fprintf(fl, ",\n\"currentstrtag\":");
+        glkunix_serialize_object_root(fl, &ctx, extra_state_func, extra_state_rock);
+    }
     
     fprintf(fl, "}\n");
 }
