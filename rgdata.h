@@ -188,11 +188,6 @@ struct data_specialreq_struct {
     char *gameid; /* may be null */
 };
 
-struct glkunix_serialize_context_struct {
-    FILE *file;
-    glui32 count;
-};
-
 extern void gli_initialize_datainput(void);
 
 extern void print_ustring_json(glui32 *buf, glui32 len, FILE *fl);
@@ -244,3 +239,4 @@ extern void data_specialspan_print(data_specialspan_t *dat, glui32 wintype);
 extern data_specialreq_t *data_specialreq_alloc(glui32 filemode, glui32 filetype);
 extern void data_specialreq_free(data_specialreq_t *data);
 extern void data_specialreq_print(data_specialreq_t *data);
+

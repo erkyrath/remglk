@@ -12,6 +12,7 @@
 #include "glk.h"
 #include "remglk.h"
 #include "rgdata.h"
+#include "rgdata_int.h"
 #include "glkstart.h"
 
 /* RawType encodes the type of a JSON data element. */

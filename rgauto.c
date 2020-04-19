@@ -9,7 +9,7 @@
 #include "glk.h"
 #include "remglk.h"
 #include "rgdata.h"
-#include "glkstart.h"
+#include "rgdata_int.h"
 
 #define SERIAL_VERSION (1)
 
