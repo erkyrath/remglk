@@ -275,6 +275,8 @@ int main(int argc, char *argv[])
     /* Initialize things. */
     gli_initialize_misc();
     gli_initialize_windows(metrics);
+    gli_initialize_streams();
+    gli_initialize_filerefs();
     gli_initialize_events();
 
     data_metrics_free(metrics);

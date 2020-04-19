@@ -60,7 +60,7 @@ struct glk_window_struct {
     glui32 magicnum;
     glui32 rock;
     glui32 type;
-    glui32 updatetag; /* numeric tag for the window in output */
+    glui32 updatetag; /* numeric tag for the window in output and autosave */
     
     grect_t bbox; /* content rectangle, excluding borders */
     window_t *parent; /* pair window which contains this one */
@@ -94,6 +94,7 @@ struct glk_window_struct {
 struct glk_stream_struct {
     glui32 magicnum;
     glui32 rock;
+    glui32 updatetag; /* numeric tag for the stream in autosave */
 
     int type; /* file, window, or memory stream */
     int unicode; /* one-byte or four-byte chars? Not meaningful for windows */
@@ -131,6 +132,7 @@ struct glk_stream_struct {
 struct glk_fileref_struct {
     glui32 magicnum;
     glui32 rock;
+    glui32 updatetag; /* numeric tag for the fileref in autosave */
 
     char *filename;
     int filetype;
@@ -229,6 +231,7 @@ extern void gli_print_spaces(int len);
 extern void gcmd_win_change_focus(window_t *win, glui32 arg);
 extern void gcmd_win_refresh(window_t *win, glui32 arg);
 
+extern void gli_initialize_streams(void);
 extern stream_t *gli_new_stream(int type, int readable, int writable, 
     glui32 rock);
 extern void gli_delete_stream(stream_t *str);
@@ -242,6 +245,7 @@ extern void gli_stream_echo_line(stream_t *str, char *buf, glui32 len);
 extern void gli_stream_echo_line_uni(stream_t *str, glui32 *buf, glui32 len);
 extern void gli_streams_close_all(void);
 
+extern void gli_initialize_filerefs(void);
 extern fileref_t *gli_new_fileref(char *filename, glui32 usage, 
     glui32 rock);
 extern void gli_delete_fileref(fileref_t *fref);
