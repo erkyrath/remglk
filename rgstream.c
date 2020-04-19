@@ -20,8 +20,31 @@
     functions.) 
 */
 
+/* Used to generate stream updatetag values. */
+static glui32 tagcounter = 0;
+
 static stream_t *gli_streamlist = NULL; /* linked list of all streams */
 static stream_t *gli_currentstr = NULL; /* the current output stream */
+
+void gli_initialize_streams()
+{
+    tagcounter = (random() % 15) + 32;
+}
+
+stream_t *glkunix_stream_find_by_updatetag(glui32 tag)
+{
+    stream_t *str;
+    for (str=gli_streamlist; str; str=str->next) {
+        if (str->updatetag == tag)
+            return str;
+    }
+    return NULL;
+}
+
+glui32 glkunix_stream_get_updatetag(strid_t str)
+{
+    return str->updatetag;
+}
 
 stream_t *gli_new_stream(int type, int readable, int writable, 
     glui32 rock)
@@ -33,6 +56,8 @@ stream_t *gli_new_stream(int type, int readable, int writable,
     str->magicnum = MAGIC_STREAM_NUM;
     str->type = type;
     str->rock = rock;
+    str->updatetag = tagcounter;
+    tagcounter += 5;
 
     str->unicode = FALSE;
     str->isbinary = FALSE;
