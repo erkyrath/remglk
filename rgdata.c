@@ -1957,9 +1957,9 @@ void glkunix_serialize_object_root(FILE *file, glkunix_serialize_context_t ctx, 
     ctx->file = file;
     ctx->count = 0;
 
-    fprintf(ctx->file, "{\n");
+    fprintf(ctx->file, "{");
     func(ctx, rock);
-    fprintf(ctx->file, "\n}");
+    fprintf(ctx->file, "}");
 }
 
 void glkunix_serialize_uint32(glkunix_serialize_context_t ctx, char *key, glui32 val)
@@ -1979,9 +1979,9 @@ void glkunix_serialize_object(glkunix_serialize_context_t ctx, char *key, glkuni
         fprintf(ctx->file, ", ");
     }
 
-    fprintf(ctx->file, "\"%s\":{\n", key);
+    fprintf(ctx->file, "\"%s\":{", key);
     func(ctx, rock);
-    fprintf(ctx->file, "\n}");
+    fprintf(ctx->file, "}");
 
     ctx->count++;
 }
@@ -2002,7 +2002,7 @@ void glkunix_serialize_object_array(glkunix_serialize_context_t ctx, char *key, 
         struct glkunix_serialize_context_struct subctx;
         
         if (ix > 0) {
-            fprintf(ctx->file, ", ");
+            fprintf(ctx->file, ",\n");
         }
 
         glkunix_serialize_object_root(ctx->file, &subctx, func, el);
