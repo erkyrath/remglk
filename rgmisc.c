@@ -1,4 +1,4 @@
-/* gtmisc.c: Miscellaneous functions
+/* rgmisc.c: Miscellaneous functions
         for RemGlk, remote-procedure-call implementation of the Glk API.
     Designed by Andrew Plotkin <erkyrath@eblong.com>
     http://eblong.com/zarf/glk/

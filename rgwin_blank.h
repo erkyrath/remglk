@@ -1,4 +1,4 @@
-/* gtw_blnk.h: The blank window header file
+/* rgwin_blank.h: The blank window header file
         for RemGlk, remote-procedure-call implementation of the Glk API.
     Designed by Andrew Plotkin <erkyrath@eblong.com>
     http://eblong.com/zarf/glk/

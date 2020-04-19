@@ -1,4 +1,4 @@
-/* gtw_grid.h: The grid window header
+/* rgwin_grid.h: The grid window header
         for RemGlk, remote-procedure-call implementation of the Glk API.
     Designed by Andrew Plotkin <erkyrath@eblong.com>
     http://eblong.com/zarf/glk/

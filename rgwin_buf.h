@@ -1,4 +1,4 @@
-/* gtw_buf.h: The buffer window header
+/* rgwin_buf.h: The buffer window header
         for RemGlk, remote-procedure-call implementation of the Glk API.
     Designed by Andrew Plotkin <erkyrath@eblong.com>
     http://eblong.com/zarf/glk/

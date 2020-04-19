@@ -1,4 +1,4 @@
-/* gtschan.c: Sound channel objects
+/* rgschan.c: Sound channel objects
         for RemGlk, remote-procedure-call implementation of the Glk API.
     Designed by Andrew Plotkin <erkyrath@eblong.com>
     http://eblong.com/zarf/glk/
