@@ -20,12 +20,35 @@
     type.
 */
 
+/* Used to generate fileref updatetag values. */
+static glui32 tagcounter = 0;
+
 /* Linked list of all filerefs */
 static fileref_t *gli_filereflist = NULL; 
 
 #define BUFLEN (256)
 
 static char workingdir[BUFLEN] = ".";
+
+void gli_initialize_filerefs()
+{
+    tagcounter = (random() % 15) + 48;
+}
+
+fileref_t *glkunix_fileref_find_by_updatetag(glui32 tag)
+{
+    fileref_t *fref;
+    for (fref=gli_filereflist; fref; fref=fref->next) {
+        if (fref->updatetag == tag)
+            return fref;
+    }
+    return NULL;
+}
+
+glui32 glkunix_fileref_get_updatetag(frefid_t fref)
+{
+    return fref->updatetag;
+}
 
 fileref_t *gli_new_fileref(char *filename, glui32 usage, glui32 rock)
 {
@@ -35,6 +58,8 @@ fileref_t *gli_new_fileref(char *filename, glui32 usage, glui32 rock)
     
     fref->magicnum = MAGIC_FILEREF_NUM;
     fref->rock = rock;
+    fref->updatetag = tagcounter;
+    tagcounter += 7;
     
     fref->filename = malloc(1 + strlen(filename));
     strcpy(fref->filename, filename);
