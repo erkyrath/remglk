@@ -1969,7 +1969,7 @@ void glkunix_serialize_uint32(glkunix_serialize_context_t ctx, char *key, glui32
         fprintf(ctx->file, ", ");
     }
 
-    fprintf(ctx->file, "\"%s\":\"%ld\"", key, (long)val);
+    fprintf(ctx->file, "\"%s\":%ld", key, (long)val);
 
     ctx->count++;
 }
