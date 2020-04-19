@@ -95,7 +95,7 @@ glui32 gli_window_current_generation()
     return generation;
 }
 
-window_t *gli_window_find_by_tag(glui32 tag)
+window_t *glkunix_window_find_by_updatetag(glui32 tag)
 {
     window_t *win;
     for (win=gli_windowlist; win; win=win->next) {
@@ -103,6 +103,11 @@ window_t *gli_window_find_by_tag(glui32 tag)
             return win;
     }
     return NULL;
+}
+
+glui32 glkunix_window_get_updatetag(winid_t win)
+{
+    return win->updatetag;
 }
 
 window_t *gli_new_window(glui32 type, glui32 rock)

@@ -51,6 +51,8 @@ extern int glkunix_startup_code(glkunix_startup_t *data);
 /* The autosave functions are not defined in every game/interpreter, but
    if they are defined, they look like this: */
 extern void glkunix_do_autosave(glui32 eventaddr);
+extern glui32 glkunix_window_get_updatetag(winid_t win);
+extern winid_t glkunix_window_find_by_updatetag(glui32 tag);
 
 extern void glkunix_set_base_file(char *filename);
 extern strid_t glkunix_stream_open_pathname_gen(char *pathname, 

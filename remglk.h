@@ -211,7 +211,7 @@ extern void gli_fast_exit(void);
 extern void gli_display_warning(char *msg);
 extern void gli_display_error(char *msg);
 extern glui32 gli_window_current_generation(void);
-extern window_t *gli_window_find_by_tag(glui32 tag);
+extern winid_t glkunix_window_find_by_updatetag(glui32 tag); // see glkstart.h
 extern window_t *gli_new_window(glui32 type, glui32 rock);
 extern void gli_delete_window(window_t *win);
 extern window_t *gli_window_iterate_treeorder(window_t *win);

@@ -71,14 +71,14 @@ void glk_select(event_t *event)
 
             case dtag_Redraw:
                 if (data->window)
-                    win = gli_window_find_by_tag(data->window);
+                    win = glkunix_window_find_by_updatetag(data->window);
                 else
                     win = NULL;
                 gli_event_store(evtype_Redraw, win, 0, 0);
                 break;
 
             case dtag_Line:
-                win = gli_window_find_by_tag(data->window);
+                win = glkunix_window_find_by_updatetag(data->window);
                 if (!win)
                     break;
                 if (!win->line_request)
@@ -89,7 +89,7 @@ void glk_select(event_t *event)
                 break;
 
             case dtag_Char:
-                win = gli_window_find_by_tag(data->window);
+                win = glkunix_window_find_by_updatetag(data->window);
                 if (!win)
                     break;
                 if (!win->char_request)
@@ -108,7 +108,7 @@ void glk_select(event_t *event)
                 break;
 
             case dtag_Hyperlink:
-                win = gli_window_find_by_tag(data->window);
+                win = glkunix_window_find_by_updatetag(data->window);
                 if (!win)
                     break;
                 if (!win->hyperlink_request)
