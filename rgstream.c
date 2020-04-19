@@ -24,7 +24,7 @@
 static glui32 tagcounter = 0;
 
 static stream_t *gli_streamlist = NULL; /* linked list of all streams */
-static stream_t *gli_currentstr = NULL; /* the current output stream */
+stream_t *gli_currentstr = NULL; /* the current output stream */
 
 void gli_initialize_streams()
 {

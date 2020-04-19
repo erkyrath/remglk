@@ -146,6 +146,7 @@ struct glk_fileref_struct {
 
 extern window_t *gli_rootwin;
 extern window_t *gli_focuswin;
+extern stream_t *gli_currentstr;
 extern void (*gli_interrupt_handler)(void);
 
 /* The following typedefs are copied from cheapglk.h. They support the
@@ -207,6 +208,7 @@ extern int gli_encode_utf8(glui32 val, char *buf, int len);
 extern void gli_initialize_events(void);
 extern void gli_event_store(glui32 type, window_t *win, glui32 val1, glui32 val2);
 extern int gli_timer_need_update(glui32 *msec);
+extern glui32 gli_timer_get_timing_msec(void);
 
 extern void gli_initialize_windows(data_metrics_t *metrics);
 extern void gli_fast_exit(void);

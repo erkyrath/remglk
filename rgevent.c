@@ -291,6 +291,11 @@ int gli_timer_need_update(glui32 *msec)
     }
 }
 
+glui32 gli_timer_get_timing_msec()
+{
+    return timing_msec;
+}
+
 /* Work out how many milliseconds it has been since timing_start.
    If there is no timer, returns -1. */
 static glsi32 gli_timer_request_since_start()
