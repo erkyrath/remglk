@@ -60,7 +60,7 @@ extern strid_t glkunix_stream_open_pathname(char *pathname, glui32 textmode,
 
 /* This library offers the hooks necessary for an interpreter to
    implement autosave. */
-#define GLKUNIX_AUTOSAVE_FEATURES
+#define GLKUNIX_AUTOSAVE_FEATURES (1)
 
 #ifdef GLKUNIX_AUTOSAVE_FEATURES
 
