@@ -25,7 +25,7 @@ REMGLK_OBJS = \
   cgunicod.o cgdate.o gi_dispa.o gi_debug.o gi_blorb.o
 
 REMGLK_HEADERS = \
-  remglk.h rgdata.h rgwin_blank.h rgwin_buf.h \
+  remglk.h rgdata.h rgdata_int.h rgwin_blank.h rgwin_buf.h \
   rgwin_grid.h rgwin_graph.h rgwin_pair.h gi_debug.h gi_dispa.h
 
 all: $(GLKLIB) Make.remglk
