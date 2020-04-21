@@ -71,9 +71,6 @@ void glkunix_serialize_object_array(glkunix_serialize_context_t, char *, glkunix
 
 #ifdef GLKUNIX_AUTOSAVE_FEATURES
 
-/* defined in unixstrt.c */
-extern void glkunix_do_autosave(glui32 eventaddr);
-
 extern void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_state_func, void *extra_state_rock);
 extern glui32 glkunix_get_last_event_type(void);
 extern glui32 glkunix_window_get_updatetag(winid_t win);
