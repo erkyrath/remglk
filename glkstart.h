@@ -60,6 +60,7 @@ extern strid_t glkunix_stream_open_pathname(char *pathname, glui32 textmode,
 
 typedef struct glkunix_serialize_context_struct *glkunix_serialize_context_t;
 typedef int (*glkunix_serialize_object_f)(glkunix_serialize_context_t, void *);
+typedef int (*glkunix_unserialize_object_f)(glkunix_serialize_context_t, void *);
 
 void glkunix_serialize_uint32(glkunix_serialize_context_t, char *, glui32);
 void glkunix_serialize_object(glkunix_serialize_context_t, char *, glkunix_serialize_object_f, void *);
@@ -72,6 +73,7 @@ void glkunix_serialize_object_array(glkunix_serialize_context_t, char *, glkunix
 #ifdef GLKUNIX_AUTOSAVE_FEATURES
 
 extern void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_state_func, void *extra_state_rock);
+extern int glkunix_load_library_state(strid_t file, glkunix_unserialize_object_f extra_state_func, void *extra_state_rock);
 extern glui32 glkunix_get_last_event_type(void);
 extern glui32 glkunix_window_get_updatetag(winid_t win);
 extern winid_t glkunix_window_find_by_updatetag(glui32 tag);
