@@ -1036,6 +1036,11 @@ void gli_windows_metrics_change(data_metrics_t *newmetrics)
     gli_event_store(evtype_Arrange, NULL, 0, 0);
 }
 
+data_metrics_t *gli_windows_get_metrics()
+{
+    return &metrics;
+}
+
 void gli_windows_trim_buffers()
 {
     window_t *win;

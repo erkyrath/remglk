@@ -1001,22 +1001,18 @@ static data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
     return metrics;
 }
 
-void data_metrics_print(data_metrics_t *metrics)
+void data_metrics_print(FILE *fl, data_metrics_t *metrics)
 {
-    /* This displays very verbosely, and not in JSON-readable format.
-       That's okay -- the library never outputs metrics, so this is only 
-       used for debugging. */
- 
-    printf("{\n");   
-    printf("  size: %ldx%ld\n", (long)metrics->width, (long)metrics->height);
-    printf("  outspacing: %ldx%ld\n", (long)metrics->outspacingx, (long)metrics->outspacingy);
-    printf("  inspacing: %ldx%ld\n", (long)metrics->inspacingx, (long)metrics->inspacingy);
-    printf("  gridchar: %.1fx%.1f\n", metrics->gridcharwidth, metrics->gridcharheight);
-    printf("  gridmargin: %ldx%ld\n", (long)metrics->gridmarginx, (long)metrics->gridmarginy);
-    printf("  bufferchar: %.1fx%.1f\n", metrics->buffercharwidth, metrics->buffercharheight);
-    printf("  buffermargin: %ldx%ld\n", (long)metrics->buffermarginx, (long)metrics->buffermarginy);
-    printf("  graphicsmargin: %ldx%ld\n", (long)metrics->graphicsmarginx, (long)metrics->graphicsmarginy);
-    printf("}\n");   
+    fprintf(fl, "{\n");   
+    fprintf(fl, "  \"width\": %ld, \"height\": %ld,\n", (long)metrics->width, (long)metrics->height);
+    fprintf(fl, "  \"outspacingx\": %ld, \"outspacingy\": %ld,\n", (long)metrics->outspacingx, (long)metrics->outspacingy);
+    fprintf(fl, "  \"inspacingx\": %ld, \"inspacingy\": %ld,\n", (long)metrics->inspacingx, (long)metrics->inspacingy);
+    fprintf(fl, "  \"gridcharwidth\": %.1f, \"gridcharheight\": %.1f,\n", metrics->gridcharwidth, metrics->gridcharheight);
+    fprintf(fl, "  \"gridmarginx\": %ld, \"gridmarginy\": %ld,\n", (long)metrics->gridmarginx, (long)metrics->gridmarginy);
+    fprintf(fl, "  \"buffercharwidth\": %.1f, \"buffercharheight\": %.1f,\n", metrics->buffercharwidth, metrics->buffercharheight);
+    fprintf(fl, "  \"buffermarginx\": %ld, \"buffermarginy\": %ld,\n", (long)metrics->buffermarginx, (long)metrics->buffermarginy);
+    fprintf(fl, "  \"graphicsmarginx\": %ld, \"graphicsmarginy\": %ld\n", (long)metrics->graphicsmarginx, (long)metrics->graphicsmarginy);
+    fprintf(fl, "}\n");   
 }
 
 data_supportcaps_t *data_supportcaps_alloc()
@@ -1099,7 +1095,7 @@ void data_event_print(data_event_t *data)
         case dtag_Init:
             printf("{ \"type\": \"init\", \"gen\": %d, \"metrics\":\n",
                 data->gen);
-            data_metrics_print(data->metrics);
+            data_metrics_print(stdout, data->metrics);
             if (data->supportcaps) {
                 printf(", \"support\":\n");
                 data_supportcaps_print(data->supportcaps);

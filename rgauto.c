@@ -19,7 +19,8 @@ void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_s
     
     fprintf(fl, "{\"type\":\"autosave\", \"version\":%d", SERIAL_VERSION);
 
-    //### metrics
+    fprintf(fl, ",\n\"metrics\":");
+    data_metrics_print(fl, gli_windows_get_metrics());
 
     //### windows, streams, filerefs
 

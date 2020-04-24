@@ -223,6 +223,7 @@ extern void gli_window_rearrange(window_t *win, grect_t *box, data_metrics_t *me
 extern void gli_windows_update(data_specialreq_t *special, int newgeneration);
 extern void gli_windows_refresh(glui32 fromgen);
 extern void gli_windows_metrics_change(data_metrics_t *newmetrics);
+extern data_metrics_t *gli_windows_get_metrics(void);
 extern void gli_windows_trim_buffers(void);
 extern void gli_window_put_char(window_t *win, glui32 ch);
 extern void gli_windows_unechostream(stream_t *str);
