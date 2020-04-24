@@ -43,3 +43,10 @@ void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_s
     
     fprintf(fl, "}\n");
 }
+
+int glkunix_load_library_state(strid_t file, glkunix_unserialize_object_f extra_state_func, void *extra_state_rock)
+{
+    //###
+    return FALSE;
+}
+
