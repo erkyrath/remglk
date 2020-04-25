@@ -85,8 +85,6 @@ void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_s
     fprintf(fl, "}\n");
 }
 
-#define UPDATETAG(obj) ((obj) ? (obj)->updatetag : 0)
-
 static void window_state_print(FILE *fl, winid_t win)
 {
     int first;
@@ -98,11 +96,14 @@ static void window_state_print(FILE *fl, winid_t win)
 
     fprintf(fl, ",\n\"bbox\":");
     data_grect_print(fl, &win->bbox);
-    
-    fprintf(fl, ",\n\"parenttag\":%ld", (long)UPDATETAG(win->parent));
 
-    fprintf(fl, ",\n\"streamtag\":%ld", (long)UPDATETAG(win->str));
-    fprintf(fl, ",\n\"echostreamtag\":%ld", (long)UPDATETAG(win->echostr));
+    if (win->parent)
+        fprintf(fl, ",\n\"parenttag\":%ld", (long)win->parent->updatetag);
+
+    if (win->str)
+        fprintf(fl, ",\n\"streamtag\":%ld", (long)win->str->updatetag);
+    if (win->echostr)
+        fprintf(fl, ",\n\"echostreamtag\":%ld", (long)win->echostr->updatetag);
 
     fprintf(fl, ",\n\"inputgen\":%ld", (long)win->inputgen);
     fprintf(fl, ",\n\"line_request\":%d", win->line_request);
@@ -120,6 +121,29 @@ static void window_state_print(FILE *fl, winid_t win)
     fprintf(fl, ",\n\"hyperlink\":%ld", (long)win->hyperlink);
 
     switch (win->type) {
+        
+    case wintype_Pair: {
+        window_pair_t *dwin = win->data;
+        if (dwin->child1)
+            fprintf(fl, ",\n\"pair_child1tag\":%ld", (long)dwin->child1->updatetag);
+        if (dwin->child2)
+            fprintf(fl, ",\n\"pair_child2tag\":%ld", (long)dwin->child2->updatetag);
+
+        fprintf(fl, ",\n\"pair_splitpos\":%d", dwin->splitpos);
+        fprintf(fl, ",\n\"pair_splitwidth\":%d", dwin->splitwidth);
+
+        fprintf(fl, ",\n\"pair_dir\":%ld", (long)dwin->dir);
+        fprintf(fl, ",\n\"pair_vertical\":%d", dwin->vertical);
+        fprintf(fl, ",\n\"pair_backward\":%d", dwin->backward);
+        fprintf(fl, ",\n\"pair_hasborder\":%d", dwin->hasborder);
+        fprintf(fl, ",\n\"pair_division\":%ld", (long)dwin->division);
+        if (dwin->key)
+             fprintf(fl, ",\n\"pair_keytag\":%ld", (long)dwin->key->updatetag);
+        /* keydamage is temporary */
+        fprintf(fl, ",\n\"pair_size\":%ld", (long)dwin->size);
+        
+        break;
+    }
         
     case wintype_TextBuffer: {
         window_textbuffer_t *dwin = win->data;
@@ -148,7 +172,7 @@ static void window_state_print(FILE *fl, winid_t win)
 
         fprintf(fl, ",\n\"buf_chars\":\n");
         print_ustring_json(dwin->chars, dwin->numchars, fl);
-        //### the text
+
         //### line buffer
         
         break;
