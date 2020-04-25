@@ -113,7 +113,7 @@ static void window_state_print(FILE *fl, winid_t win)
     fprintf(fl, ",\n\"char_request_uni\":%d", win->char_request_uni);
     fprintf(fl, ",\n\"hyperlink_request\":%d", win->hyperlink_request);
 
-    //### line buffer -- in subtypes really
+    /* The input buffer is handled below */
 
     fprintf(fl, ",\n\"echo_line_input\":%d", win->echo_line_input);
     fprintf(fl, ",\n\"terminate_line_input\":%ld", (long)win->terminate_line_input);
@@ -174,7 +174,44 @@ static void window_state_print(FILE *fl, winid_t win)
         fprintf(fl, ",\n\"buf_chars\":\n");
         print_ustring_json(dwin->chars, dwin->numchars, fl);
 
-        //### line buffer
+        /* Fields only relevant during line input. */
+        if (dwin->inbuf && dwin->inmax && gli_dispatch_locate_arr) {
+            if (dwin->incurpos)
+                fprintf(fl, ",\n\"buf_incurpos\":%ld", (long)dwin->incurpos);
+            fprintf(fl, ",\n\"buf_inunicode\":%d", dwin->inunicode);
+            if (dwin->inecho)
+                fprintf(fl, ",\n\"buf_inecho\":%d", dwin->inecho);
+            if (dwin->intermkeys)
+                fprintf(fl, ",\n\"buf_intermkeys\":%ld", (long)dwin->intermkeys);
+            fprintf(fl, ",\n\"buf_inmax\":%d", dwin->inmax);
+            if (dwin->origstyle)
+                fprintf(fl, ",\n\"buf_origstyle\":%ld", (long)dwin->origstyle);
+            if (dwin->orighyperlink)
+                fprintf(fl, ",\n\"buf_orighyperlink\":%ld", (long)dwin->orighyperlink);
+
+            long bufaddr;
+            int elemsize;
+            if (!dwin->inunicode) {
+                bufaddr = (*gli_dispatch_locate_arr)(dwin->inbuf, dwin->inmax, "&+#!Cn", dwin->inarrayrock, &elemsize);
+                fprintf(fl, ",\n\"buf_line_buffer\":%ld", bufaddr);
+                if (elemsize) {
+                    if (elemsize != 1)
+                        gli_fatal_error("bufwin encoding char array: wrong elemsize");
+                    fprintf(fl, ",\n\"buf_line_buffer_data\":");
+                    print_string_len_json(dwin->inbuf, dwin->inmax, fl);
+                }
+            }
+            else {
+                bufaddr = (*gli_dispatch_locate_arr)(dwin->inbuf, dwin->inmax, "&+#!Iu", dwin->inarrayrock, &elemsize);
+                fprintf(fl, ",\n\"buf_line_buffer\":%ld", bufaddr);
+                if (elemsize) {
+                    if (elemsize != 4)
+                        gli_fatal_error("bufwin encoding uni array: wrong elemsize");
+                    fprintf(fl, ",\n\"buf_line_buffer_data\":");
+                    print_ustring_json(dwin->inbuf, dwin->inmax, fl);
+                }
+            }
+        }
         
         break;
     }
