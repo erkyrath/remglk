@@ -292,7 +292,14 @@ static void stream_state_print(FILE *fl, strid_t str)
 static void fileref_state_print(FILE *fl, frefid_t fref)
 {
     fprintf(fl, "{\"tag\":\"%ld\"", (long)fref->updatetag);
-    //###
+    fprintf(fl, ",\n\"rock\":%ld", (long)fref->rock);
+    /* disprock is handled elsewhere */
+
+    fprintf(fl, ",\n\"filename\":");
+    print_string_json(fref->filename, fl);
+    
+    fprintf(fl, ",\n\"filetype\":%d", fref->filetype);
+    fprintf(fl, ",\n\"textmode\":%d", fref->textmode);
     fprintf(fl, "}\n");
 }
 
