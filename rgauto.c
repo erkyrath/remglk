@@ -232,7 +232,48 @@ static void window_state_print(FILE *fl, winid_t win)
         }
         fprintf(fl, "]");
         
-        //### line buffer
+
+        /* Fields only relevant during line input. */
+        if (dwin->inbuf && dwin->inoriglen && gli_dispatch_locate_arr) {
+            if (dwin->incurpos)
+                fprintf(fl, ",\n\"grid_incurpos\":%ld", (long)dwin->incurpos);
+            fprintf(fl, ",\n\"grid_inunicode\":%d", dwin->inunicode);
+            if (dwin->inecho)
+                fprintf(fl, ",\n\"grid_inecho\":%d", dwin->inecho);
+            if (dwin->intermkeys)
+                fprintf(fl, ",\n\"grid_intermkeys\":%ld", (long)dwin->intermkeys);
+            fprintf(fl, ",\n\"grid_inmax\":%d", dwin->inmax);
+            fprintf(fl, ",\n\"grid_inoriglen\":%d", dwin->inoriglen);
+            if (dwin->origstyle)
+                fprintf(fl, ",\n\"grid_origstyle\":%ld", (long)dwin->origstyle);
+            /*
+            if (dwin->orighyperlink)
+                fprintf(fl, ",\n\"grid_orighyperlink\":%ld", (long)dwin->orighyperlink);
+            */
+
+            long bufaddr;
+            int elemsize;
+            if (!dwin->inunicode) {
+                bufaddr = (*gli_dispatch_locate_arr)(dwin->inbuf, dwin->inoriglen, "&+#!Cn", dwin->inarrayrock, &elemsize);
+                fprintf(fl, ",\n\"grid_line_buffer\":%ld", bufaddr);
+                if (elemsize) {
+                    if (elemsize != 1)
+                        gli_fatal_error("gridwin encoding char array: wrong elemsize");
+                    fprintf(fl, ",\n\"grid_line_buffer_data\":");
+                    print_string_len_json(dwin->inbuf, dwin->inoriglen, fl);
+                }
+            }
+            else {
+                bufaddr = (*gli_dispatch_locate_arr)(dwin->inbuf, dwin->inoriglen, "&+#!Iu", dwin->inarrayrock, &elemsize);
+                fprintf(fl, ",\n\"grid_line_buffer\":%ld", bufaddr);
+                if (elemsize) {
+                    if (elemsize != 4)
+                        gli_fatal_error("gridwin encoding uni array: wrong elemsize");
+                    fprintf(fl, ",\n\"grid_line_buffer_data\":");
+                    print_ustring_len_json(dwin->inbuf, dwin->inoriglen, fl);
+                }
+            }
+        }
         
         break;
     }
