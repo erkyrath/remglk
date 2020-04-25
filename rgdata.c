@@ -218,6 +218,33 @@ void print_string_json(char *buf, FILE *fl)
     fprintf(fl, "\"");
 }
 
+/* Send a Latin-1 string to an output stream, validly JSON-encoded.
+   Same as above except that the string doesn't have to be null-terminated
+   (and may contain nulls). */
+void print_string_len_json(char *buf, int len, FILE *fl)
+{
+    char *cx;
+    int ix;
+    
+    fprintf(fl, "\"");
+    for (ix=0, cx=buf; ix<len; ix++, cx++) {
+        glui32 ch = (*cx) & 0xFF;
+        if (ch == '\"')
+            fprintf(fl, "\\\"");
+        else if (ch == '\\')
+            fprintf(fl, "\\\\");
+        else if (ch == '\n')
+            fprintf(fl, "\\n");
+        else if (ch == '\t')
+            fprintf(fl, "\\t");
+        else if (ch < 32)
+            fprintf(fl, "\\u%04X", ch);
+        else
+            gli_putchar_utf8(ch, fl);
+    }
+    fprintf(fl, "\"");
+}
+
 /* Send a UTF-8 string to an output stream, validly JSON-encoded.
    (This does not check that the argument is valid UTF-8; that's the
    caller's responsibility!)
