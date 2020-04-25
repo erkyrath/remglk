@@ -168,8 +168,9 @@ typedef glui32 gli_decomp_block_t[2]; /* count, position */
 extern gidispatch_rock_t (*gli_register_obj)(void *obj, glui32 objclass);
 extern void (*gli_unregister_obj)(void *obj, glui32 objclass, gidispatch_rock_t objrock);
 extern gidispatch_rock_t (*gli_register_arr)(void *array, glui32 len, char *typecode);
-extern void (*gli_unregister_arr)(void *array, glui32 len, char *typecode, 
-    gidispatch_rock_t objrock);
+extern void (*gli_unregister_arr)(void *array, glui32 len, char *typecode, gidispatch_rock_t objrock);
+extern long (*gli_dispatch_locate_arr)(void *array, glui32 len, char *typecode, gidispatch_rock_t objrock, int *elemsizeref);
+extern gidispatch_rock_t (*gli_dispatch_restore_arr)(long bufkey, glui32 len, char *typecode, void **arrayref);
 
 extern int pref_stderr;
 extern int pref_printversion;

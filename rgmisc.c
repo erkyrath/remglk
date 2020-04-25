@@ -16,10 +16,13 @@ static unsigned char char_toupper_table[256];
 
 gidispatch_rock_t (*gli_register_obj)(void *obj, glui32 objclass) = NULL;
 void (*gli_unregister_obj)(void *obj, glui32 objclass, gidispatch_rock_t objrock) = NULL;
-gidispatch_rock_t (*gli_register_arr)(void *array, glui32 len, char *typecode) = NULL;
-void (*gli_unregister_arr)(void *array, glui32 len, char *typecode, 
-    gidispatch_rock_t objrock) = NULL;
 
+gidispatch_rock_t (*gli_register_arr)(void *array, glui32 len, char *typecode) = NULL;
+void (*gli_unregister_arr)(void *array, glui32 len, char *typecode, gidispatch_rock_t objrock) = NULL;
+
+long (*gli_dispatch_locate_arr)(void *array, glui32 len, char *typecode, gidispatch_rock_t objrock, int *elemsizeref) = NULL;
+gidispatch_rock_t (*gli_dispatch_restore_arr)(long bufkey, glui32 len, char *typecode, void **arrayref) = NULL;
+        
 /* Set up things. This is called from main(). */
 void gli_initialize_misc()
 {
@@ -138,10 +141,8 @@ void gidispatch_set_autorestore_registry(
     gidispatch_rock_t (*restorearr)(long bufkey, glui32 len,
         char *typecode, void **arrayref))
 {
-    /* RemGlk is not able to serialize its UI state. Therefore, it
-       does not have the capability of autosaving and autorestoring.
-       Therefore, it will never call these hooks. Therefore, we ignore
-       them and do nothing here. */
+    gli_dispatch_locate_arr = locatearr;
+    gli_dispatch_restore_arr = restorearr;
 }
 
 unsigned char glk_char_to_lower(unsigned char ch)
