@@ -21,6 +21,7 @@ static void window_state_print(FILE *fl, winid_t win);
 static void stream_state_print(FILE *fl, strid_t str);
 static void fileref_state_print(FILE *fl, frefid_t fref);
 static void tbrun_print(FILE *fl, tbrun_t *run);
+static void tgline_print(FILE *fl, tgline_t *line, int width);
 
 void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_state_func, void *extra_state_rock)
 {
@@ -177,7 +178,28 @@ static void window_state_print(FILE *fl, winid_t win)
         
         break;
     }
+
+    case wintype_TextGrid: {
+        window_textgrid_t *dwin = win->data;
+        fprintf(fl, ",\n\"grid_width\":%d, \"grid_height\":%d", dwin->width, dwin->height);
+        fprintf(fl, ",\n\"grid_curx\":%d, \"grid_cury\":%d", dwin->curx, dwin->cury);
+
+        /* nothing is dirty at autosave (select) time */
+
+        fprintf(fl, ",\n\"grid_lines\":[\n");
+        first = TRUE;
+        for (ix=0; ix<dwin->height; ix++) {
+            if (!first) fprintf(fl, ",\n");
+            first = FALSE;
+            tgline_print(fl, &dwin->lines[ix], dwin->width);
+        }
+        fprintf(fl, "]");
         
+        //### line buffer
+        
+        break;
+    }
+
     }
 
     fprintf(fl, "}\n");
@@ -191,6 +213,53 @@ static void tbrun_print(FILE *fl, tbrun_t *run)
     fprintf(fl, ", \"pos\":%ld", run->pos);
     if (run->specialnum != -1)
         fprintf(fl, ", \"specialnum\":%ld", run->specialnum);
+    fprintf(fl, "}\n");
+}
+
+static void tgline_print(FILE *fl, tgline_t *line, int width)
+{
+    int ix;
+    int any;
+    
+    fprintf(fl, "{\"chars\":");
+    print_ustring_json(line->chars, width, fl);
+
+    /* We can omit styles and/or links if the arrays are all-zero, which is a common case. */
+
+    any = FALSE;
+    for (ix=0; ix<width; ix++) {
+        if (line->styles[ix]) {
+            any = TRUE;
+            break;
+        }
+    }
+
+    if (any) {
+        fprintf(fl, ",\n\"styles\":[");
+        for (ix=0; ix<width; ix++) {
+            if (ix) fprintf(fl, ",");
+            fprintf(fl, "%d", (int)line->styles[ix]);
+        }
+        fprintf(fl, "]");
+    }
+
+    any = FALSE;
+    for (ix=0; ix<width; ix++) {
+        if (line->links[ix]) {
+            any = TRUE;
+            break;
+        }
+    }
+
+    if (any) {
+        fprintf(fl, ",\n\"links\":[");
+        for (ix=0; ix<width; ix++) {
+            if (ix) fprintf(fl, ",");
+            fprintf(fl, "%ld", (long)line->links[ix]);
+        }
+        fprintf(fl, "]");
+    }
+    
     fprintf(fl, "}\n");
 }
 
