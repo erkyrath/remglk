@@ -200,6 +200,25 @@ static void window_state_print(FILE *fl, winid_t win)
         break;
     }
 
+    case wintype_Graphics: {
+        window_graphics_t *dwin = win->data;
+        fprintf(fl, ",\n\"graph_width\":%d, \"graph_height\":%d", dwin->graphwidth, dwin->graphheight);
+
+        //### think about this
+        fprintf(fl, ",\n\"graph_updatemark\":%ld", (long)dwin->updatemark);
+
+        fprintf(fl, ",\n\"graph_content\":[\n");
+        first = TRUE;
+        for (ix=0; ix<dwin->numcontent; ix++) {
+            if (!first) fprintf(fl, ",\n");
+            first = FALSE;
+            data_specialspan_auto_print(fl, dwin->content[ix]);
+        }
+        fprintf(fl, "]");
+        
+        break;
+    }
+
     }
 
     fprintf(fl, "}\n");
