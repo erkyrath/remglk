@@ -191,24 +191,29 @@ static void window_state_print(FILE *fl, winid_t win)
 
             long bufaddr;
             int elemsize;
+            int len;
             if (!dwin->inunicode) {
                 bufaddr = (*gli_dispatch_locate_arr)(dwin->inbuf, dwin->inmax, "&+#!Cn", dwin->inarrayrock, &elemsize);
                 fprintf(fl, ",\n\"buf_line_buffer\":%ld", bufaddr);
                 if (elemsize) {
+                    char *inbuf = dwin->inbuf;
                     if (elemsize != 1)
                         gli_fatal_error("bufwin encoding char array: wrong elemsize");
+                    for (len=dwin->inmax; len > 0 && !inbuf[len-1]; len--) {}
                     fprintf(fl, ",\n\"buf_line_buffer_data\":");
-                    print_string_len_json(dwin->inbuf, dwin->inmax, fl);
+                    print_string_len_json(inbuf, len, fl);
                 }
             }
             else {
                 bufaddr = (*gli_dispatch_locate_arr)(dwin->inbuf, dwin->inmax, "&+#!Iu", dwin->inarrayrock, &elemsize);
                 fprintf(fl, ",\n\"buf_line_buffer\":%ld", bufaddr);
                 if (elemsize) {
+                    glui32 *inbuf = dwin->inbuf;
                     if (elemsize != 4)
                         gli_fatal_error("bufwin encoding uni array: wrong elemsize");
+                    for (len=dwin->inmax; len > 0 && !inbuf[len-1]; len--) {}
                     fprintf(fl, ",\n\"buf_line_buffer_data\":");
-                    print_ustring_len_json(dwin->inbuf, dwin->inmax, fl);
+                    print_ustring_len_json(inbuf, len, fl);
                 }
             }
         }
@@ -253,24 +258,29 @@ static void window_state_print(FILE *fl, winid_t win)
 
             long bufaddr;
             int elemsize;
+            int len;
             if (!dwin->inunicode) {
                 bufaddr = (*gli_dispatch_locate_arr)(dwin->inbuf, dwin->inoriglen, "&+#!Cn", dwin->inarrayrock, &elemsize);
                 fprintf(fl, ",\n\"grid_line_buffer\":%ld", bufaddr);
                 if (elemsize) {
+                    char *inbuf = dwin->inbuf;
                     if (elemsize != 1)
                         gli_fatal_error("gridwin encoding char array: wrong elemsize");
+                    for (len=dwin->inoriglen; len > 0 && !inbuf[len-1]; len--) {}
                     fprintf(fl, ",\n\"grid_line_buffer_data\":");
-                    print_string_len_json(dwin->inbuf, dwin->inoriglen, fl);
+                    print_string_len_json(inbuf, len, fl);
                 }
             }
             else {
                 bufaddr = (*gli_dispatch_locate_arr)(dwin->inbuf, dwin->inoriglen, "&+#!Iu", dwin->inarrayrock, &elemsize);
                 fprintf(fl, ",\n\"grid_line_buffer\":%ld", bufaddr);
                 if (elemsize) {
+                    glui32 *inbuf = dwin->inbuf;
                     if (elemsize != 4)
                         gli_fatal_error("gridwin encoding uni array: wrong elemsize");
+                    for (len=dwin->inoriglen; len > 0 && !inbuf[len-1]; len--) {}
                     fprintf(fl, ",\n\"grid_line_buffer_data\":");
-                    print_ustring_len_json(dwin->inbuf, dwin->inoriglen, fl);
+                    print_ustring_len_json(inbuf, len, fl);
                 }
             }
         }
