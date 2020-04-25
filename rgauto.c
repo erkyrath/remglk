@@ -238,41 +238,39 @@ static void tbrun_print(FILE *fl, tbrun_t *run)
 static void tgline_print(FILE *fl, tgline_t *line, int width)
 {
     int ix;
-    int any;
+    int len;
+
+    /* We omit trailing spaces in the chars array. */
+    
+    for (len=width; len > 0; len--) {
+        if (line->chars[len-1] != ' ') break;
+    }
     
     fprintf(fl, "{\"chars\":");
-    print_ustring_json(line->chars, width, fl);
+    print_ustring_json(line->chars, len, fl);
 
-    /* We can omit styles and/or links if the arrays are all-zero, which is a common case. */
+    /* We omit trailing zeroes in the styles and links arrays. If the array is all-zero, we omit the whole thing. */
 
-    any = FALSE;
-    for (ix=0; ix<width; ix++) {
-        if (line->styles[ix]) {
-            any = TRUE;
-            break;
-        }
+    for (len=width; len > 0; len--) {
+        if (line->styles[len-1]) break;
     }
 
-    if (any) {
+    if (len) {
         fprintf(fl, ",\n\"styles\":[");
-        for (ix=0; ix<width; ix++) {
+        for (ix=0; ix<len; ix++) {
             if (ix) fprintf(fl, ",");
             fprintf(fl, "%d", (int)line->styles[ix]);
         }
         fprintf(fl, "]");
     }
 
-    any = FALSE;
-    for (ix=0; ix<width; ix++) {
-        if (line->links[ix]) {
-            any = TRUE;
-            break;
-        }
+    for (len=width; len > 0; len--) {
+        if (line->links[len-1]) break;
     }
 
-    if (any) {
+    if (len) {
         fprintf(fl, ",\n\"links\":[");
-        for (ix=0; ix<width; ix++) {
+        for (ix=0; ix<len; ix++) {
             if (ix) fprintf(fl, ",");
             fprintf(fl, "%ld", (long)line->links[ix]);
         }
