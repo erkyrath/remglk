@@ -1880,6 +1880,40 @@ void data_specialspan_print(data_specialspan_t *dat, glui32 wintype)
     }
 }
 
+/* Complete dump for autosave. */
+void data_specialspan_auto_print(FILE *file, data_specialspan_t *dat)
+{
+    fprintf(file, "{\"type\":%d", (int)dat->type);
+
+    if (dat->image)
+        fprintf(file, ", \"image\":%ld", (long)dat->image);
+    if (dat->chunktype)
+        fprintf(file, ", \"chunktype\":%ld", (long)dat->chunktype);
+    if (dat->hasdimensions)
+        fprintf(file, ", \"hasdimensions\":true");
+
+    if (dat->xpos || dat->ypos)
+        fprintf(file, ", \"xpos\":%ld, \"ypos\":%ld", (long)dat->xpos, (long)dat->ypos);
+    if (dat->width || dat->height)
+        fprintf(file, ", \"width\":%ld, \"height\":%ld", (long)dat->width, (long)dat->height);
+    if (dat->alignment)
+        fprintf(file, ", \"alignment\":%ld", (long)dat->alignment);
+    if (dat->hyperlink)
+        fprintf(file, ", \"hyperlink\":%ld", (long)dat->hyperlink);
+
+    if (dat->alttext) {
+        fprintf(file, ", \"alttext\":");
+        print_string_json(dat->alttext, file);
+    }
+    
+    if (dat->hascolor)
+        fprintf(file, ", \"hascolor\":true");
+    if (dat->color)
+        fprintf(file, ", \"color\":%ld", (long)dat->color);
+
+    fprintf(file, "}");
+}
+
 data_specialreq_t *data_specialreq_alloc(glui32 filemode, glui32 filetype)
 {
     data_specialreq_t *dat = (data_specialreq_t *)malloc(sizeof(data_specialreq_t));

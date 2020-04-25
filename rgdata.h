@@ -235,6 +235,7 @@ extern void data_line_print(data_line_t *data, glui32 wintype);
 extern data_specialspan_t *data_specialspan_alloc(SpecialType type);
 extern void data_specialspan_free(data_specialspan_t *data);
 extern void data_specialspan_print(data_specialspan_t *dat, glui32 wintype);
+extern void data_specialspan_auto_print(FILE *file, data_specialspan_t *dat);
 
 extern data_specialreq_t *data_specialreq_alloc(glui32 filemode, glui32 filetype);
 extern void data_specialreq_free(data_specialreq_t *data);
