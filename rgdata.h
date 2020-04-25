@@ -190,7 +190,7 @@ struct data_specialreq_struct {
 
 extern void gli_initialize_datainput(void);
 
-extern void print_ustring_json(glui32 *buf, glui32 len, FILE *fl);
+extern void print_ustring_len_json(glui32 *buf, glui32 len, FILE *fl);
 extern void print_utf8string_json(char *buf, FILE *fl);
 extern void print_string_json(char *buf, FILE *fl);
 extern void print_string_len_json(char *buf, int len, FILE *fl);

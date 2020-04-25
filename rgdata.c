@@ -170,7 +170,7 @@ static void ensure_ustringbuf_size(int val)
 
 /* Send a Unicode string to an output stream, validly JSON-encoded.
    This includes the delimiting double-quotes. */
-void print_ustring_json(glui32 *buf, glui32 len, FILE *fl)
+void print_ustring_len_json(glui32 *buf, glui32 len, FILE *fl)
 {
     int ix;
 
@@ -385,7 +385,7 @@ void data_raw_print(data_raw_t *dat)
             printf("null");
             return;
         case rawtyp_Str:
-            print_ustring_json(dat->str, dat->count, stdout);
+            print_ustring_len_json(dat->str, dat->count, stdout);
             return;
         case rawtyp_List:
             printf("[ ");
@@ -402,7 +402,7 @@ void data_raw_print(data_raw_t *dat)
             printf("{ ");
             for (ix=0; ix<dat->count; ix++) {
                 data_raw_t *subdat = dat->list[ix];
-                print_ustring_json(subdat->key, subdat->keylen, stdout);
+                print_ustring_len_json(subdat->key, subdat->keylen, stdout);
                 printf(": ");
                 data_raw_print(subdat);
                 if (ix != dat->count-1)
@@ -1553,7 +1553,7 @@ void data_input_print(data_input_t *dat)
             printf(", \"type\":\"line\", \"maxlen\":%d", dat->maxlen);
             if (dat->initstr && dat->initlen) {
                 printf(", \"initial\":");
-                print_ustring_json(dat->initstr, dat->initlen, stdout);
+                print_ustring_len_json(dat->initstr, dat->initlen, stdout);
             }
             break;
     }
@@ -1781,7 +1781,7 @@ void data_line_print(data_line_t *dat, glui32 wintype)
                 if (span->hyperlink)
                     printf(", \"hyperlink\":%ld", (unsigned long)span->hyperlink);
                 printf(", \"text\":");
-                print_ustring_json(span->str, span->len, stdout);
+                print_ustring_len_json(span->str, span->len, stdout);
                 printf("}");
             }
             if (ix+1 < dat->count)

@@ -172,7 +172,7 @@ static void window_state_print(FILE *fl, winid_t win)
         fprintf(fl, "]");
 
         fprintf(fl, ",\n\"buf_chars\":\n");
-        print_ustring_json(dwin->chars, dwin->numchars, fl);
+        print_ustring_len_json(dwin->chars, dwin->numchars, fl);
 
         /* Fields only relevant during line input. */
         if (dwin->inbuf && dwin->inmax && gli_dispatch_locate_arr) {
@@ -208,7 +208,7 @@ static void window_state_print(FILE *fl, winid_t win)
                     if (elemsize != 4)
                         gli_fatal_error("bufwin encoding uni array: wrong elemsize");
                     fprintf(fl, ",\n\"buf_line_buffer_data\":");
-                    print_ustring_json(dwin->inbuf, dwin->inmax, fl);
+                    print_ustring_len_json(dwin->inbuf, dwin->inmax, fl);
                 }
             }
         }
@@ -284,7 +284,7 @@ static void tgline_print(FILE *fl, tgline_t *line, int width)
     }
     
     fprintf(fl, "{\"chars\":");
-    print_ustring_json(line->chars, len, fl);
+    print_ustring_len_json(line->chars, len, fl);
 
     /* We omit trailing zeroes in the styles and links arrays. If the array is all-zero, we omit the whole thing. */
 
