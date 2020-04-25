@@ -240,3 +240,5 @@ extern data_specialreq_t *data_specialreq_alloc(glui32 filemode, glui32 filetype
 extern void data_specialreq_free(data_specialreq_t *data);
 extern void data_specialreq_print(data_specialreq_t *data);
 
+extern void data_grect_print(FILE *file, grect_t *box);
+

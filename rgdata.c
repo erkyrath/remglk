@@ -1949,6 +1949,12 @@ void data_specialreq_print(data_specialreq_t *dat)
     printf(" }");
 }
 
+void data_grect_print(FILE *file, grect_t *box)
+{
+    fprintf(file, "{\"left\":%d, \"top\":%d, \"right\":%d, \"bottom\":%d}",
+        box->left, box->top, box->right, box->bottom);
+}
+
 void glkunix_serialize_object_root(FILE *file, glkunix_serialize_context_t ctx, glkunix_serialize_object_f func, void *rock)
 {
     ctx->file = file;
