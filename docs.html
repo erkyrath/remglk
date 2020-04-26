@@ -137,7 +137,7 @@ RemGlk does not provide a user interface. Instead, it wraps up the application's
 RemGlk is therefore like CheapGlk, in that it works entirely through input and output streams, and can easily be attached to a bot or web service. However, unlike CheapGlk, RemGlk supports multiple Glk windows and most Glk I/O features. Whatever it's attached to just has to decode the structured output and display it appropriately.
 <p>
 
-RemGlk was designed to complement the <a href="http://eblong.com/zarf/glk/glkote.html">GlkOte</a> Javascript library. GlkOte more or less implements the other half of the job: it accepts game output (as Javascript objects), displays it, and then returns the player's commands in the same format. It is possible to connect an IF interpreter, RemGlk, and GlkOte to build a complete IF web service. (See <a href="https://github.com/erkyrath/remote-if-demo">an experimental implementation of this idea</a>.)
+RemGlk was designed to complement the <a href="http://eblong.com/zarf/glk/glkote.html">GlkOte</a> Javascript library. GlkOte more or less implements the other half of the job: it accepts game output (as Javascript objects), displays it, and then returns the player's commands in the same format. It is possible to connect an IF interpreter, RemGlk, and GlkOte to build a complete IF web service. (See <a href="https://github.com/erkyrath/remote-if-demo">an experimental implementation of this idea</a>.) Since RemGlk supports autosave/autorestore, it is practical to create a service which fires up a RemGlk process momentarily to process each player command.
 <p>
 
 RemGlk is also used by the <a href="http://eblong.com/zarf/plotex/regtest.html">RegTest</a> testing framework. In this setup, the "display layer" does not actually display anything. It is a Python script which generates test input and verifies the game's output.
@@ -333,7 +333,7 @@ RemGlk will convert the pathname to a <code>file:</code> URL and send it as abov
 
 <h2>The Data Format</h2>
 
-<em>I have not written out this documentation in detail yet. Please refer to the <a href="http://eblong.com/zarf/glk/glkote/docs.html">GlkOte documentation</a>. Input what GlkOte outputs, and vice versa.</em>
+<em>I have not written out this documentation in detail. Please refer to the <a href="http://eblong.com/zarf/glk/glkote/docs.html">GlkOte documentation</a>. Input what GlkOte outputs, and vice versa.</em>
 <p>
 
 Prior to version 0.2.1, this library used <code>contents</code> and <code>inputs</code> as the names of the top-level data fields, rather than the correct <code>content</code> and <code>input</code>. The prior version also omitted the <code>xpos</code> and <code>ypos</code> fields for grid window input.
