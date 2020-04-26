@@ -354,6 +354,14 @@ All input and output is UTF-8.
 When generating output, a complete update JSON update will be followed by a blank line (two newlines in a row). You can use this as a hint for breaking the output stream into stanzas. (But RemGlk does not require you to follow this convention when sending it input JSON objects.)
 <p>
 
+<h3>Autosave/autorestore</h3>
+
+If the interpreter implements autosave, it will use RemGlk's facilities to store a library serialization dump every turn (before each <code>glk_select()</code> call). This state dump is JSON, but it does <em>not</em> follow the GlkOte format specification. It contains more detailed information, including the "live" state of every window and stream.
+<p>
+
+The autosave format is deliberately not documented; it is specific to the implementation of RemGlk. It is not meant to be transferred between platforms or between interpreters. Use the interpreter's normal <code>.glksave</code> save files for that.
+<p>
+
 <hr>
 Last updated February 13, 2017.
 <p>
