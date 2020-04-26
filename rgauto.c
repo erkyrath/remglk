@@ -395,11 +395,45 @@ static void stream_state_print(FILE *fl, strid_t str)
             fprintf(fl, ", \"file_isbinary\":%d", str->isbinary);
         if (str->lastop)
             fprintf(fl, ", \"file_lastop\":%ld", (long)str->lastop);
+        //### file
         break;
     }
         
     case strtype_Memory: {
-        //### buf
+        fprintf(fl, ", \"mem_buflen\":%ld", (long)str->buflen);
+
+        long bufaddr;
+        int elemsize;
+        if (!str->unicode) {
+            if (str->buf && str->buflen) {
+                bufaddr = (*gli_dispatch_locate_arr)(str->buf, str->buflen, "&+#!Cn", str->arrayrock, &elemsize);
+                fprintf(fl, ", \"mem_buf\":%ld", bufaddr);
+                fprintf(fl, ", \"mem_bufptr\":%ld", str->bufptr - str->buf);
+                fprintf(fl, ", \"mem_bufeof\":%ld", str->bufeof - str->buf);
+                fprintf(fl, ", \"mem_bufend\":%ld", str->bufend - str->buf);
+                if (elemsize) {
+                    if (elemsize != 1)
+                        gli_fatal_error("memstream encoding char array: wrong elemsize");
+                    fprintf(fl, ",\n\"mem_bufdata\":");
+                    print_string_len_json((char *)str->buf, str->buflen, fl);
+                }
+            }
+        }
+        else {
+            if (str->ubuf && str->buflen) {
+                bufaddr = (*gli_dispatch_locate_arr)(str->ubuf, str->buflen, "&+#!Iu", str->arrayrock, &elemsize);
+                fprintf(fl, ", \"mem_buf\":%ld", bufaddr);
+                fprintf(fl, ", \"mem_bufptr\":%ld", str->ubufptr - str->ubuf);
+                fprintf(fl, ", \"mem_bufeof\":%ld", str->ubufeof - str->ubuf);
+                fprintf(fl, ", \"mem_bufend\":%ld", str->ubufend - str->ubuf);
+                if (elemsize) {
+                    if (elemsize != 4)
+                        gli_fatal_error("memstream encoding uni array: wrong elemsize");
+                    fprintf(fl, ",\n\"mem_ubufdata\":");
+                    print_ustring_len_json(str->ubuf, str->buflen, fl);
+                }
+            }
+        }
         break;
     }
         
