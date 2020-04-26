@@ -371,7 +371,47 @@ static void tgline_print(FILE *fl, tgline_t *line, int width)
 static void stream_state_print(FILE *fl, strid_t str)
 {
     fprintf(fl, "{\"tag\":\"%ld\"", (long)str->updatetag);
-    //###
+    fprintf(fl, ",\n\"type\":%d, \"rock\":%ld", str->type, (long)str->rock);
+    /* disprock is handled elsewhere */
+
+    fprintf(fl, ", \"unicode\":%d", str->unicode);
+
+    fprintf(fl, ", \"readable\":%d", str->readable);
+    fprintf(fl, ", \"writable\":%d", str->writable);
+
+    fprintf(fl, ", \"readcount\":%ld", (long)str->readcount);
+    fprintf(fl, ", \"writecount\":%ld", (long)str->writecount);
+
+    switch (str->type) {
+
+    case strtype_Window: {
+        if (str->win)
+            fprintf(fl, ", \"win_tag\":%ld", (long)str->win->updatetag);
+        break;
+    }
+
+    case strtype_File: {
+        if (str->isbinary)
+            fprintf(fl, ", \"file_isbinary\":%d", str->isbinary);
+        if (str->lastop)
+            fprintf(fl, ", \"file_lastop\":%ld", (long)str->lastop);
+        break;
+    }
+        
+    case strtype_Memory: {
+        //### buf
+        break;
+    }
+        
+    case strtype_Resource: {
+        if (str->isbinary)
+            fprintf(fl, ", \"res_isbinary\":%d", str->isbinary);
+        //### buf
+        break;
+    }
+        
+    }
+    
     fprintf(fl, "}\n");
 }
 
