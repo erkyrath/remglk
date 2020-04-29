@@ -393,9 +393,11 @@ static void stream_state_print(FILE *fl, strid_t str)
     case strtype_File: {
         if (str->isbinary)
             fprintf(fl, ", \"file_isbinary\":%d", str->isbinary);
-        if (str->lastop)
-            fprintf(fl, ", \"file_lastop\":%ld", (long)str->lastop);
-        //### file
+        /* lastop will be reset when the file is reopened */
+        if (str->filename) {
+            fprintf(fl, ", \"file_filename\":");
+            print_string_json(str->filename, fl);
+        }
         break;
     }
         

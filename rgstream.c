@@ -64,6 +64,7 @@ stream_t *gli_new_stream(int type, int readable, int writable,
     
     str->win = NULL;
     str->file = NULL;
+    str->filename = NULL;
     str->lastop = 0;
     str->buf = NULL;
     str->bufptr = NULL;
@@ -128,6 +129,10 @@ void gli_delete_stream(stream_t *str)
             fclose(str->file);
             str->file = NULL;
             str->lastop = 0;
+            if (str->filename) {
+                free(str->filename);
+                str->filename = NULL;
+            }
             break;
     }
 
@@ -256,7 +261,7 @@ strid_t glk_stream_open_file(fileref_t *fref, glui32 fmode,
         gli_strict_warning("stream_open_file: invalid fileref ref.");
         return 0;
     }
-    
+
     /* The spec says that Write, ReadWrite, and WriteAppend create the
        file if necessary. However, fopen(filename, "r+") doesn't create
        a file. So we have to pre-create it in the ReadWrite and
@@ -321,6 +326,9 @@ strid_t glk_stream_open_file(fileref_t *fref, glui32 fmode,
     str->isbinary = !fref->textmode;
     str->file = fl;
     str->lastop = 0;
+    
+    /* This is only needed for the autosave record. */
+    str->filename = strdup(fref->filename);
     
     return str;
 }
@@ -516,6 +524,7 @@ strid_t gli_stream_open_pathname(char *pathname, int writemode,
     
     str->file = fl;
     str->lastop = 0;
+    str->filename = strdup(pathname);
     
     return str;
 }
