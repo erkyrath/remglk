@@ -65,6 +65,7 @@ stream_t *gli_new_stream(int type, int readable, int writable,
     str->win = NULL;
     str->file = NULL;
     str->filename = NULL;
+    str->fileresnum = 0;
     str->lastop = 0;
     str->buf = NULL;
     str->bufptr = NULL;
@@ -433,6 +434,7 @@ strid_t glk_stream_open_resource(glui32 filenum, glui32 rock)
     }
 
     str->isbinary = isbinary;
+    str->fileresnum = filenum; /* Only needed for the autosave record */
     
     if (res.data.ptr && res.length) {
         str->buf = (unsigned char *)res.data.ptr;

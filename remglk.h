@@ -113,6 +113,9 @@ struct glk_stream_struct {
     /* for strtype_File, strtype_Resource */
     int isbinary;
 
+    /* for strtype_Resource */
+    glui32 fileresnum; /* only needed for autosave */
+
     /* for strtype_Memory and strtype_Resource. Separate pointers for 
        one-byte and four-byte streams */
     unsigned char *buf;

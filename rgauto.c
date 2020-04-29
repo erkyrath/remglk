@@ -442,7 +442,29 @@ static void stream_state_print(FILE *fl, strid_t str)
     case strtype_Resource: {
         if (str->isbinary)
             fprintf(fl, ", \"res_isbinary\":%d", str->isbinary);
-        //### buf
+        fprintf(fl, ", \"res_fileresnum\":%ld", (long)str->fileresnum);
+
+        fprintf(fl, ", \"res_buflen\":%ld", (long)str->buflen);
+
+        if (!str->unicode) {
+            if (str->buf && str->buflen) {
+                fprintf(fl, ", \"res_bufptr\":%ld", str->bufptr - str->buf);
+                fprintf(fl, ", \"res_bufeof\":%ld", str->bufeof - str->buf);
+                fprintf(fl, ", \"res_bufend\":%ld", str->bufend - str->buf);
+                fprintf(fl, ",\n\"res_bufdata\":");
+                print_string_len_json((char *)str->buf, str->buflen, fl);
+            }
+        }
+        else {
+            if (str->ubuf && str->buflen) {
+                fprintf(fl, ", \"res_bufptr\":%ld", str->ubufptr - str->ubuf);
+                fprintf(fl, ", \"res_bufeof\":%ld", str->ubufeof - str->ubuf);
+                fprintf(fl, ", \"res_bufend\":%ld", str->ubufend - str->ubuf);
+                fprintf(fl, ",\n\"res_ubufdata\":");
+                print_ustring_len_json(str->ubuf, str->buflen, fl);
+            }
+        }
+        
         break;
     }
         
