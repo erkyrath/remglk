@@ -545,7 +545,7 @@ static data_raw_t *data_raw_struct_field(data_raw_t *dat, char *key)
     return NULL;
 }
 
-/* Internal method: read a JSON element from stdin. If this sees
+/* Internal method: read a JSON element from the file. If this sees
    a close-brace or close-bracket, it returns NULL and stores the
    character in *termchar. */
 static data_raw_t *data_raw_blockread_sub(FILE *file, char *termchar)
@@ -590,7 +590,7 @@ static data_raw_t *data_raw_blockread_sub(FILE *file, char *termchar)
         }
 
         if (ch != EOF)
-            ungetc(ch, stdin);
+            ungetc(ch, file);
         return dat;
     }
 
@@ -623,7 +623,7 @@ static data_raw_t *data_raw_blockread_sub(FILE *file, char *termchar)
         }
 
         if (ch != EOF)
-            ungetc(ch, stdin);
+            ungetc(ch, file);
         return dat;
     }
 
@@ -729,7 +729,7 @@ static data_raw_t *data_raw_blockread_sub(FILE *file, char *termchar)
             gli_fatal_error("data: Unrecognized symbol");
 
         if (ch != EOF)
-            ungetc(ch, stdin);
+            ungetc(ch, file);
         return dat;
     }
 
