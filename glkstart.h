@@ -59,12 +59,15 @@ extern strid_t glkunix_stream_open_pathname(char *pathname, glui32 textmode,
     glui32 rock);
 
 typedef struct glkunix_serialize_context_struct *glkunix_serialize_context_t;
+typedef struct glkunix_unserialize_context_struct *glkunix_unserialize_context_t;
 typedef int (*glkunix_serialize_object_f)(glkunix_serialize_context_t, void *);
 typedef int (*glkunix_unserialize_object_f)(glkunix_serialize_context_t, void *);
 
-void glkunix_serialize_uint32(glkunix_serialize_context_t, char *, glui32);
-void glkunix_serialize_object(glkunix_serialize_context_t, char *, glkunix_serialize_object_f, void *);
-void glkunix_serialize_object_array(glkunix_serialize_context_t, char *, glkunix_serialize_object_f, glui32, size_t, void *);
+extern void glkunix_serialize_uint32(glkunix_serialize_context_t, char *, glui32);
+extern void glkunix_serialize_object(glkunix_serialize_context_t, char *, glkunix_serialize_object_f, void *);
+extern void glkunix_serialize_object_array(glkunix_serialize_context_t, char *, glkunix_serialize_object_f, glui32, size_t, void *);
+
+extern int glkunix_unserialize_uint32(glkunix_unserialize_context_t, char *, glui32 *);
 
 /* This library offers the hooks necessary for an interpreter to
    implement autosave. */

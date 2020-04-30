@@ -490,6 +490,21 @@ static void fileref_state_print(FILE *fl, frefid_t fref)
 
 int glkunix_load_library_state(strid_t file, glkunix_unserialize_object_f extra_state_func, void *extra_state_rock)
 {
+    FILE *fl = file->file;
+
+    struct glkunix_unserialize_context_struct ctx;
+    if (!glkunix_unserialize_object_root(fl, &ctx))
+        return FALSE;
+
+    glui32 version;
+    if (!glkunix_unserialize_uint32(&ctx, "version", &version))
+        return FALSE;
+    
+    if (version <= 0 || version > SERIAL_VERSION) {
+        gli_fatal_error("Autorestore serial version not supported");
+        return FALSE;
+    }
+    
     //###
     return FALSE;
 }

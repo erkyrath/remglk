@@ -60,8 +60,6 @@ static strint_t special_char_table[] = {
     { NULL, 0 }
 };
 
-typedef struct data_raw_struct data_raw_t;
-
 /* data_raw_t: Encodes a JSON data object. For lists and structs,
    this contains further JSON structures recursively. All text data
    is Unicode, stored as glui32 arrays. */
@@ -2075,5 +2073,25 @@ void glkunix_serialize_object_array(glkunix_serialize_context_t ctx, char *key, 
     fprintf(ctx->file, "\n]");
 
     ctx->count++;
+}
+
+int glkunix_unserialize_object_root(FILE *file, glkunix_unserialize_context_t ctx)
+{
+    ctx->dat = data_raw_blockread(file);
+    if (!ctx->dat)
+        return FALSE;
+
+    return TRUE;
+}
+
+int glkunix_unserialize_uint32(glkunix_unserialize_context_t ctx, char *key, glui32 *res)
+{
+    data_raw_t *dat = data_raw_struct_field(ctx->dat, key);
+    if (!dat)
+        return FALSE;
+    
+    glsi32 val = data_raw_int_value(dat);
+    *res = (glui32)val;
+    return TRUE;
 }
 

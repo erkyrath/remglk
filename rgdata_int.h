@@ -7,9 +7,17 @@
 #include <stdio.h>
 #include "glkstart.h"
 
+typedef struct data_raw_struct data_raw_t;
+
 struct glkunix_serialize_context_struct {
     FILE *file;
     glui32 count;
 };
 
+struct glkunix_unserialize_context_struct {
+    data_raw_t *dat;
+};
+
 extern void glkunix_serialize_object_root(FILE *file, struct glkunix_serialize_context_struct *ctx, glkunix_serialize_object_f func, void *rock);
+
+extern int glkunix_unserialize_object_root(FILE *file, struct glkunix_unserialize_context_struct *ctx);
