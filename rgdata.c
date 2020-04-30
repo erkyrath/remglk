@@ -81,8 +81,8 @@ struct data_raw_struct {
     int allocsize;
 };
 
-static data_raw_t *data_raw_blockread(void);
-static data_raw_t *data_raw_blockread_sub(char *termchar);
+static data_raw_t *data_raw_blockread(FILE *file);
+static data_raw_t *data_raw_blockread_sub(FILE *file, char *termchar);
 
 /* While parsing JSON, we need a place to stash strings as they come in.
    Here are a couple of resizable character buffers. */
@@ -418,13 +418,13 @@ void data_raw_print(data_raw_t *dat)
     }
 }
 
-/* Read one JSON data object from stdin. If there is none, or if the
+/* Read one JSON data object from the file. If there is none, or if the
    object is incomplete, this blocks and waits for an object to finish. */
-static data_raw_t *data_raw_blockread()
+static data_raw_t *data_raw_blockread(FILE *file)
 {
     char termchar;
 
-    data_raw_t *dat = data_raw_blockread_sub(&termchar);
+    data_raw_t *dat = data_raw_blockread_sub(file, &termchar);
     if (!dat)
         gli_fatal_error("data: Unexpected end of data object");
 
@@ -550,13 +550,13 @@ static data_raw_t *data_raw_struct_field(data_raw_t *dat, char *key)
 /* Internal method: read a JSON element from stdin. If this sees
    a close-brace or close-bracket, it returns NULL and stores the
    character in *termchar. */
-static data_raw_t *data_raw_blockread_sub(char *termchar)
+static data_raw_t *data_raw_blockread_sub(FILE *file, char *termchar)
 {
     int ch;
 
     *termchar = '\0';
 
-    while (isspace(ch = getchar())) { };
+    while (isspace(ch = getc(file))) { };
     if (ch == EOF)
         gli_fatal_error("data: Unexpected end of input");
     
@@ -572,18 +572,18 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
         data_raw_t *dat = data_raw_alloc(rawtyp_Number);
         while (ch >= '0' && ch <= '9') {
             dat->number = 10 * dat->number + (ch-'0');
-            ch = getchar();
+            ch = getc(file);
         }
 
         if (ch == '.') {
             /* We have to think about real numbers. */
-            ch = getchar();
+            ch = getc(file);
             long numer = 0;
             long denom = 1;
             while (ch >= '0' && ch <= '9') {
                 numer = 10 * numer + (ch-'0');
                 denom *= 10;
-                ch = getchar();
+                ch = getc(file);
             }
             dat->realnumber = (double)dat->number + (double)numer / (double)denom;
         }
@@ -598,25 +598,25 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
 
     if (ch == '-') {
         data_raw_t *dat = data_raw_alloc(rawtyp_Number);
-        ch = getchar();
+        ch = getc(file);
         if (!(ch >= '0' && ch <= '9'))
             gli_fatal_error("data: minus must be followed by number");
 
         while (ch >= '0' && ch <= '9') {
             dat->number = 10 * dat->number + (ch-'0');
-            ch = getchar();
+            ch = getc(file);
         }
         dat->number = -dat->number;
 
         if (ch == '.') {
             /* We have to think about real numbers. */
-            ch = getchar();
+            ch = getc(file);
             long numer = 0;
             long denom = 1;
             while (ch >= '0' && ch <= '9') {
                 numer = 10 * numer + (ch-'0');
                 denom *= 10;
-                ch = getchar();
+                ch = getc(file);
             }
             dat->realnumber = (double)dat->number - (double)numer / (double)denom;
         }
@@ -635,7 +635,7 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
         int ix;
         int ucount = 0;
         int count = 0;
-        while ((ch = getchar()) != '"') {
+        while ((ch = getc(file)) != '"') {
             if (ch == EOF)
                 gli_fatal_error("data: Unterminated string");
             if (ch >= 0 && ch < 32)
@@ -644,18 +644,18 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
                 ensure_ustringbuf_size(ucount + 2*count + 1);
                 ucount += gli_parse_utf8((unsigned char *)stringbuf, count, ustringbuf+ucount, 2*count);
                 count = 0;
-                ch = getchar();
+                ch = getc(file);
                 if (ch == EOF)
                     gli_fatal_error("data: Unterminated backslash escape");
                 if (ch == 'u') {
                     glui32 val = 0;
-                    ch = getchar();
+                    ch = getc(file);
                     val = 16*val + parse_hex_digit(ch);
-                    ch = getchar();
+                    ch = getc(file);
                     val = 16*val + parse_hex_digit(ch);
-                    ch = getchar();
+                    ch = getc(file);
                     val = 16*val + parse_hex_digit(ch);
-                    ch = getchar();
+                    ch = getc(file);
                     val = 16*val + parse_hex_digit(ch);
                     ustringbuf[ucount++] = val;
                     continue;
@@ -715,7 +715,7 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
         while (isalnum(ch) || ch == '_') {
             ensure_stringbuf_size(count+1);
             stringbuf[count++] = ch;
-            ch = getchar();
+            ch = getc(file);
         }
 
         ensure_stringbuf_size(count+1);
@@ -742,7 +742,7 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
         char term = '\0';
 
         while (TRUE) {
-            data_raw_t *subdat = data_raw_blockread_sub(&term);
+            data_raw_t *subdat = data_raw_blockread_sub(file, &term);
             if (!subdat) {
                 if (term == ']') {
                     if (commapending)
@@ -755,7 +755,7 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
             dat->list[count++] = subdat;
             commapending = FALSE;
 
-            while (isspace(ch = getchar())) { };
+            while (isspace(ch = getc(file))) { };
             if (ch == ']')
                 break;
             if (ch != ',')
@@ -774,7 +774,7 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
         char term = '\0';
 
         while (TRUE) {
-            data_raw_t *keydat = data_raw_blockread_sub(&term);
+            data_raw_t *keydat = data_raw_blockread_sub(file, &term);
             if (!keydat) {
                 if (term == '}') {
                     if (commapending)
@@ -787,12 +787,12 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
             if (keydat->type != rawtyp_Str)
                 gli_fatal_error("data: Struct key must be string");
 
-            while (isspace(ch = getchar())) { };
+            while (isspace(ch = getc(file))) { };
             
             if (ch != ':')
                 gli_fatal_error("data: Expected colon in struct");
 
-            data_raw_t *subdat = data_raw_blockread_sub(&term);
+            data_raw_t *subdat = data_raw_blockread_sub(file, &term);
             if (!keydat)
                 gli_fatal_error("data: Mismatched end of struct");
 
@@ -807,7 +807,7 @@ static data_raw_t *data_raw_blockread_sub(char *termchar)
             dat->list[count++] = subdat;
             commapending = FALSE;
 
-            while (isspace(ch = getchar())) { };
+            while (isspace(ch = getc(file))) { };
             if (ch == '}')
                 break;
             if (ch != ',')
@@ -1142,7 +1142,7 @@ data_event_t *data_event_read()
 {
     data_raw_t *dat;
 
-    data_raw_t *rawdata = data_raw_blockread();
+    data_raw_t *rawdata = data_raw_blockread(stdin);
 
     if (rawdata->type != rawtyp_Struct)
         gli_fatal_error("data: Input struct not a struct");
