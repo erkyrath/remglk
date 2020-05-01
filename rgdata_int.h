@@ -16,8 +16,10 @@ struct glkunix_serialize_context_struct {
 
 struct glkunix_unserialize_context_struct {
     data_raw_t *dat;
+    struct glkunix_unserialize_context_struct *subctx;
 };
 
 extern void glkunix_serialize_object_root(FILE *file, struct glkunix_serialize_context_struct *ctx, glkunix_serialize_object_f func, void *rock);
 
 extern int glkunix_unserialize_object_root(FILE *file, struct glkunix_unserialize_context_struct *ctx);
+extern void glkunix_unserialize_object_root_finalize(struct glkunix_unserialize_context_struct *ctx);

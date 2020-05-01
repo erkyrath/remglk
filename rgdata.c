@@ -2077,11 +2077,29 @@ void glkunix_serialize_object_array(glkunix_serialize_context_t ctx, char *key, 
 
 int glkunix_unserialize_object_root(FILE *file, glkunix_unserialize_context_t ctx)
 {
+    ctx->dat = NULL;
+    ctx->subctx = NULL;
+    
     ctx->dat = data_raw_blockread(file);
     if (!ctx->dat)
         return FALSE;
 
     return TRUE;
+}
+
+void glkunix_unserialize_object_root_finalize(glkunix_unserialize_context_t ctx)
+{
+    /* We free the chain of subctx structures, but not the dat pointers -- those are all references to elements of ctx->dat. */
+    while (ctx->subctx) {
+        glkunix_unserialize_context_t tmp = ctx->subctx->subctx;
+        free(ctx->subctx);
+        ctx->subctx = tmp;
+    }
+
+    if (ctx->dat) {
+        data_raw_free(ctx->dat);
+        ctx->dat = NULL;
+    }
 }
 
 int glkunix_unserialize_uint32(glkunix_unserialize_context_t ctx, char *key, glui32 *res)
@@ -2095,3 +2113,24 @@ int glkunix_unserialize_uint32(glkunix_unserialize_context_t ctx, char *key, glu
     return TRUE;
 }
 
+int glkunix_unserialize_struct(glkunix_unserialize_context_t ctx, char *key, glkunix_unserialize_context_t *subctx)
+{
+    *subctx = NULL;
+
+    data_raw_t *dat = data_raw_struct_field(ctx->dat, key);
+    if (!dat)
+        return FALSE;
+
+    if (dat->type != rawtyp_Struct)
+        return FALSE;
+
+    if (!ctx->subctx) {
+        ctx->subctx = (glkunix_unserialize_context_t)malloc(sizeof(struct glkunix_unserialize_context_struct));
+        ctx->subctx->dat = NULL;
+        ctx->subctx->subctx = NULL;
+    }
+    
+    ctx->subctx->dat = dat;
+    *subctx = ctx->subctx;
+    return TRUE;
+}

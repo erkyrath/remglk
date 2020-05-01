@@ -497,15 +497,32 @@ int glkunix_load_library_state(strid_t file, glkunix_unserialize_object_f extra_
         return FALSE;
 
     glui32 version;
-    if (!glkunix_unserialize_uint32(&ctx, "version", &version))
+    if (!glkunix_unserialize_uint32(&ctx, "version", &version)) {
+        gli_fatal_error("Autorestore serial version not found");
         return FALSE;
-    
+    }
     if (version <= 0 || version > SERIAL_VERSION) {
         gli_fatal_error("Autorestore serial version not supported");
         return FALSE;
     }
+
+    //### everything
     
-    //###
-    return FALSE;
+    if (extra_state_func) {
+        glkunix_unserialize_context_t dat;
+        if (!glkunix_unserialize_struct(&ctx, "extra_state", &dat)) {
+            gli_fatal_error("Autorestore extra state not found");
+            return FALSE;
+        }
+
+        if (!extra_state_func(dat, extra_state_rock)) {
+            gli_fatal_error("Autorestore extra state failed");
+            return FALSE;
+        }
+    }
+    
+    glkunix_unserialize_object_root_finalize(&ctx);
+    
+    return TRUE;
 }
 
