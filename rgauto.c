@@ -487,6 +487,8 @@ static void fileref_state_print(FILE *fl, frefid_t fref)
     fprintf(fl, "}\n");
 }
 
+/* We don't load the library state into our live library. Rather, it goes into a glkunix_library_state_t object, which can be brought live later. 
+*/
 glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unserialize_object_f extra_state_func, void *extra_state_rock)
 {
     FILE *fl = file->file;
