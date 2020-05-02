@@ -97,6 +97,46 @@ stream_t *gli_new_stream(int type, int readable, int writable,
     return str;
 }
 
+stream_t *gli_stream_alloc_inactive()
+{
+    stream_t *str = (stream_t *)malloc(sizeof(stream_t));
+    if (!str)
+        return NULL;
+    
+    str->magicnum = MAGIC_STREAM_NUM;
+    str->type = 0;
+    str->rock = 0;
+    str->updatetag = 0;
+
+    str->unicode = FALSE;
+    str->isbinary = FALSE;
+    
+    str->win = NULL;
+    str->file = NULL;
+    str->filename = NULL;
+    str->fileresnum = 0;
+    str->lastop = 0;
+    str->buf = NULL;
+    str->bufptr = NULL;
+    str->bufend = NULL;
+    str->bufeof = NULL;
+    str->ubuf = NULL;
+    str->ubufptr = NULL;
+    str->ubufend = NULL;
+    str->ubufeof = NULL;
+    str->buflen = 0;
+    
+    str->readcount = 0;
+    str->writecount = 0;
+    str->readable = FALSE;
+    str->writable = FALSE;
+    
+    str->prev = NULL;
+    str->next = NULL;
+    
+    return str;
+}
+
 void gli_delete_stream(stream_t *str)
 {
     stream_t *prev, *next;

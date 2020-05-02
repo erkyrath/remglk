@@ -80,6 +80,27 @@ fileref_t *gli_new_fileref(char *filename, glui32 usage, glui32 rock)
     return fref;
 }
 
+fileref_t *gli_fileref_alloc_inactive()
+{
+    fileref_t *fref = (fileref_t *)malloc(sizeof(fileref_t));
+    if (!fref)
+        return NULL;
+    
+    fref->magicnum = MAGIC_FILEREF_NUM;
+    fref->rock = 0;
+    fref->updatetag = 0;
+    
+    fref->filename = NULL;
+    
+    fref->textmode = 0;
+    fref->filetype = 0;
+    
+    fref->prev = NULL;
+    fref->next = NULL;
+
+    return fref;
+}
+
 void gli_delete_fileref(fileref_t *fref)
 {
     fileref_t *prev, *next;
