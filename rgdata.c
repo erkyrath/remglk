@@ -2187,6 +2187,26 @@ int glkunix_unserialize_list(glkunix_unserialize_context_t ctx, char *key, glkun
     return TRUE;
 }
 
+int glkunix_unserialize_list_entry(glkunix_unserialize_context_t ctx, int pos, glkunix_unserialize_context_t *subctx)
+{
+    *subctx = NULL;
+
+    if (!ctx->dat)
+        return FALSE;
+    if (ctx->dat->type != rawtyp_List)
+        return FALSE;
+    if (!ctx->dat->list || pos >= ctx->dat->count)
+        return FALSE;
+
+    if (!ctx->subctx) {
+        ctx->subctx = glkunix_unserialize_context_alloc();
+    }
+    
+    ctx->subctx->dat = ctx->dat->list[pos];
+    *subctx = ctx->subctx;
+    return TRUE;
+}
+
 int glkunix_unserialize_object_list_entries(glkunix_unserialize_context_t ctx, glkunix_unserialize_object_f func, int count, size_t size, void *array)
 {
     char *charray = array;
