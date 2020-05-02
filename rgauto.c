@@ -520,51 +520,46 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
         state->metrics = data_metrics_parse(dat->dat);
     }
 
-    window_t **windows = NULL;
-    int windowcount = 0;
-    stream_t **streams = NULL;
-    int streamcount = 0;
-    fileref_t **filerefs = NULL;
-    int filerefcount = 0;
-
     /* First we create blank Glk object structures, filling in only the updatetags. */
     
     if (glkunix_unserialize_list(&ctx, "windows", &array, &count)) {
-        windowcount = count;
-        windows = (window_t **)malloc(windowcount * sizeof(window_t *));
-        for (ix=0; ix<windowcount; ix++) {
-            windows[ix] = gli_window_alloc_inactive();
+        state->windowcount = count;
+        state->windowlist = (window_t **)malloc(state->windowcount * sizeof(window_t *));
+        for (ix=0; ix<state->windowcount; ix++) {
+            state->windowlist[ix] = gli_window_alloc_inactive();
             if (!glkunix_unserialize_list_entry(array, ix, &entry))
                 return NULL;
-            if (!glkunix_unserialize_uint32(entry, "tag", &windows[ix]->updatetag))
+            if (!glkunix_unserialize_uint32(entry, "tag", &state->windowlist[ix]->updatetag))
                 return NULL;
         }
     }
 
     if (glkunix_unserialize_list(&ctx, "streams", &array, &count)) {
-        streamcount = count;
-        streams = (stream_t **)malloc(streamcount * sizeof(stream_t *));
-        for (ix=0; ix<streamcount; ix++) {
-            streams[ix] = gli_stream_alloc_inactive();
+        state->streamcount = count;
+        state->streamlist = (stream_t **)malloc(state->streamcount * sizeof(stream_t *));
+        for (ix=0; ix<state->streamcount; ix++) {
+            state->streamlist[ix] = gli_stream_alloc_inactive();
             if (!glkunix_unserialize_list_entry(array, ix, &entry))
                 return NULL;
-            if (!glkunix_unserialize_uint32(entry, "tag", &streams[ix]->updatetag))
+            if (!glkunix_unserialize_uint32(entry, "tag", &state->streamlist[ix]->updatetag))
                 return NULL;
         }
     }
 
     if (glkunix_unserialize_list(&ctx, "filerefs", &array, &count)) {
-        filerefcount = count;
-        filerefs = (fileref_t **)malloc(filerefcount * sizeof(fileref_t *));
-        for (ix=0; ix<filerefcount; ix++) {
-            filerefs[ix] = gli_fileref_alloc_inactive();
+        state->filerefcount = count;
+        state->filereflist = (fileref_t **)malloc(state->filerefcount * sizeof(fileref_t *));
+        for (ix=0; ix<state->filerefcount; ix++) {
+            state->filereflist[ix] = gli_fileref_alloc_inactive();
             if (!glkunix_unserialize_list_entry(array, ix, &entry))
                 return NULL;
-            if (!glkunix_unserialize_uint32(entry, "tag", &filerefs[ix]->updatetag))
+            if (!glkunix_unserialize_uint32(entry, "tag", &state->filereflist[ix]->updatetag))
                 return NULL;
         }
     }
 
+    printf("### Found %d windows, %d streams, %d filerefs\n", state->windowcount, state->streamcount, state->filerefcount);
+    
     //### everything
     
     if (extra_state_func) {
