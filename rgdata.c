@@ -2021,18 +2021,51 @@ glkunix_library_state_t glkunix_library_state_alloc()
         gli_fatal_error("data: unable to alloc library_state");
     
     memset(state, 0, sizeof(struct glkunix_library_state_struct));
-    //###
 
     state->metrics = NULL;
-    
+    state->windowlist = NULL;
+    state->streamlist = NULL;
+    state->filereflist = NULL;
+
+    //###
+
     return state;
 }
 
 void glkunix_library_state_free(glkunix_library_state_t state)
 {
+    int ix;
+    
     if (state->metrics) {
         data_metrics_free(state->metrics);
         state->metrics = NULL;
+    }
+
+    if (state->windowlist) {
+        for (ix=0; ix<state->windowcount; ix++) {
+            free(state->windowlist[ix]);
+            //### sub-data
+        }
+        free(state->windowlist);
+        state->windowlist = NULL;
+    }
+    
+    if (state->streamlist) {
+        for (ix=0; ix<state->streamcount; ix++) {
+            free(state->streamlist[ix]);
+            //### sub-data
+        }
+        free(state->streamlist);
+        state->streamlist = NULL;
+    }
+    
+    if (state->filereflist) {
+        for (ix=0; ix<state->filerefcount; ix++) {
+            free(state->filereflist[ix]);
+            //### sub-data
+        }
+        free(state->filereflist);
+        state->filereflist = NULL;
     }
     
     //###

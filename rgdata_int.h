@@ -19,6 +19,14 @@ struct glkunix_unserialize_context_struct {
 
 struct glkunix_library_state_struct {
     data_metrics_t *metrics;
+
+    window_t **windowlist;
+    int windowcount;
+    stream_t **streamlist;
+    int streamcount;
+    fileref_t **filereflist;
+    int filerefcount;
+
 };
 
 extern glkunix_library_state_t glkunix_library_state_alloc(void);
