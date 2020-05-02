@@ -5,6 +5,7 @@
 */
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "glk.h"
 #include "remglk.h"
@@ -91,7 +92,7 @@ static void window_state_print(FILE *fl, winid_t win)
     int first;
     int ix;
     
-    fprintf(fl, "{\"tag\":\"%ld\"", (long)win->updatetag);
+    fprintf(fl, "{\"tag\":%ld", (long)win->updatetag);
     fprintf(fl, ",\n\"type\":%ld, \"rock\":%ld", (long)win->type, (long)win->rock);
     /* disprock is handled elsewhere */
 
@@ -370,7 +371,7 @@ static void tgline_print(FILE *fl, tgline_t *line, int width)
 
 static void stream_state_print(FILE *fl, strid_t str)
 {
-    fprintf(fl, "{\"tag\":\"%ld\"", (long)str->updatetag);
+    fprintf(fl, "{\"tag\":%ld", (long)str->updatetag);
     fprintf(fl, ",\n\"type\":%d, \"rock\":%ld", str->type, (long)str->rock);
     /* disprock is handled elsewhere */
 
@@ -475,7 +476,7 @@ static void stream_state_print(FILE *fl, strid_t str)
 
 static void fileref_state_print(FILE *fl, frefid_t fref)
 {
-    fprintf(fl, "{\"tag\":\"%ld\"", (long)fref->updatetag);
+    fprintf(fl, "{\"tag\":%ld", (long)fref->updatetag);
     fprintf(fl, ",\n\"rock\":%ld", (long)fref->rock);
     /* disprock is handled elsewhere */
 
@@ -492,7 +493,8 @@ static void fileref_state_print(FILE *fl, frefid_t fref)
 glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unserialize_object_f extra_state_func, void *extra_state_rock)
 {
     FILE *fl = file->file;
-
+    int ix;
+    
     struct glkunix_unserialize_context_struct ctx;
     if (!glkunix_unserialize_object_root(fl, &ctx))
         return NULL;
@@ -510,11 +512,35 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
     glkunix_library_state_t state = glkunix_library_state_alloc();
 
     glkunix_unserialize_context_t dat;
+    glkunix_unserialize_context_t array;
+    glkunix_unserialize_context_t entry;
+    int count;
 
     if (glkunix_unserialize_struct(&ctx, "metrics", &dat)) {
         state->metrics = data_metrics_parse(dat->dat);
     }
+
+    window_t **windows = NULL;
+    int windowcount = 0;
+    stream_t **streams = NULL;
+    int streamcount = 0;
+    fileref_t **filerefs = NULL;
+    int filerefcount = 0;
+
+    /* First we create blank Glk object structures, filling in only the updatetags. */
     
+    if (glkunix_unserialize_list(&ctx, "windows", &array, &count)) {
+        windowcount = count;
+        windows = (window_t **)malloc(windowcount * sizeof(window_t *));
+        for (ix=0; ix<windowcount; ix++) {
+            windows[ix] = gli_window_alloc_inactive();
+            if (!glkunix_unserialize_list_entry(array, ix, &entry))
+                return NULL;
+            if (!glkunix_unserialize_uint32(entry, "tag", &windows[ix]->updatetag))
+                return NULL;
+        }
+    }
+
     //### everything
     
     if (extra_state_func) {
@@ -528,7 +554,10 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
             return NULL;
         }
     }
-    
+
+    entry = NULL;
+    array = NULL;
+    dat = NULL;
     glkunix_unserialize_object_root_finalize(&ctx);
     
     return state;
