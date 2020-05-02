@@ -151,6 +151,39 @@ window_t *gli_new_window(glui32 type, glui32 rock)
     return win;
 }
 
+window_t *gli_window_alloc_inactive()
+{
+    window_t *win = (window_t *)malloc(sizeof(window_t));
+    if (!win)
+        return NULL;
+    
+    win->magicnum = MAGIC_WINDOW_NUM;
+    win->rock = 0;
+    win->type = 0;
+    win->updatetag = 0;
+    
+    win->parent = NULL;
+    win->data = NULL;
+    win->inputgen = 0;
+    win->char_request = FALSE;
+    win->line_request = FALSE;
+    win->line_request_uni = FALSE;
+    win->char_request_uni = FALSE;
+    win->hyperlink_request = FALSE;
+    win->echo_line_input = TRUE;
+    win->terminate_line_input = 0;
+    win->style = style_Normal;
+    win->hyperlink = 0;
+
+    win->str = NULL;
+    win->echostr = NULL;
+
+    win->prev = NULL;
+    win->next = NULL;
+    
+    return win;
+}
+
 void gli_delete_window(window_t *win)
 {
     window_t *prev, *next;
