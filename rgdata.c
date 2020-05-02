@@ -2014,6 +2014,24 @@ void data_grect_print(FILE *file, grect_t *box)
         box->left, box->top, box->right, box->bottom);
 }
 
+glkunix_library_state_t glkunix_library_state_alloc()
+{
+    glkunix_library_state_t state = (glkunix_library_state_t)malloc(sizeof(struct glkunix_library_state_struct));
+    if (!state)
+        gli_fatal_error("data: unable to alloc library_state");
+    
+    memset(state, 0, sizeof(struct glkunix_library_state_struct));
+    //###
+    
+    return state;
+}
+
+void glkunix_library_state_free(glkunix_library_state_t state)
+{
+    //###
+    free(state);
+}
+
 void glkunix_serialize_object_root(FILE *file, glkunix_serialize_context_t ctx, glkunix_serialize_object_f func, void *rock)
 {
     ctx->file = file;

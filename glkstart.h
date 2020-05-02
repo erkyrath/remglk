@@ -78,8 +78,12 @@ extern int glkunix_unserialize_object_list_entries(glkunix_unserialize_context_t
 
 #ifdef GLKUNIX_AUTOSAVE_FEATURES
 
+typedef struct glkunix_library_state_struct *glkunix_library_state_t;
+
 extern void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_state_func, void *extra_state_rock);
-extern int glkunix_load_library_state(strid_t file, glkunix_unserialize_object_f extra_state_func, void *extra_state_rock);
+extern glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unserialize_object_f extra_state_func, void *extra_state_rock);
+extern void glkunix_library_state_free(glkunix_library_state_t state);
+
 extern glui32 glkunix_get_last_event_type(void);
 extern glui32 glkunix_window_get_updatetag(winid_t win);
 extern winid_t glkunix_window_find_by_updatetag(glui32 tag);

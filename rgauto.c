@@ -487,42 +487,43 @@ static void fileref_state_print(FILE *fl, frefid_t fref)
     fprintf(fl, "}\n");
 }
 
-
-int glkunix_load_library_state(strid_t file, glkunix_unserialize_object_f extra_state_func, void *extra_state_rock)
+glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unserialize_object_f extra_state_func, void *extra_state_rock)
 {
     FILE *fl = file->file;
 
     struct glkunix_unserialize_context_struct ctx;
     if (!glkunix_unserialize_object_root(fl, &ctx))
-        return FALSE;
+        return NULL;
 
     glui32 version;
     if (!glkunix_unserialize_uint32(&ctx, "version", &version)) {
         gli_fatal_error("Autorestore serial version not found");
-        return FALSE;
+        return NULL;
     }
     if (version <= 0 || version > SERIAL_VERSION) {
         gli_fatal_error("Autorestore serial version not supported");
-        return FALSE;
+        return NULL;
     }
 
+    glkunix_library_state_t state = glkunix_library_state_alloc();
+    
     //### everything
     
     if (extra_state_func) {
         glkunix_unserialize_context_t dat;
         if (!glkunix_unserialize_struct(&ctx, "extra_state", &dat)) {
             gli_fatal_error("Autorestore extra state not found");
-            return FALSE;
+            return NULL;
         }
 
         if (!extra_state_func(dat, extra_state_rock)) {
             gli_fatal_error("Autorestore extra state failed");
-            return FALSE;
+            return NULL;
         }
     }
     
     glkunix_unserialize_object_root_finalize(&ctx);
     
-    return TRUE;
+    return state;
 }
 

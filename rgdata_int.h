@@ -19,6 +19,13 @@ struct glkunix_unserialize_context_struct {
     struct glkunix_unserialize_context_struct *subctx;
 };
 
+struct glkunix_library_state_struct {
+    int dummy;
+};
+
+extern glkunix_library_state_t glkunix_library_state_alloc(void);
+extern void glkunix_library_state_free(glkunix_library_state_t state);
+
 extern void glkunix_serialize_object_root(FILE *file, struct glkunix_serialize_context_struct *ctx, glkunix_serialize_object_f func, void *rock);
 
 extern int glkunix_unserialize_object_root(FILE *file, struct glkunix_unserialize_context_struct *ctx);
