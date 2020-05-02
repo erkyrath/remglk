@@ -541,6 +541,30 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
         }
     }
 
+    if (glkunix_unserialize_list(&ctx, "streams", &array, &count)) {
+        streamcount = count;
+        streams = (stream_t **)malloc(streamcount * sizeof(stream_t *));
+        for (ix=0; ix<streamcount; ix++) {
+            streams[ix] = gli_stream_alloc_inactive();
+            if (!glkunix_unserialize_list_entry(array, ix, &entry))
+                return NULL;
+            if (!glkunix_unserialize_uint32(entry, "tag", &streams[ix]->updatetag))
+                return NULL;
+        }
+    }
+
+    if (glkunix_unserialize_list(&ctx, "filerefs", &array, &count)) {
+        filerefcount = count;
+        filerefs = (fileref_t **)malloc(filerefcount * sizeof(fileref_t *));
+        for (ix=0; ix<filerefcount; ix++) {
+            filerefs[ix] = gli_fileref_alloc_inactive();
+            if (!glkunix_unserialize_list_entry(array, ix, &entry))
+                return NULL;
+            if (!glkunix_unserialize_uint32(entry, "tag", &filerefs[ix]->updatetag))
+                return NULL;
+        }
+    }
+
     //### everything
     
     if (extra_state_func) {
