@@ -27,6 +27,7 @@ struct glkunix_library_state_struct {
     fileref_t **filereflist;
     int filerefcount;
 
+    glui32 timerinterval;
 };
 
 extern glkunix_library_state_t glkunix_library_state_alloc(void);

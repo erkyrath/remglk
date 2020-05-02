@@ -559,7 +559,9 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
     }
 
     printf("### Found %d windows, %d streams, %d filerefs\n", state->windowcount, state->streamcount, state->filerefcount);
-    
+
+    glkunix_unserialize_uint32(entry, "timerinterval", &state->timerinterval);
+
     //### everything
     
     if (extra_state_func) {
