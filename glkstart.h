@@ -65,10 +65,12 @@ typedef int (*glkunix_unserialize_object_f)(glkunix_unserialize_context_t, void 
 
 extern void glkunix_serialize_uint32(glkunix_serialize_context_t, char *, glui32);
 extern void glkunix_serialize_object(glkunix_serialize_context_t, char *, glkunix_serialize_object_f, void *);
-extern void glkunix_serialize_object_array(glkunix_serialize_context_t, char *, glkunix_serialize_object_f, glui32, size_t, void *);
+extern void glkunix_serialize_object_list(glkunix_serialize_context_t, char *, glkunix_serialize_object_f, int, size_t, void *);
 
 extern int glkunix_unserialize_uint32(glkunix_unserialize_context_t, char *, glui32 *);
 extern int glkunix_unserialize_struct(glkunix_unserialize_context_t, char *, glkunix_unserialize_context_t *);
+extern int glkunix_unserialize_list(glkunix_unserialize_context_t, char *, glkunix_unserialize_context_t *, int *);
+extern int glkunix_unserialize_object_list_entries(glkunix_unserialize_context_t, glkunix_unserialize_object_f, int, size_t, void *);
 
 /* This library offers the hooks necessary for an interpreter to
    implement autosave. */
