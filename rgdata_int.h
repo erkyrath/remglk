@@ -7,8 +7,6 @@
 #include <stdio.h>
 #include "glkstart.h"
 
-typedef struct data_raw_struct data_raw_t;
-
 struct glkunix_serialize_context_struct {
     FILE *file;
     glui32 count;
@@ -20,7 +18,7 @@ struct glkunix_unserialize_context_struct {
 };
 
 struct glkunix_library_state_struct {
-    int dummy;
+    data_metrics_t *metrics;
 };
 
 extern glkunix_library_state_t glkunix_library_state_alloc(void);

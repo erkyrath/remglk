@@ -44,6 +44,7 @@ typedef struct grect_struct {
     ((boxref)->left = 0, (boxref)->top = 0,     \
      (boxref)->right = (wid), (boxref)->bottom = (hgt))
 
+typedef struct data_raw_struct data_raw_t;
 typedef struct data_metrics_struct data_metrics_t;
 typedef struct data_content_struct data_content_t;
 typedef struct data_specialreq_struct data_specialreq_t;

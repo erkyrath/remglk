@@ -856,7 +856,7 @@ void data_metrics_free(data_metrics_t *metrics)
     free(metrics);
 }
 
-static data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
+data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
 {
     data_raw_t *dat;
     data_metrics_t *metrics = data_metrics_alloc(0, 0);
@@ -2022,12 +2022,19 @@ glkunix_library_state_t glkunix_library_state_alloc()
     
     memset(state, 0, sizeof(struct glkunix_library_state_struct));
     //###
+
+    state->metrics = NULL;
     
     return state;
 }
 
 void glkunix_library_state_free(glkunix_library_state_t state)
 {
+    if (state->metrics) {
+        data_metrics_free(state->metrics);
+        state->metrics = NULL;
+    }
+    
     //###
     free(state);
 }

@@ -506,11 +506,16 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
     }
 
     glkunix_library_state_t state = glkunix_library_state_alloc();
+
+    glkunix_unserialize_context_t dat;
+
+    if (glkunix_unserialize_struct(&ctx, "metrics", &dat)) {
+        state->metrics = data_metrics_parse(dat->dat);
+    }
     
     //### everything
     
     if (extra_state_func) {
-        glkunix_unserialize_context_t dat;
         if (!glkunix_unserialize_struct(&ctx, "extra_state", &dat)) {
             gli_fatal_error("Autorestore extra state not found");
             return NULL;
