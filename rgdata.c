@@ -2027,6 +2027,9 @@ glkunix_library_state_t glkunix_library_state_alloc()
     state->streamlist = NULL;
     state->filereflist = NULL;
 
+    state->rootwin = NULL;
+    state->currentstr = NULL;
+
     //###
 
     return state;
@@ -2067,6 +2070,9 @@ void glkunix_library_state_free(glkunix_library_state_t state)
         free(state->filereflist);
         state->filereflist = NULL;
     }
+
+    state->rootwin = NULL;
+    state->currentstr = NULL;
     
     //###
     free(state);
