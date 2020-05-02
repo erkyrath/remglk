@@ -2195,7 +2195,7 @@ int glkunix_unserialize_list_entry(glkunix_unserialize_context_t ctx, int pos, g
         return FALSE;
     if (ctx->dat->type != rawtyp_List)
         return FALSE;
-    if (!ctx->dat->list || pos >= ctx->dat->count)
+    if (!ctx->dat->list || pos < 0 || pos >= ctx->dat->count)
         return FALSE;
 
     if (!ctx->subctx) {
@@ -2219,19 +2219,18 @@ int glkunix_unserialize_object_list_entries(glkunix_unserialize_context_t ctx, g
     if (!ctx->dat->list || count > ctx->dat->count)
         return FALSE;
 
-    struct glkunix_unserialize_context_struct subctx;
-    subctx.dat = NULL;
-    subctx.subctx = NULL;
+    if (!ctx->subctx) {
+        ctx->subctx = glkunix_unserialize_context_alloc();
+    }
 
     for (ix=0; ix<count; ix++) {
         char *el = charray + ix*size;
-        subctx.dat = ctx->dat->list[ix];
-        if (!func(&subctx, el))
+        ctx->subctx->dat = ctx->dat->list[ix];
+        if (!func(ctx->subctx, el))
             return FALSE;
     }
 
-    subctx.dat = NULL;
-    glkunix_unserialize_object_root_finalize(&subctx);
+    ctx->subctx->dat = NULL;
 
     return TRUE;
 }
