@@ -2171,7 +2171,7 @@ int glkunix_unserialize_object_list_entries(glkunix_unserialize_context_t ctx, g
         return FALSE;
     if (ctx->dat->type != rawtyp_List)
         return FALSE;
-    if (count > ctx->dat->count || !ctx->dat->list)
+    if (!ctx->dat->list || count > ctx->dat->count)
         return FALSE;
 
     struct glkunix_unserialize_context_struct subctx;
