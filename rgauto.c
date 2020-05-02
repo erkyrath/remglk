@@ -24,6 +24,10 @@ static void fileref_state_print(FILE *fl, frefid_t fref);
 static void tbrun_print(FILE *fl, tbrun_t *run);
 static void tgline_print(FILE *fl, tgline_t *line, int width);
 
+static window_t *libstate_window_find_by_updatetag(glkunix_library_state_t state, glui32 tag);
+static stream_t *libstate_stream_find_by_updatetag(glkunix_library_state_t state, glui32 tag);
+static fileref_t *libstate_fileref_find_by_updatetag(glkunix_library_state_t state, glui32 tag);
+
 void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_state_func, void *extra_state_rock)
 {
     FILE *fl = file->file;
@@ -515,6 +519,7 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
     glkunix_unserialize_context_t array;
     glkunix_unserialize_context_t entry;
     int count;
+    glui32 tag;
 
     if (glkunix_unserialize_struct(&ctx, "metrics", &dat)) {
         state->metrics = data_metrics_parse(dat->dat);
@@ -562,6 +567,18 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
 
     glkunix_unserialize_uint32(entry, "timerinterval", &state->timerinterval);
 
+    if (glkunix_unserialize_uint32(entry, "rootwintag", &tag)) {
+        state->rootwin = libstate_window_find_by_updatetag(state, tag);
+        if (!state->rootwin)
+            gli_fatal_error("Could not locate rootwin");
+    }
+
+    if (glkunix_unserialize_uint32(entry, "currentstrtag", &tag)) {
+        state->currentstr = libstate_stream_find_by_updatetag(state, tag);
+        if (!state->currentstr)
+            gli_fatal_error("Could not locate currentstr");
+    }
+
     //### everything
     
     if (extra_state_func) {
@@ -584,3 +601,32 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
     return state;
 }
 
+static window_t *libstate_window_find_by_updatetag(glkunix_library_state_t state, glui32 tag)
+{
+    int ix;
+    for (ix=0; ix<state->windowcount; ix++) {
+        if (state->windowlist[ix]->updatetag == tag)
+            return state->windowlist[ix];
+    }
+    return NULL;
+}
+
+static stream_t *libstate_stream_find_by_updatetag(glkunix_library_state_t state, glui32 tag)
+{
+    int ix;
+    for (ix=0; ix<state->streamcount; ix++) {
+        if (state->streamlist[ix]->updatetag == tag)
+            return state->streamlist[ix];
+    }
+    return NULL;
+}
+
+static fileref_t *libstate_fileref_find_by_updatetag(glkunix_library_state_t state, glui32 tag)
+{
+    int ix;
+    for (ix=0; ix<state->filerefcount; ix++) {
+        if (state->filereflist[ix]->updatetag == tag)
+            return state->filereflist[ix];
+    }
+    return NULL;
+}
