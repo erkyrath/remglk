@@ -26,7 +26,6 @@ static void tgline_print(FILE *fl, tgline_t *line, int width);
 
 static window_t *libstate_window_find_by_updatetag(glkunix_library_state_t state, glui32 tag);
 static stream_t *libstate_stream_find_by_updatetag(glkunix_library_state_t state, glui32 tag);
-static fileref_t *libstate_fileref_find_by_updatetag(glkunix_library_state_t state, glui32 tag);
 
 void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_state_func, void *extra_state_rock)
 {
@@ -525,7 +524,7 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
         state->metrics = data_metrics_parse(dat->dat);
     }
 
-    /* First we create blank Glk object structures, filling in only the updatetags. */
+    /* First we create blank Glk object structures, filling in only the updatetags. (We have to do this before dealing with the object data, because objects can refer to each other.) */
     
     if (glkunix_unserialize_list(&ctx, "windows", &array, &count)) {
         state->windowcount = count;
@@ -563,6 +562,24 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
         }
     }
 
+    /* Now we unserialize all the object data. */
+
+    //### windows
+    //### streams
+    
+    if (glkunix_unserialize_list(&ctx, "filerefs", &array, &count)) {
+        for (ix=0; ix<state->filerefcount; ix++) {
+            if (!glkunix_unserialize_list_entry(array, ix, &entry))
+                return NULL;
+            fileref_t *fref = state->filereflist[ix];
+            glkunix_unserialize_uint32(entry, "rock", &fref->rock);
+            /* disprock is handled elsewhere */
+            glkunix_unserialize_latin1_string(entry, "filename", &fref->filename);
+            glkunix_unserialize_int(entry, "filetype", &fref->filetype);
+            glkunix_unserialize_int(entry, "textmode", &fref->textmode);
+        }
+    }
+    
     printf("### Found %d windows, %d streams, %d filerefs\n", state->windowcount, state->streamcount, state->filerefcount);
 
     glkunix_unserialize_uint32(entry, "timerinterval", &state->timerinterval);
@@ -579,8 +596,6 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
             gli_fatal_error("Could not locate currentstr");
     }
 
-    //### everything
-    
     if (extra_state_func) {
         if (!glkunix_unserialize_struct(&ctx, "extra_state", &dat)) {
             gli_fatal_error("Autorestore extra state not found");
@@ -621,12 +636,3 @@ static stream_t *libstate_stream_find_by_updatetag(glkunix_library_state_t state
     return NULL;
 }
 
-static fileref_t *libstate_fileref_find_by_updatetag(glkunix_library_state_t state, glui32 tag)
-{
-    int ix;
-    for (ix=0; ix<state->filerefcount; ix++) {
-        if (state->filereflist[ix]->updatetag == tag)
-            return state->filereflist[ix];
-    }
-    return NULL;
-}
