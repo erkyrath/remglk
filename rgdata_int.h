@@ -36,7 +36,12 @@ struct glkunix_library_state_struct {
 extern glkunix_library_state_t glkunix_library_state_alloc(void);
 extern void glkunix_library_state_free(glkunix_library_state_t state);
 
+/* Some serialize/unserialize calls that are used by the library but not exported to game/interpreter code. */
+
 extern void glkunix_serialize_object_root(FILE *file, struct glkunix_serialize_context_struct *ctx, glkunix_serialize_object_f func, void *rock);
+
+extern int glkunix_unserialize_int(glkunix_unserialize_context_t, char *, int *);
+extern int glkunix_unserialize_latin1_string(glkunix_unserialize_context_t, char *, char **);
 
 extern int glkunix_unserialize_object_root(FILE *file, struct glkunix_unserialize_context_struct *ctx);
 extern void glkunix_unserialize_object_root_finalize(struct glkunix_unserialize_context_struct *ctx);

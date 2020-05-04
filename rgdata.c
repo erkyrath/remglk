@@ -2196,6 +2196,28 @@ int glkunix_unserialize_int(glkunix_unserialize_context_t ctx, char *key, int *r
     return TRUE;
 }
 
+/* Returned string is malloced */
+int glkunix_unserialize_latin1_string(glkunix_unserialize_context_t ctx, char *key, char **res)
+{
+    data_raw_t *dat = data_raw_struct_field(ctx->dat, key);
+    if (!dat)
+        return FALSE;
+
+    if (dat->type != rawtyp_Str)
+        gli_fatal_error("data: Need str");
+
+    int ix;
+    
+    char *buf = malloc(dat->count+1);
+    for (ix=0; ix<dat->count; ix++) {
+        glui32 ch = dat->str[ix];
+        buf[ix] = ((ch < 0x100) ? (char)ch : '?');
+    }
+    buf[dat->count] = '\0';
+    *res = buf;
+    return TRUE;
+}
+
 int glkunix_unserialize_struct(glkunix_unserialize_context_t ctx, char *key, glkunix_unserialize_context_t *subctx)
 {
     *subctx = NULL;
