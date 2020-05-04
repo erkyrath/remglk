@@ -428,10 +428,10 @@ static void stream_state_print(FILE *fl, strid_t str)
         else {
             if (str->ubuf && str->buflen) {
                 bufaddr = (*gli_dispatch_locate_arr)(str->ubuf, str->buflen, "&+#!Iu", str->arrayrock, &elemsize);
-                fprintf(fl, ", \"mem_buf\":%ld", bufaddr);
-                fprintf(fl, ", \"mem_bufptr\":%ld", str->ubufptr - str->ubuf);
-                fprintf(fl, ", \"mem_bufeof\":%ld", str->ubufeof - str->ubuf);
-                fprintf(fl, ", \"mem_bufend\":%ld", str->ubufend - str->ubuf);
+                fprintf(fl, ", \"mem_ubuf\":%ld", bufaddr);
+                fprintf(fl, ", \"mem_ubufptr\":%ld", str->ubufptr - str->ubuf);
+                fprintf(fl, ", \"mem_ubufeof\":%ld", str->ubufeof - str->ubuf);
+                fprintf(fl, ", \"mem_ubufend\":%ld", str->ubufend - str->ubuf);
                 if (elemsize) {
                     if (elemsize != 4)
                         gli_fatal_error("memstream encoding uni array: wrong elemsize");
@@ -461,9 +461,9 @@ static void stream_state_print(FILE *fl, strid_t str)
         }
         else {
             if (str->ubuf && str->buflen) {
-                fprintf(fl, ", \"res_bufptr\":%ld", str->ubufptr - str->ubuf);
-                fprintf(fl, ", \"res_bufeof\":%ld", str->ubufeof - str->ubuf);
-                fprintf(fl, ", \"res_bufend\":%ld", str->ubufend - str->ubuf);
+                fprintf(fl, ", \"res_ubufptr\":%ld", str->ubufptr - str->ubuf);
+                fprintf(fl, ", \"res_ubufeof\":%ld", str->ubufeof - str->ubuf);
+                fprintf(fl, ", \"res_ubufend\":%ld", str->ubufend - str->ubuf);
                 fprintf(fl, ",\n\"res_ubufdata\":");
                 print_ustring_len_json(str->ubuf, str->buflen, fl);
             }
@@ -565,7 +565,68 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
     /* Now we unserialize all the object data. */
 
     //### windows
-    //### streams
+
+    if (glkunix_unserialize_list(&ctx, "streams", &array, &count)) {
+        for (ix=0; ix<state->streamcount; ix++) {
+            if (!glkunix_unserialize_list_entry(array, ix, &entry))
+                return NULL;
+            stream_t *str = state->streamlist[ix];
+            glkunix_unserialize_uint32(entry, "rock", &str->rock);
+            glkunix_unserialize_int(entry, "type", &str->type);
+            /* disprock is handled elsewhere */
+            glkunix_unserialize_int(entry, "unicode", &str->unicode);
+            glkunix_unserialize_int(entry, "readable", &str->readable);
+            glkunix_unserialize_int(entry, "writable", &str->writable);
+            glkunix_unserialize_uint32(entry, "readcount", &str->readcount);
+            glkunix_unserialize_uint32(entry, "writecount", &str->writecount);
+            switch (str->type) {
+            case strtype_Window:
+                if (glkunix_unserialize_uint32(entry, "win_tag", &tag)) {
+                    str->win = libstate_window_find_by_updatetag(state, tag);
+                }
+                break;
+            case strtype_File:
+                glkunix_unserialize_int(entry, "file_isbinary", &str->isbinary);
+                glkunix_unserialize_latin1_string(entry, "file_filename", &str->filename);
+                /* we'll open the file itself later */
+                break;
+            case strtype_Memory:
+                glkunix_unserialize_uint32(entry, "mem_buflen", &str->buflen);
+                if (!str->unicode) {
+                    glkunix_unserialize_long(entry, "mem_buf", &str->tempbufkey);
+                    glkunix_unserialize_uint32(entry, "mem_bufptr", &str->tempbufptr);
+                    glkunix_unserialize_uint32(entry, "mem_bufeof", &str->tempbufeof);
+                    glkunix_unserialize_uint32(entry, "mem_bufend", &str->tempbufend);
+                    glkunix_unserialize_len_bytes(entry, "mem_bufdata", &str->tempbufdata, &str->tempbufdatalen);
+                }
+                else {
+                    glkunix_unserialize_long(entry, "mem_ubuf", &str->tempbufkey);
+                    glkunix_unserialize_uint32(entry, "mem_ubufptr", &str->tempbufptr);
+                    glkunix_unserialize_uint32(entry, "mem_ubufeof", &str->tempbufeof);
+                    glkunix_unserialize_uint32(entry, "mem_ubufend", &str->tempbufend);
+                    glkunix_unserialize_len_unicode(entry, "mem_ubufdata", &str->tempubufdata, &str->tempbufdatalen);
+                }
+                break;
+            case strtype_Resource:
+                glkunix_unserialize_int(entry, "res_isbinary", &str->isbinary);
+                glkunix_unserialize_uint32(entry, "res_fileresnum", &str->fileresnum);
+                glkunix_unserialize_uint32(entry, "res_buflen", &str->buflen);
+                if (!str->unicode) {
+                    glkunix_unserialize_uint32(entry, "res_bufptr", &str->tempbufptr);
+                    glkunix_unserialize_uint32(entry, "res_bufeof", &str->tempbufeof);
+                    glkunix_unserialize_uint32(entry, "res_bufend", &str->tempbufend);
+                    glkunix_unserialize_len_bytes(entry, "res_bufdata", &str->tempbufdata, &str->tempbufdatalen);
+                }
+                else {
+                    glkunix_unserialize_uint32(entry, "res_ubufptr", &str->tempbufptr);
+                    glkunix_unserialize_uint32(entry, "res_ubufeof", &str->tempbufeof);
+                    glkunix_unserialize_uint32(entry, "res_ubufend", &str->tempbufend);
+                    glkunix_unserialize_len_unicode(entry, "res_ubufdata", &str->tempubufdata, &str->tempbufdatalen);
+                }
+                break;
+            }
+        }
+    }
     
     if (glkunix_unserialize_list(&ctx, "filerefs", &array, &count)) {
         for (ix=0; ix<state->filerefcount; ix++) {
