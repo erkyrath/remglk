@@ -2196,6 +2196,17 @@ int glkunix_unserialize_int(glkunix_unserialize_context_t ctx, char *key, int *r
     return TRUE;
 }
 
+int glkunix_unserialize_long(glkunix_unserialize_context_t ctx, char *key, long *res)
+{
+    data_raw_t *dat = data_raw_struct_field(ctx->dat, key);
+    if (!dat)
+        return FALSE;
+    
+    glsi32 val = data_raw_int_value(dat);
+    *res = (long)val;
+    return TRUE;
+}
+
 /* Returned string is malloced */
 int glkunix_unserialize_latin1_string(glkunix_unserialize_context_t ctx, char *key, char **res)
 {
@@ -2215,6 +2226,46 @@ int glkunix_unserialize_latin1_string(glkunix_unserialize_context_t ctx, char *k
     }
     buf[dat->count] = '\0';
     *res = buf;
+    return TRUE;
+}
+
+/* Returned string is malloced */
+int glkunix_unserialize_len_bytes(glkunix_unserialize_context_t ctx, char *key, unsigned char **res, long *reslen)
+{
+    data_raw_t *dat = data_raw_struct_field(ctx->dat, key);
+    if (!dat)
+        return FALSE;
+
+    if (dat->type != rawtyp_Str)
+        gli_fatal_error("data: Need str");
+
+    unsigned char *buf;
+    
+    if (dat->count == 0) {
+        buf = malloc(1);
+        buf[0] = 0;
+    }
+    else {
+        int ix;
+        buf = malloc(dat->count);
+        for (ix=0; ix<dat->count; ix++) {
+            glui32 ch = dat->str[ix];
+            buf[ix] = (ch & 0xFF);
+        }
+    }
+    *res = buf;
+    *reslen = dat->count;
+    return TRUE;
+}
+
+int glkunix_unserialize_len_unicode(glkunix_unserialize_context_t ctx, char *key, glui32 **res, long *reslen)
+{
+    data_raw_t *dat = data_raw_struct_field(ctx->dat, key);
+    if (!dat)
+        return FALSE;
+
+    *res = data_raw_str_dup(dat);
+    *reslen = dat->count;
     return TRUE;
 }
 
