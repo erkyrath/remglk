@@ -68,6 +68,7 @@ extern void glkunix_serialize_object(glkunix_serialize_context_t, char *, glkuni
 extern void glkunix_serialize_object_list(glkunix_serialize_context_t, char *, glkunix_serialize_object_f, int, size_t, void *);
 
 extern int glkunix_unserialize_uint32(glkunix_unserialize_context_t, char *, glui32 *);
+extern int glkunix_unserialize_int(glkunix_unserialize_context_t, char *, int *);
 extern int glkunix_unserialize_struct(glkunix_unserialize_context_t, char *, glkunix_unserialize_context_t *);
 extern int glkunix_unserialize_list(glkunix_unserialize_context_t, char *, glkunix_unserialize_context_t *, int *);
 extern int glkunix_unserialize_list_entry(glkunix_unserialize_context_t, int, glkunix_unserialize_context_t *);

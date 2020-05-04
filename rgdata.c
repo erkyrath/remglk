@@ -2185,6 +2185,17 @@ int glkunix_unserialize_uint32(glkunix_unserialize_context_t ctx, char *key, glu
     return TRUE;
 }
 
+int glkunix_unserialize_int(glkunix_unserialize_context_t ctx, char *key, int *res)
+{
+    data_raw_t *dat = data_raw_struct_field(ctx->dat, key);
+    if (!dat)
+        return FALSE;
+    
+    glsi32 val = data_raw_int_value(dat);
+    *res = (int)val;
+    return TRUE;
+}
+
 int glkunix_unserialize_struct(glkunix_unserialize_context_t ctx, char *key, glkunix_unserialize_context_t *subctx)
 {
     *subctx = NULL;
