@@ -81,6 +81,14 @@ stream_t *gli_new_stream(int type, int readable, int writable,
     str->writecount = 0;
     str->readable = readable;
     str->writable = writable;
+
+    str->tempbufdata = NULL;
+    str->tempubufdata = NULL;
+    str->tempbufdatalen = 0;
+    str->tempbufkey = 0;
+    str->tempbufptr = 0;
+    str->tempbufend = 0;
+    str->tempbufeof = 0;
     
     str->prev = NULL;
     str->next = gli_streamlist;
@@ -130,6 +138,14 @@ stream_t *gli_stream_alloc_inactive()
     str->writecount = 0;
     str->readable = FALSE;
     str->writable = FALSE;
+
+    str->tempbufdata = NULL;
+    str->tempubufdata = NULL;
+    str->tempbufdatalen = 0;
+    str->tempbufkey = 0;
+    str->tempbufptr = 0;
+    str->tempbufend = 0;
+    str->tempbufeof = 0;
     
     str->prev = NULL;
     str->next = NULL;

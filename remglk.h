@@ -130,6 +130,13 @@ struct glk_stream_struct {
     glui32 buflen;
     gidispatch_rock_t arrayrock;
 
+    /* These values are only used in a temporary library_state, while deserializing. */
+    unsigned char *tempbufdata;
+    glui32 *tempubufdata;
+    long tempbufdatalen;
+    long tempbufkey;
+    glui32 tempbufptr, tempbufend, tempbufeof;
+
     gidispatch_rock_t disprock;
     stream_t *next, *prev; /* in the big linked list of streams */
 };
