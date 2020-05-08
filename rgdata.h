@@ -244,4 +244,5 @@ extern void data_specialreq_free(data_specialreq_t *data);
 extern void data_specialreq_print(data_specialreq_t *data);
 
 extern void data_grect_print(FILE *file, grect_t *box);
+extern void data_grect_parse(data_raw_t *rawdata, grect_t *box);
 

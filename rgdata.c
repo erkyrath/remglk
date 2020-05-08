@@ -2014,6 +2014,26 @@ void data_grect_print(FILE *file, grect_t *box)
         box->left, box->top, box->right, box->bottom);
 }
 
+void data_grect_parse(data_raw_t *rawdata, grect_t *box)
+{
+    data_raw_t *dat;
+
+    grect_set_from_size(box, 0, 0);
+
+    dat = data_raw_struct_field(rawdata, "left");
+    if (dat)
+        box->left = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "top");
+    if (dat)
+        box->top = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "right");
+    if (dat)
+        box->right = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "bottom");
+    if (dat)
+        box->bottom = data_raw_int_value(dat);
+}
+
 glkunix_library_state_t glkunix_library_state_alloc()
 {
     glkunix_library_state_t state = (glkunix_library_state_t)malloc(sizeof(struct glkunix_library_state_struct));

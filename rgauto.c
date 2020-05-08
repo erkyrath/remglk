@@ -572,7 +572,10 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
             glkunix_unserialize_uint32(entry, "rock", &win->rock);
             glkunix_unserialize_uint32(entry, "type", &win->type);
             /* disprock is handled elsewhere */
-            //### bbox
+            glkunix_unserialize_context_t boxentry;
+            if (!glkunix_unserialize_struct(entry, "extra_state", &boxentry)) {
+                data_grect_parse(boxentry->dat, &win->bbox);
+            }
             if (glkunix_unserialize_uint32(entry, "parenttag", &tag)) {
                 win->parent = libstate_window_find_by_updatetag(state, tag);
             }
@@ -592,6 +595,8 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
             glkunix_unserialize_uint32(entry, "terminate_line_input", &win->terminate_line_input);
             glkunix_unserialize_uint32(entry, "style", &win->style);
             glkunix_unserialize_uint32(entry, "hyperlink", &win->hyperlink);
+            switch (win->type) {
+            }
         }
     }
 
