@@ -564,7 +564,36 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
 
     /* Now we unserialize all the object data. */
 
-    //### windows
+    if (glkunix_unserialize_list(&ctx, "windows", &array, &count)) {
+        for (ix=0; ix<state->windowcount; ix++) {
+            if (!glkunix_unserialize_list_entry(array, ix, &entry))
+                return NULL;
+            window_t *win = state->windowlist[ix];
+            glkunix_unserialize_uint32(entry, "rock", &win->rock);
+            glkunix_unserialize_uint32(entry, "type", &win->type);
+            /* disprock is handled elsewhere */
+            //### bbox
+            if (glkunix_unserialize_uint32(entry, "parenttag", &tag)) {
+                win->parent = libstate_window_find_by_updatetag(state, tag);
+            }
+            if (glkunix_unserialize_uint32(entry, "streamtag", &tag)) {
+                win->str = libstate_stream_find_by_updatetag(state, tag);
+            }
+            if (glkunix_unserialize_uint32(entry, "echostreamtag", &tag)) {
+                win->echostr = libstate_stream_find_by_updatetag(state, tag);
+            }
+            glkunix_unserialize_uint32(entry, "inputgen", &win->inputgen);
+            glkunix_unserialize_int(entry, "line_request", &win->line_request);
+            glkunix_unserialize_int(entry, "line_request_uni", &win->line_request_uni);
+            glkunix_unserialize_int(entry, "char_request", &win->char_request);
+            glkunix_unserialize_int(entry, "char_request_uni", &win->char_request_uni);
+            glkunix_unserialize_int(entry, "hyperlink_request", &win->hyperlink_request);
+            glkunix_unserialize_int(entry, "echo_line_input", &win->echo_line_input);
+            glkunix_unserialize_uint32(entry, "terminate_line_input", &win->terminate_line_input);
+            glkunix_unserialize_uint32(entry, "style", &win->style);
+            glkunix_unserialize_uint32(entry, "hyperlink", &win->hyperlink);
+        }
+    }
 
     if (glkunix_unserialize_list(&ctx, "streams", &array, &count)) {
         for (ix=0; ix<state->streamcount; ix++) {
