@@ -711,6 +711,15 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
         glkunix_unserialize_long(entry, "buf_updatemark", &dwin->updatemark);
         glkunix_unserialize_int(entry, "buf_startclear", &dwin->startclear);
 
+        glui32 *buf;
+        long bufcount;
+        if (glkunix_unserialize_len_unicode(entry, "buf_chars", &buf, &bufcount)) {
+            free(dwin->chars); /* replace original malloced array */
+            dwin->chars = buf;
+            dwin->numchars = bufcount;
+            dwin->charssize = bufcount;
+        }
+        
         if (glkunix_unserialize_list(entry, "buf_runs", &array, &count)) {
             if (count > dwin->runssize) {
                 dwin->runssize = (count | 7) + 1 + 8;
