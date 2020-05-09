@@ -713,7 +713,7 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
 
         if (glkunix_unserialize_list(entry, "buf_runs", &array, &count)) {
             if (count > dwin->runssize) {
-                dwin->runssize = (count | 7) + 8;
+                dwin->runssize = (count | 7) + 1 + 8;
                 dwin->runs = (tbrun_t *)realloc(dwin->runs, dwin->runssize * sizeof(tbrun_t));
             }
             if (!dwin->runs)
@@ -731,6 +731,33 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
                 if (!glkunix_unserialize_long(el, "specialnum", &run->specialnum)) {
                     run->specialnum = -1; /* default value */
                 }
+            }
+        }
+
+        if (glkunix_unserialize_list(entry, "buf_specials", &array, &count)) {
+            if (count > dwin->specialssize) {
+                dwin->specialssize = (count | 7) + 1 + 8;
+                dwin->specials = (data_specialspan_t **)realloc(dwin->specials, dwin->specialssize * sizeof(data_specialspan_t *));
+            }
+            if (!dwin->specials)
+                return FALSE;
+            dwin->numspecials = count;
+            for (ix=0; ix<count; ix++) {
+                glkunix_unserialize_int(el, "type", &intval);
+                data_specialspan_t *special = data_specialspan_alloc(intval);
+                dwin->specials[ix] = special;
+                glkunix_unserialize_uint32(el, "image", &special->image);
+                glkunix_unserialize_uint32(el, "chunktype", &special->chunktype);
+                glkunix_unserialize_int(el, "hasdimensions", &special->hasdimensions);
+                glkunix_unserialize_uint32(el, "xpos", &special->xpos);
+                glkunix_unserialize_uint32(el, "ypos", &special->ypos);
+                glkunix_unserialize_uint32(el, "width", &special->width);
+                glkunix_unserialize_uint32(el, "height", &special->height);
+                glkunix_unserialize_uint32(el, "alignment", &special->alignment);
+                glkunix_unserialize_uint32(el, "hyperlink", &special->hyperlink);
+                glkunix_unserialize_latin1_string(el, "alttext", &special->alttext); /* This gets leaked; the library doesn't expect it to be alloced. */
+                glkunix_unserialize_int(el, "hascolor", &special->hascolor);
+                glkunix_unserialize_uint32(el, "color", &special->color);
             }
         }
         
