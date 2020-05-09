@@ -670,13 +670,27 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
     switch (win->type) {
 
     case wintype_Pair: {
-        window_pair_t *dwin = win->data;
+        window_pair_t *dwin = win_pair_create(win, 0, NULL, 0);
+        win->data = dwin;
+        
         if (glkunix_unserialize_uint32(entry, "pair_child1tag", &tag)) {
             dwin->child1 = libstate_window_find_by_updatetag(state, tag);
         }
         if (glkunix_unserialize_uint32(entry, "pair_child2tag", &tag)) {
             dwin->child2 = libstate_window_find_by_updatetag(state, tag);
         }
+        if (glkunix_unserialize_uint32(entry, "pair_keytag", &tag)) {
+            dwin->key = libstate_window_find_by_updatetag(state, tag);
+        }
+        
+        glkunix_unserialize_int(entry, "pair_splitpos", &dwin->splitpos);
+        glkunix_unserialize_int(entry, "pair_splitwidth", &dwin->splitwidth);
+        glkunix_unserialize_uint32(entry, "pair_dir", &dwin->dir);
+        glkunix_unserialize_int(entry, "pair_vertical", &dwin->vertical);
+        glkunix_unserialize_int(entry, "pair_backward", &dwin->backward);
+        glkunix_unserialize_int(entry, "pair_hasborder", &dwin->hasborder);
+        glkunix_unserialize_uint32(entry, "pair_division", &dwin->division);
+        glkunix_unserialize_uint32(entry, "pair_size", &dwin->size);
         break;
     }
                 
