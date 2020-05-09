@@ -21,6 +21,9 @@
 static void window_state_print(FILE *fl, winid_t win);
 static void stream_state_print(FILE *fl, strid_t str);
 static void fileref_state_print(FILE *fl, frefid_t fref);
+static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize_context_t entry, winid_t win);
+static int stream_state_parse(glkunix_library_state_t state, glkunix_unserialize_context_t entry, strid_t str);
+static int fileref_state_parse(glkunix_library_state_t state, glkunix_unserialize_context_t entry, frefid_t fref);
 static void tbrun_print(FILE *fl, tbrun_t *run);
 static void tgline_print(FILE *fl, tgline_t *line, int width);
 
@@ -569,34 +572,8 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
             if (!glkunix_unserialize_list_entry(array, ix, &entry))
                 return NULL;
             window_t *win = state->windowlist[ix];
-            glkunix_unserialize_uint32(entry, "rock", &win->rock);
-            glkunix_unserialize_uint32(entry, "type", &win->type);
-            /* disprock is handled elsewhere */
-            glkunix_unserialize_context_t boxentry;
-            if (!glkunix_unserialize_struct(entry, "extra_state", &boxentry)) {
-                data_grect_parse(boxentry->dat, &win->bbox);
-            }
-            if (glkunix_unserialize_uint32(entry, "parenttag", &tag)) {
-                win->parent = libstate_window_find_by_updatetag(state, tag);
-            }
-            if (glkunix_unserialize_uint32(entry, "streamtag", &tag)) {
-                win->str = libstate_stream_find_by_updatetag(state, tag);
-            }
-            if (glkunix_unserialize_uint32(entry, "echostreamtag", &tag)) {
-                win->echostr = libstate_stream_find_by_updatetag(state, tag);
-            }
-            glkunix_unserialize_uint32(entry, "inputgen", &win->inputgen);
-            glkunix_unserialize_int(entry, "line_request", &win->line_request);
-            glkunix_unserialize_int(entry, "line_request_uni", &win->line_request_uni);
-            glkunix_unserialize_int(entry, "char_request", &win->char_request);
-            glkunix_unserialize_int(entry, "char_request_uni", &win->char_request_uni);
-            glkunix_unserialize_int(entry, "hyperlink_request", &win->hyperlink_request);
-            glkunix_unserialize_int(entry, "echo_line_input", &win->echo_line_input);
-            glkunix_unserialize_uint32(entry, "terminate_line_input", &win->terminate_line_input);
-            glkunix_unserialize_uint32(entry, "style", &win->style);
-            glkunix_unserialize_uint32(entry, "hyperlink", &win->hyperlink);
-            switch (win->type) {
-            }
+            if (!window_state_parse(state, entry, win))
+                return NULL;
         }
     }
 
@@ -605,60 +582,8 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
             if (!glkunix_unserialize_list_entry(array, ix, &entry))
                 return NULL;
             stream_t *str = state->streamlist[ix];
-            glkunix_unserialize_uint32(entry, "rock", &str->rock);
-            glkunix_unserialize_int(entry, "type", &str->type);
-            /* disprock is handled elsewhere */
-            glkunix_unserialize_int(entry, "unicode", &str->unicode);
-            glkunix_unserialize_int(entry, "readable", &str->readable);
-            glkunix_unserialize_int(entry, "writable", &str->writable);
-            glkunix_unserialize_uint32(entry, "readcount", &str->readcount);
-            glkunix_unserialize_uint32(entry, "writecount", &str->writecount);
-            switch (str->type) {
-            case strtype_Window:
-                if (glkunix_unserialize_uint32(entry, "win_tag", &tag)) {
-                    str->win = libstate_window_find_by_updatetag(state, tag);
-                }
-                break;
-            case strtype_File:
-                glkunix_unserialize_int(entry, "file_isbinary", &str->isbinary);
-                glkunix_unserialize_latin1_string(entry, "file_filename", &str->filename);
-                /* we'll open the file itself later */
-                break;
-            case strtype_Memory:
-                glkunix_unserialize_uint32(entry, "mem_buflen", &str->buflen);
-                if (!str->unicode) {
-                    glkunix_unserialize_long(entry, "mem_buf", &str->tempbufkey);
-                    glkunix_unserialize_uint32(entry, "mem_bufptr", &str->tempbufptr);
-                    glkunix_unserialize_uint32(entry, "mem_bufeof", &str->tempbufeof);
-                    glkunix_unserialize_uint32(entry, "mem_bufend", &str->tempbufend);
-                    glkunix_unserialize_len_bytes(entry, "mem_bufdata", &str->tempbufdata, &str->tempbufdatalen);
-                }
-                else {
-                    glkunix_unserialize_long(entry, "mem_ubuf", &str->tempbufkey);
-                    glkunix_unserialize_uint32(entry, "mem_ubufptr", &str->tempbufptr);
-                    glkunix_unserialize_uint32(entry, "mem_ubufeof", &str->tempbufeof);
-                    glkunix_unserialize_uint32(entry, "mem_ubufend", &str->tempbufend);
-                    glkunix_unserialize_len_unicode(entry, "mem_ubufdata", &str->tempubufdata, &str->tempbufdatalen);
-                }
-                break;
-            case strtype_Resource:
-                glkunix_unserialize_int(entry, "res_isbinary", &str->isbinary);
-                glkunix_unserialize_uint32(entry, "res_fileresnum", &str->fileresnum);
-                glkunix_unserialize_uint32(entry, "res_buflen", &str->buflen);
-                if (!str->unicode) {
-                    glkunix_unserialize_uint32(entry, "res_bufptr", &str->tempbufptr);
-                    glkunix_unserialize_uint32(entry, "res_bufeof", &str->tempbufeof);
-                    glkunix_unserialize_uint32(entry, "res_bufend", &str->tempbufend);
-                    glkunix_unserialize_len_bytes(entry, "res_bufdata", &str->tempbufdata, &str->tempbufdatalen);
-                }
-                else {
-                    glkunix_unserialize_uint32(entry, "res_ubufptr", &str->tempbufptr);
-                    glkunix_unserialize_uint32(entry, "res_ubufeof", &str->tempbufeof);
-                    glkunix_unserialize_uint32(entry, "res_ubufend", &str->tempbufend);
-                    glkunix_unserialize_len_unicode(entry, "res_ubufdata", &str->tempubufdata, &str->tempbufdatalen);
-                }
-                break;
-            }
+            if (!stream_state_parse(state, entry, str))
+                return NULL;
         }
     }
     
@@ -667,11 +592,8 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
             if (!glkunix_unserialize_list_entry(array, ix, &entry))
                 return NULL;
             fileref_t *fref = state->filereflist[ix];
-            glkunix_unserialize_uint32(entry, "rock", &fref->rock);
-            /* disprock is handled elsewhere */
-            glkunix_unserialize_latin1_string(entry, "filename", &fref->filename);
-            glkunix_unserialize_int(entry, "filetype", &fref->filetype);
-            glkunix_unserialize_int(entry, "textmode", &fref->textmode);
+            if (!fileref_state_parse(state, entry, fref))
+                return NULL;
         }
     }
     
@@ -709,6 +631,137 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
     glkunix_unserialize_object_root_finalize(&ctx);
     
     return state;
+}
+
+static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize_context_t entry, winid_t win)
+{
+    glui32 tag;
+    
+    glkunix_unserialize_uint32(entry, "rock", &win->rock);
+    glkunix_unserialize_uint32(entry, "type", &win->type);
+    /* disprock is handled elsewhere */
+    
+    glkunix_unserialize_context_t boxentry;
+    if (!glkunix_unserialize_struct(entry, "extra_state", &boxentry)) {
+        data_grect_parse(boxentry->dat, &win->bbox);
+    }
+    
+    if (glkunix_unserialize_uint32(entry, "parenttag", &tag)) {
+        win->parent = libstate_window_find_by_updatetag(state, tag);
+    }
+    if (glkunix_unserialize_uint32(entry, "streamtag", &tag)) {
+        win->str = libstate_stream_find_by_updatetag(state, tag);
+    }
+    if (glkunix_unserialize_uint32(entry, "echostreamtag", &tag)) {
+        win->echostr = libstate_stream_find_by_updatetag(state, tag);
+    }
+    
+    glkunix_unserialize_uint32(entry, "inputgen", &win->inputgen);
+    glkunix_unserialize_int(entry, "line_request", &win->line_request);
+    glkunix_unserialize_int(entry, "line_request_uni", &win->line_request_uni);
+    glkunix_unserialize_int(entry, "char_request", &win->char_request);
+    glkunix_unserialize_int(entry, "char_request_uni", &win->char_request_uni);
+    glkunix_unserialize_int(entry, "hyperlink_request", &win->hyperlink_request);
+    glkunix_unserialize_int(entry, "echo_line_input", &win->echo_line_input);
+    glkunix_unserialize_uint32(entry, "terminate_line_input", &win->terminate_line_input);
+    glkunix_unserialize_uint32(entry, "style", &win->style);
+    glkunix_unserialize_uint32(entry, "hyperlink", &win->hyperlink);
+    
+    switch (win->type) {
+
+    case wintype_Pair: {
+        window_pair_t *dwin = win->data;
+        if (glkunix_unserialize_uint32(entry, "pair_child1tag", &tag)) {
+            dwin->child1 = libstate_window_find_by_updatetag(state, tag);
+        }
+        if (glkunix_unserialize_uint32(entry, "pair_child2tag", &tag)) {
+            dwin->child2 = libstate_window_find_by_updatetag(state, tag);
+        }
+        break;
+    }
+                
+    }
+
+    return TRUE;
+}
+
+static int stream_state_parse(glkunix_library_state_t state, glkunix_unserialize_context_t entry, strid_t str)
+{
+    glui32 tag;
+    
+    glkunix_unserialize_uint32(entry, "rock", &str->rock);
+    glkunix_unserialize_int(entry, "type", &str->type);
+    /* disprock is handled elsewhere */
+    glkunix_unserialize_int(entry, "unicode", &str->unicode);
+    glkunix_unserialize_int(entry, "readable", &str->readable);
+    glkunix_unserialize_int(entry, "writable", &str->writable);
+    glkunix_unserialize_uint32(entry, "readcount", &str->readcount);
+    glkunix_unserialize_uint32(entry, "writecount", &str->writecount);
+
+    switch (str->type) {
+        
+    case strtype_Window:
+        if (glkunix_unserialize_uint32(entry, "win_tag", &tag)) {
+            str->win = libstate_window_find_by_updatetag(state, tag);
+        }
+        break;
+        
+    case strtype_File:
+        glkunix_unserialize_int(entry, "file_isbinary", &str->isbinary);
+        glkunix_unserialize_latin1_string(entry, "file_filename", &str->filename);
+        /* we'll open the file itself later */
+        break;
+        
+    case strtype_Memory:
+        glkunix_unserialize_uint32(entry, "mem_buflen", &str->buflen);
+        if (!str->unicode) {
+            glkunix_unserialize_long(entry, "mem_buf", &str->tempbufkey);
+            glkunix_unserialize_uint32(entry, "mem_bufptr", &str->tempbufptr);
+            glkunix_unserialize_uint32(entry, "mem_bufeof", &str->tempbufeof);
+            glkunix_unserialize_uint32(entry, "mem_bufend", &str->tempbufend);
+            glkunix_unserialize_len_bytes(entry, "mem_bufdata", &str->tempbufdata, &str->tempbufdatalen);
+        }
+        else {
+            glkunix_unserialize_long(entry, "mem_ubuf", &str->tempbufkey);
+            glkunix_unserialize_uint32(entry, "mem_ubufptr", &str->tempbufptr);
+            glkunix_unserialize_uint32(entry, "mem_ubufeof", &str->tempbufeof);
+            glkunix_unserialize_uint32(entry, "mem_ubufend", &str->tempbufend);
+            glkunix_unserialize_len_unicode(entry, "mem_ubufdata", &str->tempubufdata, &str->tempbufdatalen);
+        }
+        break;
+        
+    case strtype_Resource:
+        glkunix_unserialize_int(entry, "res_isbinary", &str->isbinary);
+        glkunix_unserialize_uint32(entry, "res_fileresnum", &str->fileresnum);
+        glkunix_unserialize_uint32(entry, "res_buflen", &str->buflen);
+        if (!str->unicode) {
+            glkunix_unserialize_uint32(entry, "res_bufptr", &str->tempbufptr);
+            glkunix_unserialize_uint32(entry, "res_bufeof", &str->tempbufeof);
+            glkunix_unserialize_uint32(entry, "res_bufend", &str->tempbufend);
+            glkunix_unserialize_len_bytes(entry, "res_bufdata", &str->tempbufdata, &str->tempbufdatalen);
+        }
+        else {
+            glkunix_unserialize_uint32(entry, "res_ubufptr", &str->tempbufptr);
+            glkunix_unserialize_uint32(entry, "res_ubufeof", &str->tempbufeof);
+            glkunix_unserialize_uint32(entry, "res_ubufend", &str->tempbufend);
+            glkunix_unserialize_len_unicode(entry, "res_ubufdata", &str->tempubufdata, &str->tempbufdatalen);
+        }
+        break;
+        
+    }
+
+    return TRUE;
+}
+
+static int fileref_state_parse(glkunix_library_state_t state, glkunix_unserialize_context_t entry, frefid_t fref)
+{
+    glkunix_unserialize_uint32(entry, "rock", &fref->rock);
+    /* disprock is handled elsewhere */
+    glkunix_unserialize_latin1_string(entry, "filename", &fref->filename);
+    glkunix_unserialize_int(entry, "filetype", &fref->filetype);
+    glkunix_unserialize_int(entry, "textmode", &fref->textmode);
+
+    return TRUE;
 }
 
 static window_t *libstate_window_find_by_updatetag(glkunix_library_state_t state, glui32 tag)
