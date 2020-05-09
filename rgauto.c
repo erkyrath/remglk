@@ -6,6 +6,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "glk.h"
 #include "remglk.h"
@@ -635,6 +636,11 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
 
 static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize_context_t entry, winid_t win)
 {
+    int ix;
+    int intval;
+    glkunix_unserialize_context_t array;
+    glkunix_unserialize_context_t el;
+    int count;
     glui32 tag;
     
     glkunix_unserialize_uint32(entry, "rock", &win->rock);
@@ -693,7 +699,44 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
         glkunix_unserialize_uint32(entry, "pair_size", &dwin->size);
         break;
     }
-                
+
+    case wintype_TextBuffer: {
+        window_textbuffer_t *dwin = win_textbuffer_create(win);
+        win->data = dwin;
+
+        glkunix_unserialize_int(entry, "buf_width", &dwin->width);
+        glkunix_unserialize_int(entry, "buf_height", &dwin->height);
+
+        //### think about this
+        glkunix_unserialize_long(entry, "buf_updatemark", &dwin->updatemark);
+        glkunix_unserialize_int(entry, "buf_startclear", &dwin->startclear);
+
+        if (glkunix_unserialize_list(entry, "buf_runs", &array, &count)) {
+            if (count > dwin->runssize) {
+                dwin->runssize = (count | 7) + 8;
+                dwin->runs = (tbrun_t *)realloc(dwin->runs, dwin->runssize * sizeof(tbrun_t));
+            }
+            if (!dwin->runs)
+                return FALSE;
+            memset(dwin->runs, 0, dwin->runssize * sizeof(tbrun_t));
+            dwin->numruns = count;
+            for (ix=0; ix<count; ix++) {
+                tbrun_t *run = &dwin->runs[ix];
+                if (!glkunix_unserialize_list_entry(array, ix, &el))
+                    return FALSE;
+                glkunix_unserialize_int(el, "style", &intval);
+                run->style = intval;
+                glkunix_unserialize_uint32(el, "hyperlink", &run->hyperlink);
+                glkunix_unserialize_long(el, "pos", &run->pos);
+                if (!glkunix_unserialize_long(el, "specialnum", &run->specialnum)) {
+                    run->specialnum = -1; /* default value */
+                }
+            }
+        }
+        
+        break;
+    }
+        
     }
 
     return TRUE;
