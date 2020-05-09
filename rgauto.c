@@ -648,7 +648,7 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
     /* disprock is handled elsewhere */
     
     glkunix_unserialize_context_t boxentry;
-    if (!glkunix_unserialize_struct(entry, "extra_state", &boxentry)) {
+    if (glkunix_unserialize_struct(entry, "extra_state", &boxentry)) {
         data_grect_parse(boxentry->dat, &win->bbox);
     }
     
