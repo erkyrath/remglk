@@ -2210,6 +2210,16 @@ int glkunix_unserialize_int(glkunix_unserialize_context_t ctx, char *key, int *r
     data_raw_t *dat = data_raw_struct_field(ctx->dat, key);
     if (!dat)
         return FALSE;
+
+    /* Sometimes we serialize an int as a JSON boolean. */
+    if (dat->type == rawtyp_True) {
+        *res = 1;
+        return TRUE;
+    }
+    if (dat->type == rawtyp_False) {
+        *res = 0;
+        return TRUE;
+    }
     
     glsi32 val = data_raw_int_value(dat);
     *res = (int)val;
