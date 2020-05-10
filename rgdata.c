@@ -2391,6 +2391,20 @@ int glkunix_unserialize_list_entry(glkunix_unserialize_context_t ctx, int pos, g
     return TRUE;
 }
 
+int glkunix_unserialize_uint32_list_entry(glkunix_unserialize_context_t ctx, int pos, glui32 *res)
+{
+    if (!ctx->dat)
+        return FALSE;
+    if (ctx->dat->type != rawtyp_List)
+        return FALSE;
+    if (!ctx->dat->list || pos < 0 || pos >= ctx->dat->count)
+        return FALSE;
+
+    glsi32 val = data_raw_int_value(ctx->dat->list[pos]);
+    *res = (glui32)val;
+    return TRUE;
+}
+
 int glkunix_unserialize_object_list_entries(glkunix_unserialize_context_t ctx, glkunix_unserialize_object_f func, int count, size_t size, void *array)
 {
     char *charray = array;

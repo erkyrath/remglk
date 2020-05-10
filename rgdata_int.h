@@ -46,5 +46,7 @@ extern int glkunix_unserialize_latin1_string(glkunix_unserialize_context_t, char
 extern int glkunix_unserialize_len_bytes(glkunix_unserialize_context_t, char *, unsigned char **, long *);
 extern int glkunix_unserialize_len_unicode(glkunix_unserialize_context_t, char *, glui32 **, long *);
 
+extern int glkunix_unserialize_uint32_list_entry(glkunix_unserialize_context_t, int, glui32 *);
+
 extern int glkunix_unserialize_object_root(FILE *file, struct glkunix_unserialize_context_struct *ctx);
 extern void glkunix_unserialize_object_root_finalize(struct glkunix_unserialize_context_struct *ctx);
