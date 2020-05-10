@@ -795,15 +795,33 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
                 tgline_t *line = &dwin->lines[ix];
                 if (!glkunix_unserialize_list_entry(array, ix, &el))
                     return FALSE;
+                
+                glkunix_unserialize_context_t subarray;
                 int jx;
                 glui32 *ubuf;
                 long buflen;
+                int len;
                 if (glkunix_unserialize_len_unicode(el, "chars", &ubuf, &buflen)) {
                     for (jx=0; jx<buflen && jx<dwin->width; jx++) {
                         line->chars[jx] = ubuf[jx];
                     }
                     free(ubuf);
                 }
+                if (glkunix_unserialize_list(el, "styles", &subarray, &len)) {
+                    for (jx=0; jx<len && jx<dwin->width; jx++) {
+                        if (!glkunix_unserialize_uint32_list_entry(subarray, jx, &tag))
+                            return FALSE;
+                        line->styles[jx] = tag;
+                    }
+                }
+                if (glkunix_unserialize_list(el, "links", &subarray, &len)) {
+                    for (jx=0; jx<len && jx<dwin->width; jx++) {
+                        if (!glkunix_unserialize_uint32_list_entry(subarray, jx, &tag))
+                            return FALSE;
+                        line->links[jx] = tag;
+                    }
+                }
+
             }
         }
         
