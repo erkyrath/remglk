@@ -769,6 +769,8 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
                 glkunix_unserialize_uint32(el, "color", &special->color);
             }
         }
+
+        //### input line stuff
         
         break;
     }
@@ -807,19 +809,20 @@ static int stream_state_parse(glkunix_library_state_t state, glkunix_unserialize
         
     case strtype_Memory:
         glkunix_unserialize_uint32(entry, "mem_buflen", &str->buflen);
+        str->tempbufinfo = data_tempbufinfo_alloc();
         if (!str->unicode) {
-            glkunix_unserialize_long(entry, "mem_buf", &str->tempbufkey);
-            glkunix_unserialize_uint32(entry, "mem_bufptr", &str->tempbufptr);
-            glkunix_unserialize_uint32(entry, "mem_bufeof", &str->tempbufeof);
-            glkunix_unserialize_uint32(entry, "mem_bufend", &str->tempbufend);
-            glkunix_unserialize_len_bytes(entry, "mem_bufdata", &str->tempbufdata, &str->tempbufdatalen);
+            glkunix_unserialize_long(entry, "mem_buf", &str->tempbufinfo->bufkey);
+            glkunix_unserialize_uint32(entry, "mem_bufptr", &str->tempbufinfo->bufptr);
+            glkunix_unserialize_uint32(entry, "mem_bufeof", &str->tempbufinfo->bufeof);
+            glkunix_unserialize_uint32(entry, "mem_bufend", &str->tempbufinfo->bufend);
+            glkunix_unserialize_len_bytes(entry, "mem_bufdata", &str->tempbufinfo->bufdata, &str->tempbufinfo->bufdatalen);
         }
         else {
-            glkunix_unserialize_long(entry, "mem_ubuf", &str->tempbufkey);
-            glkunix_unserialize_uint32(entry, "mem_ubufptr", &str->tempbufptr);
-            glkunix_unserialize_uint32(entry, "mem_ubufeof", &str->tempbufeof);
-            glkunix_unserialize_uint32(entry, "mem_ubufend", &str->tempbufend);
-            glkunix_unserialize_len_unicode(entry, "mem_ubufdata", &str->tempubufdata, &str->tempbufdatalen);
+            glkunix_unserialize_long(entry, "mem_ubuf", &str->tempbufinfo->bufkey);
+            glkunix_unserialize_uint32(entry, "mem_ubufptr", &str->tempbufinfo->bufptr);
+            glkunix_unserialize_uint32(entry, "mem_ubufeof", &str->tempbufinfo->bufeof);
+            glkunix_unserialize_uint32(entry, "mem_ubufend", &str->tempbufinfo->bufend);
+            glkunix_unserialize_len_unicode(entry, "mem_ubufdata", &str->tempbufinfo->ubufdata, &str->tempbufinfo->bufdatalen);
         }
         break;
         
@@ -827,17 +830,18 @@ static int stream_state_parse(glkunix_library_state_t state, glkunix_unserialize
         glkunix_unserialize_int(entry, "res_isbinary", &str->isbinary);
         glkunix_unserialize_uint32(entry, "res_fileresnum", &str->fileresnum);
         glkunix_unserialize_uint32(entry, "res_buflen", &str->buflen);
+        str->tempbufinfo = data_tempbufinfo_alloc();
         if (!str->unicode) {
-            glkunix_unserialize_uint32(entry, "res_bufptr", &str->tempbufptr);
-            glkunix_unserialize_uint32(entry, "res_bufeof", &str->tempbufeof);
-            glkunix_unserialize_uint32(entry, "res_bufend", &str->tempbufend);
-            glkunix_unserialize_len_bytes(entry, "res_bufdata", &str->tempbufdata, &str->tempbufdatalen);
+            glkunix_unserialize_uint32(entry, "res_bufptr", &str->tempbufinfo->bufptr);
+            glkunix_unserialize_uint32(entry, "res_bufeof", &str->tempbufinfo->bufeof);
+            glkunix_unserialize_uint32(entry, "res_bufend", &str->tempbufinfo->bufend);
+            glkunix_unserialize_len_bytes(entry, "res_bufdata", &str->tempbufinfo->bufdata, &str->tempbufinfo->bufdatalen);
         }
         else {
-            glkunix_unserialize_uint32(entry, "res_ubufptr", &str->tempbufptr);
-            glkunix_unserialize_uint32(entry, "res_ubufeof", &str->tempbufeof);
-            glkunix_unserialize_uint32(entry, "res_ubufend", &str->tempbufend);
-            glkunix_unserialize_len_unicode(entry, "res_ubufdata", &str->tempubufdata, &str->tempbufdatalen);
+            glkunix_unserialize_uint32(entry, "res_ubufptr", &str->tempbufinfo->bufptr);
+            glkunix_unserialize_uint32(entry, "res_ubufeof", &str->tempbufinfo->bufeof);
+            glkunix_unserialize_uint32(entry, "res_ubufend", &str->tempbufinfo->bufend);
+            glkunix_unserialize_len_unicode(entry, "res_ubufdata", &str->tempbufinfo->ubufdata, &str->tempbufinfo->bufdatalen);
         }
         break;
         
