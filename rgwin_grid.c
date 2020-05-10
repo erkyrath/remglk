@@ -17,8 +17,6 @@
     255 styles, things will have to be changed, but that's unlikely.)
 */
 
-static void init_lines(window_textgrid_t *dwin, int beg, int end, int linewid);
-
 
 window_textgrid_t *win_textgrid_create(window_t *win)
 {
@@ -91,7 +89,7 @@ void win_textgrid_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics
         dwin->lines = (tgline_t *)malloc(dwin->linessize * sizeof(tgline_t));
         if (!dwin->lines)
             return;
-        init_lines(dwin, 0, dwin->linessize, newwid);
+        win_textgrid_alloc_lines(dwin, 0, dwin->linessize, newwid);
     }
     else {
         if (newhgt > dwin->linessize) {
@@ -101,7 +99,7 @@ void win_textgrid_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics
                 dwin->linessize * sizeof(tgline_t));
             if (!dwin->lines)
                 return;
-            init_lines(dwin, oldval, dwin->linessize, newwid);
+            win_textgrid_alloc_lines(dwin, oldval, dwin->linessize, newwid);
         }
         if (newhgt > dwin->height) {
             /* Clear any new lines */
@@ -144,7 +142,7 @@ void win_textgrid_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics
     dwin->alldirty = TRUE;
 }
 
-static void init_lines(window_textgrid_t *dwin, int beg, int end, int linewid)
+void win_textgrid_alloc_lines(window_textgrid_t *dwin, int beg, int end, int linewid)
 {
     int ix, jx;
 
