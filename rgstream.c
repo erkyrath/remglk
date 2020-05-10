@@ -10,6 +10,7 @@
 #include "glk.h"
 #include "remglk.h"
 #include "gi_blorb.h"
+#include "rgdata.h"
 
 /* This implements pretty much what any Glk implementation needs for 
     stream stuff. Memory streams, file streams (using stdio functions), 
@@ -82,13 +83,7 @@ stream_t *gli_new_stream(int type, int readable, int writable,
     str->readable = readable;
     str->writable = writable;
 
-    str->tempbufdata = NULL;
-    str->tempubufdata = NULL;
-    str->tempbufdatalen = 0;
-    str->tempbufkey = 0;
-    str->tempbufptr = 0;
-    str->tempbufend = 0;
-    str->tempbufeof = 0;
+    str->tempbufinfo = NULL;
     
     str->prev = NULL;
     str->next = gli_streamlist;
@@ -139,13 +134,7 @@ stream_t *gli_stream_alloc_inactive()
     str->readable = FALSE;
     str->writable = FALSE;
 
-    str->tempbufdata = NULL;
-    str->tempubufdata = NULL;
-    str->tempbufdatalen = 0;
-    str->tempbufkey = 0;
-    str->tempbufptr = 0;
-    str->tempbufend = 0;
-    str->tempbufeof = 0;
+    str->tempbufinfo = NULL;
     
     str->prev = NULL;
     str->next = NULL;
@@ -196,6 +185,11 @@ void gli_delete_stream(stream_t *str)
     if (gli_unregister_obj) {
         (*gli_unregister_obj)(str, gidisp_Class_Stream, str->disprock);
         str->disprock.ptr = NULL;
+    }
+
+    if (str->tempbufinfo) {
+        data_tempbufinfo_free(str->tempbufinfo);
+        str->tempbufinfo = NULL;
     }
 
     prev = str->prev;

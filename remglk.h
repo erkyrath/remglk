@@ -48,6 +48,7 @@ typedef struct data_raw_struct data_raw_t;
 typedef struct data_metrics_struct data_metrics_t;
 typedef struct data_content_struct data_content_t;
 typedef struct data_specialreq_struct data_specialreq_t;
+typedef struct data_tempbufinfo_struct data_tempbufinfo_t;
 
 typedef struct glk_window_struct window_t;
 typedef struct glk_stream_struct stream_t;
@@ -130,12 +131,8 @@ struct glk_stream_struct {
     glui32 buflen;
     gidispatch_rock_t arrayrock;
 
-    /* These values are only used in a temporary library_state, while deserializing. */
-    unsigned char *tempbufdata;
-    glui32 *tempubufdata;
-    long tempbufdatalen;
-    long tempbufkey;
-    glui32 tempbufptr, tempbufend, tempbufeof;
+    /* only used in a temporary library_state, while deserializing. */
+    data_tempbufinfo_t *tempbufinfo;
 
     gidispatch_rock_t disprock;
     stream_t *next, *prev; /* in the big linked list of streams */
