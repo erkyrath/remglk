@@ -774,7 +774,22 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
         
         break;
     }
+
+    case wintype_TextGrid: {
+        window_textgrid_t *dwin = win_textgrid_create(win);
+        win->data = dwin;
+
+        glkunix_unserialize_int(entry, "grid_width", &dwin->width);
+        glkunix_unserialize_int(entry, "grid_height", &dwin->height);
+        glkunix_unserialize_int(entry, "grid_curx", &dwin->curx);
+        glkunix_unserialize_int(entry, "grid_cury", &dwin->cury);
+
+        //### input line stuff
         
+        break;
+    }
+
+
     }
 
     return TRUE;
