@@ -784,6 +784,29 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
         glkunix_unserialize_int(entry, "grid_curx", &dwin->curx);
         glkunix_unserialize_int(entry, "grid_cury", &dwin->cury);
 
+        dwin->linessize = dwin->height+1;
+        dwin->lines = (tgline_t *)malloc(dwin->linessize * sizeof(tgline_t));
+        if (!dwin->lines)
+            return FALSE;
+        win_textgrid_alloc_lines(dwin, 0, dwin->linessize, dwin->width);
+        
+        if (glkunix_unserialize_list(entry, "grid_lines", &array, &count)) {
+            for (ix=0; ix<count && ix<dwin->height; ix++) {
+                tgline_t *line = &dwin->lines[ix];
+                if (!glkunix_unserialize_list_entry(array, ix, &el))
+                    return FALSE;
+                int jx;
+                glui32 *ubuf;
+                long buflen;
+                if (glkunix_unserialize_len_unicode(el, "chars", &ubuf, &buflen)) {
+                    for (jx=0; jx<buflen && jx<dwin->width; jx++) {
+                        line->chars[jx] = ubuf[jx];
+                    }
+                    free(ubuf);
+                }
+            }
+        }
+        
         //### input line stuff
         
         break;
