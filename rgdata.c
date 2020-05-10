@@ -2008,6 +2008,37 @@ void data_specialreq_print(data_specialreq_t *dat)
     printf(" }");
 }
 
+data_tempbufinfo_t *data_tempbufinfo_alloc()
+{
+    data_tempbufinfo_t *temp = (data_tempbufinfo_t *)malloc(sizeof(data_tempbufinfo_t));
+    if (!temp)
+        return NULL;
+
+    temp->bufdata = NULL;
+    temp->ubufdata = NULL;
+    temp->bufdatalen = 0;
+    temp->bufkey = 0;
+    temp->bufptr = 0;
+    temp->bufend = 0;
+    temp->bufeof = 0;
+
+    return temp;
+}
+
+void data_tempbufinfo_free(data_tempbufinfo_t *temp)
+{
+    if (temp->bufdata) {
+        free(temp->bufdata);
+        temp->bufdata = NULL;
+    }
+    if (temp->ubufdata) {
+        free(temp->ubufdata);
+        temp->ubufdata = NULL;
+    }
+    
+    free(temp);
+}
+
 void data_grect_print(FILE *file, grect_t *box)
 {
     fprintf(file, "{\"left\":%d, \"top\":%d, \"right\":%d, \"bottom\":%d}",

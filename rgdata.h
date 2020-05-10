@@ -188,6 +188,15 @@ struct data_specialreq_struct {
     char *gameid; /* may be null */
 };
 
+/* data_tempbufinfo_t: Temporary storage during autorestore. */
+struct data_tempbufinfo_struct {
+    unsigned char *bufdata;
+    glui32 *ubufdata;
+    long bufdatalen;
+    long bufkey;
+    glui32 bufptr, bufend, bufeof;
+};
+
 extern void gli_initialize_datainput(void);
 
 extern void print_ustring_len_json(glui32 *buf, glui32 len, FILE *fl);
@@ -242,6 +251,9 @@ extern void data_specialspan_auto_print(FILE *file, data_specialspan_t *dat);
 extern data_specialreq_t *data_specialreq_alloc(glui32 filemode, glui32 filetype);
 extern void data_specialreq_free(data_specialreq_t *data);
 extern void data_specialreq_print(data_specialreq_t *data);
+
+extern data_tempbufinfo_t *data_tempbufinfo_alloc(void);
+extern void data_tempbufinfo_free(data_tempbufinfo_t *data);
 
 extern void data_grect_print(FILE *file, grect_t *box);
 extern void data_grect_parse(data_raw_t *rawdata, grect_t *box);
