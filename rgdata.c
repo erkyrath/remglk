@@ -447,6 +447,20 @@ static double data_raw_real_value(data_raw_t *dat)
     return dat->realnumber;
 }
 
+/* Validate that the object is a boolean, and get its value. */
+static int data_raw_bool_value(data_raw_t *dat)
+{
+    if (dat->type == rawtyp_True) {
+        return TRUE;
+    }
+    if (dat->type == rawtyp_False) {
+        return FALSE;
+    }
+
+    gli_fatal_error("data: Need number or bool");
+    return FALSE;
+}
+
 /* Validate that the object is a string, and return its value as a
    freshly-malloced Unicode array. (Not null-terminated! The caller
    must record the length separately.) */
@@ -1939,6 +1953,77 @@ void data_specialspan_auto_print(FILE *file, data_specialspan_t *dat)
     fprintf(file, "}");
 }
 
+data_specialspan_t *data_specialspan_auto_parse(data_raw_t *rawdata)
+{
+    int ix;
+    data_raw_t *dat;
+
+    dat = data_raw_struct_field(rawdata, "type");
+    if (!dat)
+        return NULL;
+    
+    int typeval = data_raw_int_value(dat);
+    data_specialspan_t *special = data_specialspan_alloc(typeval);
+    if (!special)
+        return NULL;
+
+    dat = data_raw_struct_field(rawdata, "image");
+    if (dat)
+        special->image = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "chunktype");
+    if (dat)
+        special->chunktype = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "hasdimensions");
+    if (dat) {
+        if (dat->type == rawtyp_Number)
+            special->hasdimensions = data_raw_int_value(dat);
+        else
+            special->hasdimensions = data_raw_bool_value(dat);
+    }
+    dat = data_raw_struct_field(rawdata, "xpos");
+    if (dat)
+        special->xpos = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "ypos");
+    if (dat)
+        special->ypos = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "width");
+    if (dat)
+        special->width = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "height");
+    if (dat)
+        special->height = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "alignment");
+    if (dat)
+        special->alignment = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "hyperlink");
+    if (dat)
+        special->hyperlink = data_raw_int_value(dat);
+
+    dat = data_raw_struct_field(rawdata, "alttext");
+    if (dat && dat->type == rawtyp_Str) {
+        /* This gets leaked; the library doesn't expect it to be alloced. */
+        special->alttext = malloc(dat->count+1);
+        for (ix=0; ix<dat->count; ix++) {
+            glui32 ch = dat->str[ix];
+            special->alttext[ix] = ((ch < 0x100) ? (char)ch : '?');
+        }
+        special->alttext[dat->count] = '\0';
+    }
+
+    dat = data_raw_struct_field(rawdata, "hascolor");
+    if (dat) {
+        if (dat->type == rawtyp_Number)
+            special->hascolor = data_raw_int_value(dat);
+        else
+            special->hascolor = data_raw_bool_value(dat);
+    }
+    dat = data_raw_struct_field(rawdata, "color");
+    if (dat)
+        special->color = data_raw_int_value(dat);
+
+    return special;
+}
+
 data_specialreq_t *data_specialreq_alloc(glui32 filemode, glui32 filetype)
 {
     data_specialreq_t *dat = (data_specialreq_t *)malloc(sizeof(data_specialreq_t));
@@ -2241,16 +2326,6 @@ int glkunix_unserialize_int(glkunix_unserialize_context_t ctx, char *key, int *r
     data_raw_t *dat = data_raw_struct_field(ctx->dat, key);
     if (!dat)
         return FALSE;
-
-    /* Sometimes we serialize an int as a JSON boolean. */
-    if (dat->type == rawtyp_True) {
-        *res = 1;
-        return TRUE;
-    }
-    if (dat->type == rawtyp_False) {
-        *res = 0;
-        return TRUE;
-    }
     
     glsi32 val = data_raw_int_value(dat);
     *res = (int)val;
