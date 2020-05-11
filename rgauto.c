@@ -754,21 +754,9 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
             for (ix=0; ix<count; ix++) {
                 if (!glkunix_unserialize_list_entry(array, ix, &el))
                     return FALSE;
-                glkunix_unserialize_int(el, "type", &intval);
-                data_specialspan_t *special = data_specialspan_alloc(intval);
-                dwin->specials[ix] = special;
-                glkunix_unserialize_uint32(el, "image", &special->image);
-                glkunix_unserialize_uint32(el, "chunktype", &special->chunktype);
-                glkunix_unserialize_int(el, "hasdimensions", &special->hasdimensions);
-                glkunix_unserialize_uint32(el, "xpos", &special->xpos);
-                glkunix_unserialize_uint32(el, "ypos", &special->ypos);
-                glkunix_unserialize_uint32(el, "width", &special->width);
-                glkunix_unserialize_uint32(el, "height", &special->height);
-                glkunix_unserialize_uint32(el, "alignment", &special->alignment);
-                glkunix_unserialize_uint32(el, "hyperlink", &special->hyperlink);
-                glkunix_unserialize_latin1_string(el, "alttext", &special->alttext); /* This gets leaked; the library doesn't expect it to be alloced. */
-                glkunix_unserialize_int(el, "hascolor", &special->hascolor);
-                glkunix_unserialize_uint32(el, "color", &special->color);
+                dwin->specials[ix] = data_specialspan_auto_parse(el->dat);
+                if (!dwin->specials[ix])
+                    return FALSE;
             }
         }
 
@@ -854,22 +842,9 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
             for (ix=0; ix<count; ix++) {
                 if (!glkunix_unserialize_list_entry(array, ix, &el))
                     return FALSE;
-                //### refactor this bit? (specialspan parsing)
-                glkunix_unserialize_int(el, "type", &intval);
-                data_specialspan_t *special = data_specialspan_alloc(intval);
-                dwin->content[ix] = special;
-                glkunix_unserialize_uint32(el, "image", &special->image);
-                glkunix_unserialize_uint32(el, "chunktype", &special->chunktype);
-                glkunix_unserialize_int(el, "hasdimensions", &special->hasdimensions);
-                glkunix_unserialize_uint32(el, "xpos", &special->xpos);
-                glkunix_unserialize_uint32(el, "ypos", &special->ypos);
-                glkunix_unserialize_uint32(el, "width", &special->width);
-                glkunix_unserialize_uint32(el, "height", &special->height);
-                glkunix_unserialize_uint32(el, "alignment", &special->alignment);
-                glkunix_unserialize_uint32(el, "hyperlink", &special->hyperlink);
-                glkunix_unserialize_latin1_string(el, "alttext", &special->alttext); /* This gets leaked; the library doesn't expect it to be alloced. */
-                glkunix_unserialize_int(el, "hascolor", &special->hascolor);
-                glkunix_unserialize_uint32(el, "color", &special->color);
+                dwin->content[ix] = data_specialspan_auto_parse(el->dat);
+                if (!dwin->content[ix])
+                    return FALSE;
             }
         }
         
