@@ -84,6 +84,9 @@ struct glk_window_struct {
     glui32 style;
     glui32 hyperlink;
     
+    /* only used in a temporary library_state, while deserializing. */
+    data_tempbufinfo_t *tempbufinfo;
+    
     gidispatch_rock_t disprock;
     window_t *next, *prev; /* in the big linked list of windows */
 };

@@ -137,6 +137,8 @@ window_t *gli_new_window(glui32 type, glui32 rock)
 
     win->str = gli_stream_open_window(win);
     win->echostr = NULL;
+    
+    win->tempbufinfo = NULL;
 
     win->prev = NULL;
     win->next = gli_windowlist;
@@ -178,6 +180,8 @@ window_t *gli_window_alloc_inactive()
     win->str = NULL;
     win->echostr = NULL;
 
+    win->tempbufinfo = NULL;
+    
     win->prev = NULL;
     win->next = NULL;
     
@@ -199,6 +203,11 @@ void gli_delete_window(window_t *win)
         win->str = NULL;
     }
     
+    if (win->tempbufinfo) {
+        data_tempbufinfo_free(win->tempbufinfo);
+        win->tempbufinfo = NULL;
+    }
+
     prev = win->prev;
     next = win->next;
     win->prev = NULL;
