@@ -457,7 +457,7 @@ static int data_raw_bool_value(data_raw_t *dat)
         return FALSE;
     }
 
-    gli_fatal_error("data: Need number or bool");
+    gli_fatal_error("data: Need bool");
     return FALSE;
 }
 

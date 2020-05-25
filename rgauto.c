@@ -184,6 +184,7 @@ static void window_state_print(FILE *fl, winid_t win)
 
         /* Fields only relevant during line input. */
         if (dwin->inbuf && dwin->inmax && gli_dispatch_locate_arr) {
+            fprintf(fl, ",\n\"buf_ininput\":%d", 1);
             if (dwin->incurpos)
                 fprintf(fl, ",\n\"buf_incurpos\":%ld", (long)dwin->incurpos);
             fprintf(fl, ",\n\"buf_inunicode\":%d", dwin->inunicode);
@@ -248,6 +249,7 @@ static void window_state_print(FILE *fl, winid_t win)
 
         /* Fields only relevant during line input. */
         if (dwin->inbuf && dwin->inoriglen && gli_dispatch_locate_arr) {
+            fprintf(fl, ",\n\"grid_ininput\":%d", 1);
             if (dwin->incurpos)
                 fprintf(fl, ",\n\"grid_incurpos\":%ld", (long)dwin->incurpos);
             fprintf(fl, ",\n\"grid_inunicode\":%d", dwin->inunicode);
@@ -760,7 +762,26 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
             }
         }
 
-        //### input line stuff
+        intval = FALSE;
+        if (glkunix_unserialize_int(entry, "buf_ininput", &intval) && intval) {
+            glkunix_unserialize_uint32(entry, "buf_incurpos", &dwin->incurpos);
+            glkunix_unserialize_int(entry, "buf_inunicode", &dwin->inunicode);
+            glkunix_unserialize_int(entry, "buf_inecho", &dwin->inecho);
+            glkunix_unserialize_uint32(entry, "buf_intermkeys", &dwin->intermkeys);
+            glkunix_unserialize_int(entry, "buf_inmax", &dwin->inmax);
+            glkunix_unserialize_uint32(entry, "buf_origstyle", &dwin->origstyle);
+            glkunix_unserialize_uint32(entry, "buf_orighyperlink", &dwin->orighyperlink);
+
+            win->tempbufinfo = data_tempbufinfo_alloc();
+            if (!dwin->inunicode) {
+                glkunix_unserialize_long(entry, "buf_line_buffer", &win->tempbufinfo->bufkey);
+                glkunix_unserialize_len_bytes(entry, "buf_line_buffer_data", &win->tempbufinfo->bufdata, &win->tempbufinfo->bufdatalen);
+            }
+            else {
+                glkunix_unserialize_long(entry, "buf_line_buffer", &win->tempbufinfo->bufkey);
+                glkunix_unserialize_len_unicode(entry, "buf_line_buffer_data", &win->tempbufinfo->ubufdata, &win->tempbufinfo->bufdatalen);
+            }
+        }
         
         break;
     }
