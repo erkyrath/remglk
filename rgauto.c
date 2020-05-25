@@ -837,7 +837,29 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
             }
         }
         
-        //### input line stuff
+        intval = FALSE;
+        if (glkunix_unserialize_int(entry, "grid_ininput", &intval) && intval) {
+            glkunix_unserialize_uint32(entry, "grid_incurpos", &dwin->incurpos);
+            glkunix_unserialize_int(entry, "grid_inunicode", &dwin->inunicode);
+            glkunix_unserialize_int(entry, "grid_inecho", &dwin->inecho);
+            glkunix_unserialize_uint32(entry, "grid_intermkeys", &dwin->intermkeys);
+            glkunix_unserialize_int(entry, "grid_inmax", &dwin->inmax);
+            glkunix_unserialize_int(entry, "grid_inoriglen", &dwin->inoriglen);
+            glkunix_unserialize_uint32(entry, "grid_origstyle", &dwin->origstyle);
+            /*
+            glkunix_unserialize_uint32(entry, "grid_orighyperlink", &dwin->orighyperlink);
+            */
+
+            win->tempbufinfo = data_tempbufinfo_alloc();
+            if (!dwin->inunicode) {
+                glkunix_unserialize_long(entry, "grid_line_buffer", &win->tempbufinfo->bufkey);
+                glkunix_unserialize_len_bytes(entry, "grid_line_buffer_data", &win->tempbufinfo->bufdata, &win->tempbufinfo->bufdatalen);
+            }
+            else {
+                glkunix_unserialize_long(entry, "grid_line_buffer", &win->tempbufinfo->bufkey);
+                glkunix_unserialize_len_unicode(entry, "grid_line_buffer_data", &win->tempbufinfo->ubufdata, &win->tempbufinfo->bufdatalen);
+            }
+        }
         
         break;
     }
