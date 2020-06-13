@@ -129,6 +129,12 @@ static void window_state_print(FILE *fl, winid_t win)
     fprintf(fl, ",\n\"style\":%ld", (long)win->style);
     fprintf(fl, ",\n\"hyperlink\":%ld", (long)win->hyperlink);
 
+    /* Dirty flags will not be saved here. Autosave occurs just before
+       the glk_select call. So even though dirty flags exist at this point,
+       we're about to generate a window update and clear them all. At
+       autorestore time, a continuously-connected client will be up to date
+       and should not see any dirtiness. */
+    
     switch (win->type) {
         
     case wintype_Pair: {
@@ -235,7 +241,7 @@ static void window_state_print(FILE *fl, winid_t win)
         fprintf(fl, ",\n\"grid_width\":%d, \"grid_height\":%d", dwin->width, dwin->height);
         fprintf(fl, ",\n\"grid_curx\":%d, \"grid_cury\":%d", dwin->curx, dwin->cury);
 
-        /* nothing is dirty at autosave (select) time */
+        /* We don't save the dirty flags. */
 
         fprintf(fl, ",\n\"grid_lines\":[\n");
         first = TRUE;
