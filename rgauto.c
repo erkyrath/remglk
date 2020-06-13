@@ -806,7 +806,6 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
         if (!dwin->lines)
             return FALSE;
         win_textgrid_alloc_lines(dwin, 0, dwin->linessize, dwin->width);
-        //### lines are marked dirty?
         
         if (glkunix_unserialize_list(entry, "grid_lines", &array, &count)) {
             for (ix=0; ix<count && ix<dwin->height; ix++) {
@@ -866,6 +865,11 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
                 glkunix_unserialize_len_unicode(entry, "grid_line_buffer_data", &win->tempbufinfo->ubufdata, &win->tempbufinfo->bufdatalen);
             }
         }
+
+        for (ix=0; ix<dwin->linessize; ix++) {
+            dwin->lines[ix].dirty = FALSE;
+        }
+        dwin->alldirty = FALSE;
         
         break;
     }
