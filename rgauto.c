@@ -163,9 +163,8 @@ static void window_state_print(FILE *fl, winid_t win)
     case wintype_TextBuffer: {
         window_textbuffer_t *dwin = win->data;
         fprintf(fl, ",\n\"buf_width\":%d, \"buf_height\":%d", dwin->width, dwin->height);
-        //### think about this
-        fprintf(fl, ",\n\"buf_updatemark\":%ld", (long)dwin->updatemark);
-        fprintf(fl, ",\n\"buf_startclear\":%d", dwin->startclear);
+        
+        /* We don't save the updatemark/startclear. */
         
         fprintf(fl, ",\n\"buf_runs\":[\n");
         first = TRUE;
@@ -714,10 +713,6 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
         glkunix_unserialize_int(entry, "buf_width", &dwin->width);
         glkunix_unserialize_int(entry, "buf_height", &dwin->height);
 
-        //### think about this
-        glkunix_unserialize_long(entry, "buf_updatemark", &dwin->updatemark);
-        glkunix_unserialize_int(entry, "buf_startclear", &dwin->startclear);
-
         glui32 *buf;
         long bufcount;
         if (glkunix_unserialize_len_unicode(entry, "buf_chars", &buf, &bufcount)) {
@@ -787,7 +782,11 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
                 glkunix_unserialize_len_unicode(entry, "buf_line_buffer_data", &win->tempbufinfo->ubufdata, &win->tempbufinfo->bufdatalen);
             }
         }
-        
+
+        /* Clear dirty flags. */
+        dwin->updatemark = dwin->numchars;
+        dwin->startclear = FALSE;
+
         break;
     }
 
