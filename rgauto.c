@@ -308,8 +308,7 @@ static void window_state_print(FILE *fl, winid_t win)
         window_graphics_t *dwin = win->data;
         fprintf(fl, ",\n\"graph_width\":%d, \"graph_height\":%d", dwin->graphwidth, dwin->graphheight);
 
-        //### think about this
-        fprintf(fl, ",\n\"graph_updatemark\":%ld", (long)dwin->updatemark);
+        /* We don't save the updatemark. */
 
         fprintf(fl, ",\n\"graph_content\":[\n");
         first = TRUE;
@@ -866,6 +865,7 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
             }
         }
 
+        /* Clear dirty flags. */
         for (ix=0; ix<dwin->linessize; ix++) {
             dwin->lines[ix].dirty = FALSE;
         }
@@ -880,9 +880,6 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
 
         glkunix_unserialize_int(entry, "graph_width", &dwin->graphwidth);
         glkunix_unserialize_int(entry, "graph_height", &dwin->graphheight);
-
-        //### think about this
-        glkunix_unserialize_long(entry, "graph_updatemark", &dwin->updatemark);
 
         if (glkunix_unserialize_list(entry, "graph_content", &array, &count)) {
             if (count > dwin->contentsize) {
@@ -900,6 +897,9 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
                     return FALSE;
             }
         }
+
+        /* Clear dirty flags. */
+        dwin->updatemark = dwin->numcontent;
         
         break;
     }
