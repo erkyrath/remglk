@@ -231,6 +231,7 @@ extern glui32 gli_window_current_generation(void);
 extern winid_t glkunix_window_find_by_updatetag(glui32 tag); /* see glkstart.h */
 extern window_t *gli_new_window(glui32 type, glui32 rock);
 extern window_t *gli_window_alloc_inactive(void);
+extern int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin);
 extern void gli_delete_window(window_t *win);
 extern window_t *gli_window_iterate_treeorder(window_t *win);
 extern void gli_window_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics);
@@ -238,6 +239,7 @@ extern void gli_windows_update(data_specialreq_t *special, int newgeneration);
 extern void gli_windows_refresh(glui32 fromgen);
 extern void gli_windows_metrics_change(data_metrics_t *newmetrics);
 extern data_metrics_t *gli_windows_get_metrics(void);
+extern void gli_windows_update_metrics(data_metrics_t *newmetrics);
 extern void gli_windows_trim_buffers(void);
 extern void gli_window_put_char(window_t *win, glui32 ch);
 extern void gli_windows_unechostream(stream_t *str);

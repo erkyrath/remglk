@@ -193,6 +193,28 @@ window_t *gli_window_alloc_inactive()
     return win;
 }
 
+int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
+{
+    if (gli_windowlist) {
+        gli_fatal_error("windows already exist");
+        return FALSE;
+    }
+
+    for (int ix=count-1; ix>=0; ix--) {
+        winid_t win = list[ix];
+        win->next = gli_windowlist;
+        gli_windowlist = win;
+        if (win->next) {
+            win->next->prev = win;
+        }
+        //### register?
+    }
+
+    gli_rootwin = rootwin;
+
+    return TRUE;
+}
+
 void gli_delete_window(window_t *win)
 {
     window_t *prev, *next;
@@ -1086,6 +1108,12 @@ void gli_windows_metrics_change(data_metrics_t *newmetrics)
 data_metrics_t *gli_windows_get_metrics()
 {
     return &metrics;
+}
+
+/* Only used during autorestore. Does not take ownership of newmtrics. */
+void gli_windows_update_metrics(data_metrics_t *newmetrics)
+{
+    metrics = *newmetrics;
 }
 
 void gli_windows_trim_buffers()
