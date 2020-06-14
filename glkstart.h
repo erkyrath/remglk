@@ -83,6 +83,7 @@ typedef struct glkunix_library_state_struct *glkunix_library_state_t;
 
 extern void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_state_func, void *extra_state_rock);
 extern glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unserialize_object_f extra_state_func, void *extra_state_rock);
+extern glui32 glkunix_update_from_library_state(glkunix_library_state_t state);
 extern void glkunix_library_state_free(glkunix_library_state_t state);
 
 extern glui32 glkunix_get_last_event_type(void);

@@ -31,6 +31,18 @@ static void tgline_print(FILE *fl, tgline_t *line, int width);
 static window_t *libstate_window_find_by_updatetag(glkunix_library_state_t state, glui32 tag);
 static stream_t *libstate_stream_find_by_updatetag(glkunix_library_state_t state, glui32 tag);
 
+/* Import a new library_state into the current Glk library globals. Existing data objects are closed and new ones are opened.
+   
+   This is used only during an autorestore (out-of-band restore), where the entire library state (as well as the game state) is being deserialized.
+
+   The passed-in state object cleared out in the process and cannot be reused. (You should still call glkunix_library_state_free on it afterwards.)
+ */
+glui32 glkunix_update_from_library_state(glkunix_library_state_t state)
+{
+    //###
+    return TRUE;
+}
+
 void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_state_func, void *extra_state_rock)
 {
     FILE *fl = file->file;
