@@ -235,7 +235,8 @@ int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
         return FALSE;
     }
 
-    for (int ix=count-1; ix>=0; ix--) {
+    int ix;
+    for (ix=count-1; ix>=0; ix--) {
         winid_t win = list[ix];
         win->next = gli_windowlist;
         gli_windowlist = win;

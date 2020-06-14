@@ -212,6 +212,29 @@ void gli_delete_stream(stream_t *str)
     free(str);
 }
 
+int gli_streams_update_from_state(stream_t **list, int count, stream_t *currentstr)
+{
+    if (gli_streamlist) {
+        gli_fatal_error("streams already exist");
+        return FALSE;
+    }
+
+    int ix;
+    for (ix=count-1; ix>=0; ix--) {
+        strid_t str = list[ix];
+        str->next = gli_streamlist;
+        gli_streamlist = str;
+        if (str->next) {
+            str->next->prev = str;
+        }
+        //### register?
+    }
+
+    gli_currentstr = currentstr;
+
+    return TRUE;
+}
+
 void gli_stream_fill_result(stream_t *str, stream_result_t *result)
 {
     if (!result)

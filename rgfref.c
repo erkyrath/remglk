@@ -135,6 +135,27 @@ void gli_delete_fileref(fileref_t *fref)
     free(fref);
 }
 
+int gli_filerefs_update_from_state(fileref_t **list, int count)
+{
+    if (gli_filereflist) {
+        gli_fatal_error("filerefs already exist");
+        return FALSE;
+    }
+
+    int ix;
+    for (ix=count-1; ix>=0; ix--) {
+        frefid_t fref = list[ix];
+        fref->next = gli_filereflist;
+        gli_filereflist = fref;
+        if (fref->next) {
+            fref->next->prev = fref;
+        }
+        //### register?
+    }
+
+    return TRUE;
+}
+
 void glk_fileref_destroy(fileref_t *fref)
 {
     if (!fref) {
