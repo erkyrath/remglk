@@ -231,8 +231,8 @@ extern glui32 gli_window_current_generation(void);
 extern winid_t glkunix_window_find_by_updatetag(glui32 tag); /* see glkstart.h */
 extern window_t *gli_new_window(glui32 type, glui32 rock);
 extern window_t *gli_window_alloc_inactive(void);
-extern int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin);
 extern void gli_delete_window(window_t *win);
+extern int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin);
 extern window_t *gli_window_iterate_treeorder(window_t *win);
 extern void gli_window_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics);
 extern void gli_windows_update(data_specialreq_t *special, int newgeneration);
@@ -255,6 +255,7 @@ extern stream_t *gli_new_stream(int type, int readable, int writable,
     glui32 rock);
 extern stream_t *gli_stream_alloc_inactive(void);
 extern void gli_delete_stream(stream_t *str);
+extern int gli_streams_update_from_state(stream_t **list, int count, stream_t *currentstr);
 extern stream_t *gli_stream_open_window(window_t *win);
 extern strid_t gli_stream_open_pathname(char *pathname, int writemode, 
     int textmode, glui32 rock);
@@ -270,6 +271,7 @@ extern fileref_t *gli_new_fileref(char *filename, glui32 usage,
     glui32 rock);
 extern fileref_t *gli_fileref_alloc_inactive(void);
 extern void gli_delete_fileref(fileref_t *fref);
+extern int gli_filerefs_update_from_state(fileref_t **list, int count);
 
 /* A macro that I can't think of anywhere else to put it. */
 

@@ -62,6 +62,34 @@ glui32 glkunix_update_from_library_state(glkunix_library_state_t state)
         gli_fatal_error("root references remain!");
         return FALSE;
     }
+
+    /* Begin updating the library. */
+    
+    gli_windows_update_metrics(state->metrics);
+    
+    /* Transfer in all the data objects. They are already correctly linked to each other (e.g., win->str refers to a stream object in the state) so we just have to shove the chains into place. */
+
+    gli_windows_update_from_state(state->windowlist, state->windowcount, state->rootwin);
+    gli_streams_update_from_state(state->streamlist, state->streamcount, state->currentstr);
+    gli_filerefs_update_from_state(state->filereflist, state->filerefcount);
+    
+    glk_request_timer_events(state->timerinterval);
+
+    /* At this point, state no longer owns its object references. Clean them out to avoid problems later. */
+    if (state->windowlist) {
+        free(state->windowlist);
+        state->windowlist = NULL;
+    }
+    if (state->streamlist) {
+        free(state->streamlist);
+        state->streamlist = NULL;
+    }
+    if (state->filereflist) {
+        free(state->filereflist);
+        state->filereflist = NULL;
+    }
+    state->rootwin = NULL;
+    state->currentstr = NULL;
     
     return TRUE;
 }
