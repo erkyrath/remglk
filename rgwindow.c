@@ -193,28 +193,6 @@ window_t *gli_window_alloc_inactive()
     return win;
 }
 
-int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
-{
-    if (gli_windowlist) {
-        gli_fatal_error("windows already exist");
-        return FALSE;
-    }
-
-    for (int ix=count-1; ix>=0; ix--) {
-        winid_t win = list[ix];
-        win->next = gli_windowlist;
-        gli_windowlist = win;
-        if (win->next) {
-            win->next->prev = win;
-        }
-        //### register?
-    }
-
-    gli_rootwin = rootwin;
-
-    return TRUE;
-}
-
 void gli_delete_window(window_t *win)
 {
     window_t *prev, *next;
@@ -248,6 +226,28 @@ void gli_delete_window(window_t *win)
         next->prev = prev;
         
     free(win);
+}
+
+int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
+{
+    if (gli_windowlist) {
+        gli_fatal_error("windows already exist");
+        return FALSE;
+    }
+
+    for (int ix=count-1; ix>=0; ix--) {
+        winid_t win = list[ix];
+        win->next = gli_windowlist;
+        gli_windowlist = win;
+        if (win->next) {
+            win->next->prev = win;
+        }
+        //### register?
+    }
+
+    gli_rootwin = rootwin;
+
+    return TRUE;
 }
 
 winid_t glk_window_open(winid_t splitwin, glui32 method, glui32 size, 
