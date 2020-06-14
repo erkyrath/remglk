@@ -32,14 +32,37 @@ static window_t *libstate_window_find_by_updatetag(glkunix_library_state_t state
 static stream_t *libstate_stream_find_by_updatetag(glkunix_library_state_t state, glui32 tag);
 
 /* Import a new library_state into the current Glk library globals. Existing data objects are closed and new ones are opened.
-   
-   This is used only during an autorestore (out-of-band restore), where the entire library state (as well as the game state) is being deserialized.
 
    The passed-in state object cleared out in the process and cannot be reused. (You should still call glkunix_library_state_free on it afterwards.)
  */
 glui32 glkunix_update_from_library_state(glkunix_library_state_t state)
 {
-    //###
+    /* First close all the windows and streams and filerefs. (It only really matters for streams, which need to be flushed, but it's cleaner to close everything.) */
+    if (gli_rootwin) {
+        /* This takes care of all the windows. */
+        glk_window_close(gli_rootwin, NULL);
+    }
+    while (TRUE) {
+        strid_t str = glk_stream_iterate(NULL, NULL);
+        if (!str) break;
+        glk_stream_close(str, NULL); 
+    }
+    while (TRUE) {
+        frefid_t fref = glk_fileref_iterate(NULL, NULL);
+        if (!fref) break;
+        glk_fileref_destroy(fref); 
+    }
+    glk_request_timer_events(0);
+
+    if (glk_window_iterate(NULL, NULL) || glk_stream_iterate(NULL, NULL) || glk_fileref_iterate(NULL, NULL)) {
+        gli_fatal_error("unclosed objects remain!");
+        return FALSE;
+    }
+    if (gli_rootwin || gli_currentstr) {
+        gli_fatal_error("root references remain!");
+        return FALSE;
+    }
+    
     return TRUE;
 }
 
