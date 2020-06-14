@@ -88,10 +88,13 @@ extern void glkunix_library_state_free(glkunix_library_state_t state);
 extern glui32 glkunix_get_last_event_type(void);
 extern glui32 glkunix_window_get_updatetag(winid_t win);
 extern winid_t glkunix_window_find_by_updatetag(glui32 tag);
+extern void glkunix_window_set_dispatch_rock(winid_t win, gidispatch_rock_t rock);
 extern glui32 glkunix_stream_get_updatetag(strid_t str);
 extern strid_t glkunix_stream_find_by_updatetag(glui32 tag);
+extern void glkunix_stream_set_dispatch_rock(strid_t str, gidispatch_rock_t rock);
 extern glui32 glkunix_fileref_get_updatetag(frefid_t fref);
 extern frefid_t glkunix_fileref_find_by_updatetag(glui32 tag);
+extern void glkunix_fileref_set_dispatch_rock(frefid_t fref, gidispatch_rock_t rock);
 
 #endif /* GLKUNIX_AUTOSAVE_FEATURES */
 

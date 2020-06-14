@@ -42,6 +42,11 @@ stream_t *glkunix_stream_find_by_updatetag(glui32 tag)
     return NULL;
 }
 
+void glkunix_stream_set_dispatch_rock(strid_t str, gidispatch_rock_t rock)
+{
+    str->disprock = rock;
+}
+
 glui32 glkunix_stream_get_updatetag(strid_t str)
 {
     return str->updatetag;

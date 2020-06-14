@@ -45,6 +45,11 @@ fileref_t *glkunix_fileref_find_by_updatetag(glui32 tag)
     return NULL;
 }
 
+void glkunix_fileref_set_dispatch_rock(frefid_t fref, gidispatch_rock_t rock)
+{
+    fref->disprock = rock;
+}
+
 glui32 glkunix_fileref_get_updatetag(frefid_t fref)
 {
     return fref->updatetag;

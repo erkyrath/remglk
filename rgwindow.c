@@ -105,6 +105,11 @@ window_t *glkunix_window_find_by_updatetag(glui32 tag)
     return NULL;
 }
 
+void glkunix_window_set_dispatch_rock(winid_t win, gidispatch_rock_t rock)
+{
+    win->disprock = rock;
+}
+
 glui32 glkunix_window_get_updatetag(winid_t win)
 {
     return win->updatetag;
