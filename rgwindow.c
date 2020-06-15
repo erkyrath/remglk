@@ -243,9 +243,75 @@ int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
         if (win->next) {
             win->next->prev = win;
         }
-        //### register?
-    }
 
+        if (win->tempbufinfo) {
+            data_tempbufinfo_t *info = win->tempbufinfo;
+            win->tempbufinfo = NULL;
+
+            void *voidbuf = NULL;
+
+            switch (win->type) {
+                
+            case wintype_TextBuffer: {
+                window_textbuffer_t *dwin = win->data;
+                if (!win->line_request_uni) {
+                    dwin->inarrayrock = (*gli_dispatch_restore_arr)(info->bufkey, dwin->inmax, "&+#!Cn", &voidbuf);
+                    if (voidbuf) {
+                        dwin->inbuf = voidbuf;
+                        if (info->bufdata) {
+                            if (info->bufdatalen > dwin->inmax)
+                                info->bufdatalen = dwin->inmax;
+                            memcpy(dwin->inbuf, info->bufdata, info->bufdatalen);
+                        }
+                    }
+                }
+                else {
+                    dwin->inarrayrock = (*gli_dispatch_restore_arr)(info->bufkey, dwin->inmax, "&+#!Iu", &voidbuf);
+                    if (voidbuf) {
+                        dwin->inbuf = voidbuf;
+                        if (info->ubufdata) {
+                            if (info->bufdatalen > dwin->inmax)
+                                info->bufdatalen = dwin->inmax;
+                            memcpy(dwin->inbuf, info->ubufdata, sizeof(glui32)*info->bufdatalen);
+                        }
+                    }
+                }
+            }
+            break;
+                
+            case wintype_TextGrid: {
+                window_textgrid_t *dwin = win->data;
+                if (!win->line_request_uni) {
+                    dwin->inarrayrock = (*gli_dispatch_restore_arr)(info->bufkey, dwin->inmax, "&+#!Cn", &voidbuf);
+                    if (voidbuf) {
+                        dwin->inbuf = voidbuf;
+                        if (info->bufdata) {
+                            if (info->bufdatalen > dwin->inmax)
+                                info->bufdatalen = dwin->inmax;
+                            memcpy(dwin->inbuf, info->bufdata, info->bufdatalen);
+                        }
+                    }
+                }
+                else {
+                    dwin->inarrayrock = (*gli_dispatch_restore_arr)(info->bufkey, dwin->inmax, "&+#!Iu", &voidbuf);
+                    if (voidbuf) {
+                        dwin->inbuf = voidbuf;
+                        if (info->ubufdata) {
+                            if (info->bufdatalen > dwin->inmax)
+                                info->bufdatalen = dwin->inmax;
+                            memcpy(dwin->inbuf, info->ubufdata, sizeof(glui32)*info->bufdatalen);
+                        }
+                    }
+                }
+            }
+            break;
+            
+            }
+            
+            data_tempbufinfo_free(info);
+        }
+    }
+    
     gli_rootwin = rootwin;
 
     return TRUE;
