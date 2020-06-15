@@ -150,7 +150,6 @@ int gli_filerefs_update_from_state(fileref_t **list, int count)
         if (fref->next) {
             fref->next->prev = fref;
         }
-        //### register?
     }
 
     return TRUE;
