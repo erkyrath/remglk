@@ -67,7 +67,7 @@ glui32 glkunix_update_from_library_state(glkunix_library_state_t state)
     
     gli_windows_update_metrics(state->metrics);
     
-    /* Transfer in all the data objects. They are already correctly linked to each other (e.g., win->str refers to a stream object in the state) so we just have to shove the chains into place. */
+    /* Transfer in all the data objects. They are already correctly linked to each other (e.g., each win->str refers to a stream object in the state) so we just have to shove the chains into place. */
 
     gli_windows_update_from_state(state->windowlist, state->windowcount, state->rootwin);
     gli_streams_update_from_state(state->streamlist, state->streamcount, state->currentstr);
