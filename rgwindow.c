@@ -254,6 +254,7 @@ int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
                 
             case wintype_TextBuffer: {
                 window_textbuffer_t *dwin = win->data;
+                if (!gli_dispatch_restore_arr) break;
                 if (!win->line_request_uni) {
                     dwin->inarrayrock = (*gli_dispatch_restore_arr)(info->bufkey, dwin->inmax, "&+#!Cn", &voidbuf);
                     if (voidbuf) {
@@ -281,6 +282,7 @@ int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
                 
             case wintype_TextGrid: {
                 window_textgrid_t *dwin = win->data;
+                if (!gli_dispatch_restore_arr) break;
                 if (!win->line_request_uni) {
                     dwin->inarrayrock = (*gli_dispatch_restore_arr)(info->bufkey, dwin->inmax, "&+#!Cn", &voidbuf);
                     if (voidbuf) {
