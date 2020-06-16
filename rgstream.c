@@ -227,7 +227,58 @@ int gli_streams_update_from_state(stream_t **list, int count, stream_t *currents
         if (str->next) {
             str->next->prev = str;
         }
-        //### register?
+
+        if (str->tempbufinfo) {
+            data_tempbufinfo_t *info = str->tempbufinfo;
+            str->tempbufinfo = NULL;
+
+            if (!gli_dispatch_restore_arr) {
+                data_tempbufinfo_free(info);
+                continue;
+            }
+
+            void *voidbuf = NULL;
+            
+            switch (str->type) {
+
+            //### open file streams?
+                
+            case strtype_Memory: {
+                if (!str->unicode) {
+                    str->arrayrock = (*gli_dispatch_restore_arr)(info->bufkey, str->buflen, "&+#!Cn", &voidbuf);
+                    if (voidbuf) {
+                        str->buf = voidbuf;
+                        str->bufptr = str->buf + info->bufptr;
+                        str->bufeof = str->buf + info->bufeof;
+                        str->bufend = str->buf + info->bufend;
+                        if (info->bufdata) {
+                            if (info->bufdatalen > str->buflen)
+                                info->bufdatalen = str->buflen;
+                            memcpy(str->buf, info->bufdata, info->bufdatalen);
+                        }
+                    }
+                }
+                else {
+                    str->arrayrock = (*gli_dispatch_restore_arr)(info->bufkey, str->buflen, "&+#!Iu", &voidbuf);
+                    if (voidbuf) {
+                        str->ubuf = voidbuf;
+                        str->ubufptr = str->ubuf + info->bufptr;
+                        str->ubufeof = str->ubuf + info->bufeof;
+                        str->ubufend = str->ubuf + info->bufend;
+                        if (info->ubufdata) {
+                            if (info->bufdatalen > str->buflen)
+                                info->bufdatalen = str->buflen;
+                            memcpy(str->ubuf, info->ubufdata, sizeof(glui32)*info->bufdatalen);
+                        }
+                    }
+                }
+                
+            }
+            break;
+            
+            data_tempbufinfo_free(info);
+            }
+        }
     }
 
     gli_currentstr = currentstr;
