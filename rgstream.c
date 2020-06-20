@@ -71,6 +71,7 @@ stream_t *gli_new_stream(int type, int readable, int writable,
     str->win = NULL;
     str->file = NULL;
     str->filename = NULL;
+    str->fmode = 0;
     str->fileresnum = 0;
     str->lastop = 0;
     str->buf = NULL;
@@ -122,6 +123,7 @@ stream_t *gli_stream_alloc_inactive()
     str->win = NULL;
     str->file = NULL;
     str->filename = NULL;
+    str->fmode = 0;
     str->fileresnum = 0;
     str->lastop = 0;
     str->buf = NULL;
@@ -241,7 +243,44 @@ int gli_streams_update_from_state(stream_t **list, int count, stream_t *currents
             
             switch (str->type) {
 
-            //### open file streams?
+            case strtype_File: {
+                FILE *fl = NULL;
+                /* The file should already exist, but we'll do the pre-create dance just in case. */
+                glui32 fmode = str->fmode;
+                if (fmode == filemode_ReadWrite || fmode == filemode_WriteAppend) {
+                    fl = fopen(str->filename, "ab");
+                    if (fl)
+                        fclose(fl);
+                }
+
+                char modestr[16];
+                switch (fmode) {
+                case filemode_Write:
+                    strcpy(modestr, "w");
+                    break;
+                case filemode_Read:
+                    strcpy(modestr, "r");
+                    break;
+                case filemode_ReadWrite:
+                    strcpy(modestr, "r+");
+                    break;
+                case filemode_WriteAppend:
+                    strcpy(modestr, "r+");
+                    break;
+                }
+                if (str->isbinary)
+                    strcat(modestr, "b");
+    
+                fl = fopen(str->filename, modestr);
+                if (!fl) {
+                    gli_strict_warning("streams_update_from_state: unable to open file.");
+                    return FALSE;
+                }
+
+                glk_stream_set_position(str, info->bufptr, seekmode_Start);
+                /* lastop is now cleared */
+            }
+            break;
                 
             case strtype_Memory: {
                 if (!str->unicode) {
@@ -276,8 +315,9 @@ int gli_streams_update_from_state(stream_t **list, int count, stream_t *currents
             }
             break;
             
+            } /* end switch */
+            
             data_tempbufinfo_free(info);
-            }
         }
     }
 
