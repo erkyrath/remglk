@@ -311,7 +311,7 @@ int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
             }
             break;
             
-            }
+            } /* end switch */
             
             data_tempbufinfo_free(info);
         }
