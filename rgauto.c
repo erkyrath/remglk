@@ -475,6 +475,9 @@ static void stream_state_print(FILE *fl, strid_t str)
             fprintf(fl, ", \"file_filename\":");
             print_string_json(str->filename, fl);
         }
+        fprintf(fl, ", \"file_fmode\":%ld", (long)str->fmode);
+        long pos = glk_stream_get_position(str);
+        fprintf(fl, ", \"file_filepos\":%ld", pos);
         break;
     }
         
@@ -995,6 +998,9 @@ static int stream_state_parse(glkunix_library_state_t state, glkunix_unserialize
     case strtype_File:
         glkunix_unserialize_int(entry, "file_isbinary", &str->isbinary);
         glkunix_unserialize_latin1_string(entry, "file_filename", &str->filename);
+        glkunix_unserialize_uint32(entry, "file_fmode", &str->fmode);
+        str->tempbufinfo = data_tempbufinfo_alloc();
+        glkunix_unserialize_uint32(entry, "file_filepos", &str->tempbufinfo->bufptr);
         /* we'll open the file itself later */
         break;
         
