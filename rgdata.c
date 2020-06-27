@@ -2214,7 +2214,6 @@ void glkunix_library_state_free(glkunix_library_state_t state)
     state->rootwin = NULL;
     state->currentstr = NULL;
     
-    //###
     free(state);
 }
 
