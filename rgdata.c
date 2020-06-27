@@ -2166,8 +2166,6 @@ glkunix_library_state_t glkunix_library_state_alloc()
     state->rootwin = NULL;
     state->currentstr = NULL;
 
-    //###
-
     return state;
 }
 
@@ -2182,8 +2180,10 @@ void glkunix_library_state_free(glkunix_library_state_t state)
 
     if (state->windowlist) {
         for (ix=0; ix<state->windowcount; ix++) {
-            free(state->windowlist[ix]);
-            //### sub-data
+            if (state->windowlist[ix]) {
+                free(state->windowlist[ix]);
+                //### sub-data
+            }
         }
         free(state->windowlist);
         state->windowlist = NULL;
@@ -2191,8 +2191,10 @@ void glkunix_library_state_free(glkunix_library_state_t state)
     
     if (state->streamlist) {
         for (ix=0; ix<state->streamcount; ix++) {
-            free(state->streamlist[ix]);
-            //### sub-data
+            if (state->streamlist[ix]) {
+                free(state->streamlist[ix]);
+                //### sub-data
+            }
         }
         free(state->streamlist);
         state->streamlist = NULL;
@@ -2200,8 +2202,10 @@ void glkunix_library_state_free(glkunix_library_state_t state)
     
     if (state->filereflist) {
         for (ix=0; ix<state->filerefcount; ix++) {
-            free(state->filereflist[ix]);
-            //### sub-data
+            if (state->filereflist[ix]) {
+                free(state->filereflist[ix]);
+                //### sub-data
+            }
         }
         free(state->filereflist);
         state->filereflist = NULL;
