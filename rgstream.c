@@ -149,6 +149,21 @@ stream_t *gli_stream_alloc_inactive()
     return str;
 }
 
+void gli_stream_dealloc_inactive(stream_t *str)
+{
+    if (str->filename) {
+        free(str->filename);
+        str->filename = NULL;
+    }
+    
+    if (str->tempbufinfo) {
+        data_tempbufinfo_free(str->tempbufinfo);
+        str->tempbufinfo = NULL;
+    }
+    
+    free(str);
+}
+
 void gli_delete_stream(stream_t *str)
 {
     stream_t *prev, *next;

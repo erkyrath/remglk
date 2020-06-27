@@ -2191,9 +2191,9 @@ void glkunix_library_state_free(glkunix_library_state_t state)
     
     if (state->streamlist) {
         for (ix=0; ix<state->streamcount; ix++) {
-            if (state->streamlist[ix]) {
-                free(state->streamlist[ix]);
-                //### sub-data
+            strid_t str = state->streamlist[ix];
+            if (str) {
+                gli_stream_dealloc_inactive(str);
             }
         }
         free(state->streamlist);
@@ -2202,9 +2202,9 @@ void glkunix_library_state_free(glkunix_library_state_t state)
     
     if (state->filereflist) {
         for (ix=0; ix<state->filerefcount; ix++) {
-            if (state->filereflist[ix]) {
-                free(state->filereflist[ix]);
-                //### sub-data
+            frefid_t fref = state->filereflist[ix];
+            if (fref) {
+                gli_fileref_dealloc_inactive(fref);
             }
         }
         free(state->filereflist);

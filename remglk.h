@@ -256,6 +256,7 @@ extern void gli_initialize_streams(void);
 extern stream_t *gli_new_stream(int type, int readable, int writable, 
     glui32 rock);
 extern stream_t *gli_stream_alloc_inactive(void);
+extern void gli_stream_dealloc_inactive(stream_t *str);
 extern void gli_delete_stream(stream_t *str);
 extern int gli_streams_update_from_state(stream_t **list, int count, stream_t *currentstr);
 extern stream_t *gli_stream_open_window(window_t *win);
@@ -272,6 +273,7 @@ extern void gli_initialize_filerefs(void);
 extern fileref_t *gli_new_fileref(char *filename, glui32 usage, 
     glui32 rock);
 extern fileref_t *gli_fileref_alloc_inactive(void);
+extern void gli_fileref_dealloc_inactive(fileref_t *fref);
 extern void gli_delete_fileref(fileref_t *fref);
 extern int gli_filerefs_update_from_state(fileref_t **list, int count);
 

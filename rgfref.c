@@ -106,6 +106,16 @@ fileref_t *gli_fileref_alloc_inactive()
     return fref;
 }
 
+void gli_fileref_dealloc_inactive(fileref_t *fref)
+{
+    if (fref->filename) {
+        free(fref->filename);
+        fref->filename = NULL;
+    }
+    
+    free(fref);
+}
+
 void gli_delete_fileref(fileref_t *fref)
 {
     fileref_t *prev, *next;
