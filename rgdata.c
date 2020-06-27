@@ -2180,9 +2180,9 @@ void glkunix_library_state_free(glkunix_library_state_t state)
 
     if (state->windowlist) {
         for (ix=0; ix<state->windowcount; ix++) {
-            if (state->windowlist[ix]) {
-                free(state->windowlist[ix]);
-                //### sub-data
+            winid_t win = state->windowlist[ix];
+            if (win) {
+                gli_window_dealloc_inactive(win);
             }
         }
         free(state->windowlist);

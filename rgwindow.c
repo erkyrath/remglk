@@ -193,6 +193,50 @@ window_t *gli_window_alloc_inactive()
     return win;
 }
 
+void gli_window_dealloc_inactive(window_t *win)
+{
+    switch (win->type) {
+    case wintype_Blank: {
+        window_blank_t *dwin = win->data;
+        if (dwin)
+            win_blank_destroy(dwin);
+    }
+    break;
+    case wintype_Pair: {
+        window_pair_t *dwin = win->data;
+        /* note that dwin->inbuf is still null, so there will be no unregister step */
+        if (dwin)
+            win_pair_destroy(dwin);
+    }
+    break;
+    case wintype_TextBuffer: {
+        window_textbuffer_t *dwin = win->data;
+        if (dwin)
+            win_textbuffer_destroy(dwin);
+    }
+    break;
+    case wintype_TextGrid: {
+        window_textgrid_t *dwin = win->data;
+        if (dwin)
+            win_textgrid_destroy(dwin);
+    }
+    break;
+    case wintype_Graphics: {
+        window_graphics_t *dwin = win->data;
+        if (dwin)
+            win_graphics_destroy(dwin);
+    }
+    break;
+    }
+    
+    if (win->tempbufinfo) {
+        data_tempbufinfo_free(win->tempbufinfo);
+        win->tempbufinfo = NULL;
+    }
+    
+    free(win);
+}
+
 void gli_delete_window(window_t *win)
 {
     window_t *prev, *next;
