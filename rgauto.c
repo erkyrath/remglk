@@ -94,7 +94,7 @@ glui32 glkunix_update_from_library_state(glkunix_library_state_t state)
     return TRUE;
 }
 
-void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_state_func, void *extra_state_rock)
+void glkunix_save_library_state(strid_t file, strid_t omitstream, glkunix_serialize_object_f extra_state_func, void *extra_state_rock)
 {
     FILE *fl = file->file;
     winid_t tmpwin;
@@ -121,6 +121,7 @@ void glkunix_save_library_state(strid_t file, glkunix_serialize_object_f extra_s
     fprintf(fl, ",\n\"streams\": [\n");
     first = TRUE;
     for (tmpstr = glk_stream_iterate(NULL, NULL); tmpstr; tmpstr = glk_stream_iterate(tmpstr, NULL)) {
+        if (tmpstr == omitstream) continue;
         if (!first) fprintf(fl, ",\n");
         first = FALSE;
         stream_state_print(fl, tmpstr);
