@@ -307,6 +307,7 @@ int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
                     dwin->inarrayrock = (*gli_dispatch_restore_arr)(info->bufkey, dwin->inmax, "&+#!Cn", &voidbuf);
                     if (voidbuf) {
                         dwin->inbuf = voidbuf;
+                        memset(dwin->inbuf, 0, dwin->inmax);
                         if (info->bufdata) {
                             if (info->bufdatalen > dwin->inmax)
                                 info->bufdatalen = dwin->inmax;
@@ -318,6 +319,7 @@ int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
                     dwin->inarrayrock = (*gli_dispatch_restore_arr)(info->bufkey, dwin->inmax, "&+#!Iu", &voidbuf);
                     if (voidbuf) {
                         dwin->inbuf = voidbuf;
+                        memset(dwin->inbuf, 0, sizeof(glui32)*dwin->inmax);
                         if (info->ubufdata) {
                             if (info->bufdatalen > dwin->inmax)
                                 info->bufdatalen = dwin->inmax;
@@ -334,6 +336,7 @@ int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
                     dwin->inarrayrock = (*gli_dispatch_restore_arr)(info->bufkey, dwin->inmax, "&+#!Cn", &voidbuf);
                     if (voidbuf) {
                         dwin->inbuf = voidbuf;
+                        memset(dwin->inbuf, 0, dwin->inmax);
                         if (info->bufdata) {
                             if (info->bufdatalen > dwin->inmax)
                                 info->bufdatalen = dwin->inmax;
@@ -345,6 +348,7 @@ int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
                     dwin->inarrayrock = (*gli_dispatch_restore_arr)(info->bufkey, dwin->inmax, "&+#!Iu", &voidbuf);
                     if (voidbuf) {
                         dwin->inbuf = voidbuf;
+                        memset(dwin->inbuf, 0, sizeof(glui32)*dwin->inmax);
                         if (info->ubufdata) {
                             if (info->bufdatalen > dwin->inmax)
                                 info->bufdatalen = dwin->inmax;
