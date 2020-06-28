@@ -124,6 +124,7 @@ struct glk_stream_struct {
 
     /* for strtype_Memory and strtype_Resource. Separate pointers for 
        one-byte and four-byte streams */
+    /* note that buf/ubuf point to memory outside the library. Usually it's owned by the dispatch layer. The other pointers point within buf/ubuf. */
     unsigned char *buf;
     unsigned char *bufptr;
     unsigned char *bufend;

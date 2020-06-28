@@ -293,6 +293,7 @@ int gli_streams_update_from_state(stream_t **list, int count, stream_t *currents
                     str->arrayrock = (*gli_dispatch_restore_arr)(info->bufkey, str->buflen, "&+#!Cn", &voidbuf);
                     if (voidbuf) {
                         str->buf = voidbuf;
+                        memset(str->buf, 0, str->buflen);
                         str->bufptr = str->buf + info->bufptr;
                         str->bufeof = str->buf + info->bufeof;
                         str->bufend = str->buf + info->bufend;
@@ -307,6 +308,7 @@ int gli_streams_update_from_state(stream_t **list, int count, stream_t *currents
                     str->arrayrock = (*gli_dispatch_restore_arr)(info->bufkey, str->buflen, "&+#!Iu", &voidbuf);
                     if (voidbuf) {
                         str->ubuf = voidbuf;
+                        memset(str->ubuf, 0, sizeof(glui32)*str->buflen);
                         str->ubufptr = str->ubuf + info->bufptr;
                         str->ubufeof = str->ubuf + info->bufeof;
                         str->ubufend = str->ubuf + info->bufend;
