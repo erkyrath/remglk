@@ -256,7 +256,7 @@ int main(int argc, char *argv[])
         if (data->dtag != dtag_Init)
             gli_fatal_error("First input event must be 'init'");
         if (data->supportcaps) {
-            /* Set the suppport preference flags. (Bit of a layering 
+            /* Set the support preference flags. (Bit of a layering 
                violation, but the flags are simple.) */
             if (data->supportcaps->timer)
                 pref_timersupport = TRUE;
