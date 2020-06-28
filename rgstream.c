@@ -281,6 +281,7 @@ int gli_streams_update_from_state(stream_t **list, int count, stream_t *currents
                     gli_strict_warning("streams_update_from_state: unable to open file.");
                     return FALSE;
                 }
+                str->file = fl;
 
                 glk_stream_set_position(str, info->bufptr, seekmode_Start);
                 /* lastop is now cleared */
