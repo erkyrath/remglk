@@ -68,7 +68,8 @@ extern void gidispatch_set_retained_registry(
         gidispatch_rock_t objrock));
 
 /* This function is also part of the Glk library, but it only exists
-    on libraries that support autorestore. (Only iosglk, currently.)
+    on libraries that support autorestore. (Only iosglk and remglk, 
+    currently.)
     Only call this if GIDISPATCH_AUTORESTORE_REGISTRY is defined.
 */
 #define GIDISPATCH_AUTORESTORE_REGISTRY
