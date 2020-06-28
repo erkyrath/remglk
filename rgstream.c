@@ -71,7 +71,7 @@ stream_t *gli_new_stream(int type, int readable, int writable,
     str->win = NULL;
     str->file = NULL;
     str->filename = NULL;
-    str->fmode = 0;
+    str->modestr = NULL;
     str->fileresnum = 0;
     str->lastop = 0;
     str->buf = NULL;
@@ -123,7 +123,7 @@ stream_t *gli_stream_alloc_inactive()
     str->win = NULL;
     str->file = NULL;
     str->filename = NULL;
-    str->fmode = 0;
+    str->modestr = NULL;
     str->fileresnum = 0;
     str->lastop = 0;
     str->buf = NULL;
@@ -154,6 +154,10 @@ void gli_stream_dealloc_inactive(stream_t *str)
     if (str->filename) {
         free(str->filename);
         str->filename = NULL;
+    }
+    if (str->modestr) {
+        free(str->modestr);
+        str->modestr = NULL;
     }
     
     if (str->tempbufinfo) {
@@ -197,11 +201,16 @@ void gli_delete_stream(stream_t *str)
             fclose(str->file);
             str->file = NULL;
             str->lastop = 0;
-            if (str->filename) {
-                free(str->filename);
-                str->filename = NULL;
-            }
             break;
+    }
+
+    if (str->filename) {
+        free(str->filename);
+        str->filename = NULL;
+    }
+    if (str->modestr) {
+        free(str->modestr);
+        str->modestr = NULL;
     }
 
     if (gli_unregister_obj) {
@@ -261,32 +270,13 @@ int gli_streams_update_from_state(stream_t **list, int count, stream_t *currents
             case strtype_File: {
                 FILE *fl = NULL;
                 /* The file should already exist, but we'll do the pre-create dance just in case. */
-                glui32 fmode = str->fmode;
-                if (fmode == filemode_ReadWrite || fmode == filemode_WriteAppend) {
+                if (strchr(str->modestr, '+')) {
                     fl = fopen(str->filename, "ab");
                     if (fl)
                         fclose(fl);
                 }
 
-                char modestr[16];
-                switch (fmode) {
-                case filemode_Write:
-                    strcpy(modestr, "w");
-                    break;
-                case filemode_Read:
-                    strcpy(modestr, "r");
-                    break;
-                case filemode_ReadWrite:
-                    strcpy(modestr, "r+");
-                    break;
-                case filemode_WriteAppend:
-                    strcpy(modestr, "r+");
-                    break;
-                }
-                if (str->isbinary)
-                    strcat(modestr, "b");
-    
-                fl = fopen(str->filename, modestr);
+                fl = fopen(str->filename, str->modestr);
                 if (!fl) {
                     gli_strict_warning("streams_update_from_state: unable to open file.");
                     return FALSE;
@@ -514,6 +504,7 @@ strid_t glk_stream_open_file(fileref_t *fref, glui32 fmode,
     
     /* This is only needed for the autosave record. */
     str->filename = strdup(fref->filename);
+    str->modestr = strdup(modestr);
     
     return str;
 }
@@ -711,6 +702,7 @@ strid_t gli_stream_open_pathname(char *pathname, int writemode,
     str->file = fl;
     str->lastop = 0;
     str->filename = strdup(pathname);
+    str->modestr = strdup(modestr);
     
     return str;
 }

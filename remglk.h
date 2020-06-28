@@ -114,7 +114,7 @@ struct glk_stream_struct {
     FILE *file; 
     glui32 lastop; /* 0, filemode_Write, or filemode_Read */
     char *filename; /* only needed for autosave */
-    glui32 fmode; /* only needed for autosave */
+    char *modestr; /* only needed for autosave */
     
     /* for strtype_File, strtype_Resource */
     int isbinary;
