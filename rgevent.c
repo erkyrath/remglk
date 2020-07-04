@@ -47,7 +47,11 @@ void glk_select(event_t *event)
     if (gli_debugger)
         gidebug_announce_cycle(gidebug_cycle_InputWait);
 
-    gli_windows_update(NULL, TRUE);
+    /* Send an update stanza to stdout. We do this before every glk_select,
+       including at startup, but *not* if we just autorestored. */
+    if (last_event_type != 0xFFFFFFFE) {
+        gli_windows_update(NULL, TRUE);
+    }
     
     while (curevent->type == evtype_None) {
         data_event_t *data = data_event_read();
