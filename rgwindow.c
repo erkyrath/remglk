@@ -1230,7 +1230,7 @@ data_metrics_t *gli_windows_get_metrics()
     return &metrics;
 }
 
-/* Only used during autorestore. Does not take ownership of newmtrics. */
+/* Only used during autorestore. Does not take ownership of newmetrics. */
 void gli_windows_update_metrics(data_metrics_t *newmetrics)
 {
     metrics = *newmetrics;
