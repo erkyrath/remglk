@@ -160,6 +160,9 @@ int gli_filerefs_update_from_state(fileref_t **list, int count)
         if (fref->next) {
             fref->next->prev = fref;
         }
+        
+        if (fref->updatetag >= tagcounter)
+            tagcounter = fref->updatetag + 7;
     }
 
     return TRUE;

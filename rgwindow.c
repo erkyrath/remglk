@@ -288,6 +288,9 @@ int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
             win->next->prev = win;
         }
 
+        if (win->updatetag >= tagcounter)
+            tagcounter = win->updatetag + 3;
+
         if (win->tempbufinfo) {
             data_tempbufinfo_t *info = win->tempbufinfo;
             win->tempbufinfo = NULL;

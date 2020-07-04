@@ -254,6 +254,9 @@ int gli_streams_update_from_state(stream_t **list, int count, stream_t *currents
             str->next->prev = str;
         }
 
+        if (str->updatetag >= tagcounter)
+            tagcounter = str->updatetag + 5;
+
         if (str->tempbufinfo) {
             data_tempbufinfo_t *info = str->tempbufinfo;
             str->tempbufinfo = NULL;
