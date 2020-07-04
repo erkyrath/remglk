@@ -34,10 +34,6 @@ static window_t *gli_windowlist = NULL;
 static char spacebuffer[NUMSPACES+1];
 
 window_t *gli_rootwin = NULL; /* The topmost window. */
-window_t *gli_focuswin = NULL; /* The window selected by the player. 
-    (This has nothing to do with the "current output stream", which is
-    gli_currentstr in gtstream.c. In fact, the program doesn't know
-    about gli_focuswin at all.) */
 
 /* The current screen metrics. */
 static data_metrics_t metrics;
@@ -57,7 +53,6 @@ void gli_initialize_windows(data_metrics_t *newmetrics)
     srandom(time(NULL));
     tagcounter = (random() % 15) + 16;
     gli_rootwin = NULL;
-    gli_focuswin = NULL;
     
     /* Build a convenient array of spaces. */
     for (ix=0; ix<NUMSPACES; ix++)
@@ -498,10 +493,6 @@ winid_t glk_window_open(winid_t splitwin, glui32 method, glui32 size,
 static void gli_window_close(window_t *win, int recurse)
 {
     window_t *wx;
-    
-    if (gli_focuswin == win) {
-        gli_focuswin = NULL;
-    }
     
     for (wx=win->parent; wx; wx=wx->parent) {
         if (wx->type == wintype_Pair) {
