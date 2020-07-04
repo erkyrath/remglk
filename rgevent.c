@@ -262,10 +262,15 @@ void gli_event_store(glui32 type, window_t *win, glui32 val1, glui32 val2)
 }
 
 /* Peek at the last Glk event to come in. Returns 0xFFFFFFFF if we just
-   started up. */
+   started up; 0xFFFFFFFE if we just autorestored. */
 glui32 glkunix_get_last_event_type()
 {
     return last_event_type;
+}
+
+void gli_set_last_event_type(glui32 type)
+{
+    last_event_type = type;
 }
 
 void glk_request_timer_events(glui32 millisecs)

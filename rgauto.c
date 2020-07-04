@@ -74,6 +74,7 @@ glui32 glkunix_update_from_library_state(glkunix_library_state_t state)
     gli_filerefs_update_from_state(state->filereflist, state->filerefcount);
     
     glk_request_timer_events(state->timerinterval);
+    gli_set_last_event_type(0xFFFFFFFE);
 
     /* At this point, state no longer owns its object references. Clean them out to avoid problems later. */
     if (state->windowlist) {

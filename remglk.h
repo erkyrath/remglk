@@ -222,6 +222,7 @@ extern int gli_encode_utf8(glui32 val, char *buf, int len);
 
 extern void gli_initialize_events(void);
 extern void gli_event_store(glui32 type, window_t *win, glui32 val1, glui32 val2);
+extern void gli_set_last_event_type(glui32 type);
 extern int gli_timer_need_update(glui32 *msec);
 extern glui32 gli_timer_get_timing_msec(void);
 
