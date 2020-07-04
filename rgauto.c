@@ -105,6 +105,8 @@ void glkunix_save_library_state(strid_t file, strid_t omitstream, glkunix_serial
     
     fprintf(fl, "{\"type\":\"autosave\", \"version\":%d", SERIAL_VERSION);
 
+    fprintf(fl, ",\n\"generation\":%ld", (long)gli_window_current_generation());
+
     fprintf(fl, ",\n\"metrics\":");
     data_metrics_print(fl, gli_windows_get_metrics());
 
