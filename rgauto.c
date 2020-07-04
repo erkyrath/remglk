@@ -69,7 +69,7 @@ glui32 glkunix_update_from_library_state(glkunix_library_state_t state)
     
     /* Transfer in all the data objects. They are already correctly linked to each other (e.g., each win->str refers to a stream object in the state) so we just have to shove the chains into place. */
 
-    gli_windows_update_from_state(state->windowlist, state->windowcount, state->rootwin);
+    gli_windows_update_from_state(state->windowlist, state->windowcount, state->rootwin, state->generation);
     gli_streams_update_from_state(state->streamlist, state->streamcount, state->currentstr);
     gli_filerefs_update_from_state(state->filereflist, state->filerefcount);
     
@@ -603,6 +603,8 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
     int count;
     glui32 tag;
 
+    glkunix_unserialize_uint32(&ctx, "generation", &state->generation);
+
     if (glkunix_unserialize_struct(&ctx, "metrics", &dat)) {
         state->metrics = data_metrics_parse(dat->dat);
     }
@@ -676,18 +678,20 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
                 return NULL;
         }
     }
+
+    entry = NULL;
     
-    printf("### Found %d windows, %d streams, %d filerefs\n", state->windowcount, state->streamcount, state->filerefcount);
+    printf("### Gen = %d; found %d windows, %d streams, %d filerefs\n", state->generation, state->windowcount, state->streamcount, state->filerefcount);
 
-    glkunix_unserialize_uint32(entry, "timerinterval", &state->timerinterval);
+    glkunix_unserialize_uint32(&ctx, "timerinterval", &state->timerinterval);
 
-    if (glkunix_unserialize_uint32(entry, "rootwintag", &tag)) {
+    if (glkunix_unserialize_uint32(&ctx, "rootwintag", &tag)) {
         state->rootwin = libstate_window_find_by_updatetag(state, tag);
         if (!state->rootwin)
             gli_fatal_error("Could not locate rootwin");
     }
 
-    if (glkunix_unserialize_uint32(entry, "currentstrtag", &tag)) {
+    if (glkunix_unserialize_uint32(&ctx, "currentstrtag", &tag)) {
         state->currentstr = libstate_stream_find_by_updatetag(state, tag);
         if (!state->currentstr)
             gli_fatal_error("Could not locate currentstr");

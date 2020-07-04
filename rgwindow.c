@@ -267,7 +267,7 @@ void gli_delete_window(window_t *win)
     free(win);
 }
 
-int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
+int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin, glui32 gen)
 {
     if (gli_windowlist) {
         gli_fatal_error("windows already exist");
@@ -364,6 +364,7 @@ int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin)
     }
     
     gli_rootwin = rootwin;
+    generation = gen;
 
     return TRUE;
 }
