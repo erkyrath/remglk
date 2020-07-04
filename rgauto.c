@@ -105,7 +105,9 @@ void glkunix_save_library_state(strid_t file, strid_t omitstream, glkunix_serial
     
     fprintf(fl, "{\"type\":\"autosave\", \"version\":%d", SERIAL_VERSION);
 
-    fprintf(fl, ",\n\"generation\":%ld", (long)gli_window_current_generation());
+    /* We store generation+1, because the upcoming gli_windows_update is going to increment the generation. We want to match that. */
+    glui32 newgen = gli_window_current_generation() + 1;
+    fprintf(fl, ",\n\"generation\":%ld", (long)newgen);
 
     fprintf(fl, ",\n\"metrics\":");
     data_metrics_print(fl, gli_windows_get_metrics());
