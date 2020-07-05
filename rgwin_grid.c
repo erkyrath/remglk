@@ -33,9 +33,16 @@ window_textgrid_t *win_textgrid_create(window_t *win)
     dwin->lines = NULL;
     
     dwin->inbuf = NULL;
+    dwin->incurpos = 0;
     dwin->inunicode = FALSE;
     dwin->inecho = FALSE;
-    
+    dwin->intermkeys = 0;
+    dwin->inoriglen = 0;
+    dwin->inmax = 0;
+    dwin->origstyle = 0;
+
+    dwin->inarrayrock.num = 0;
+
     return dwin;
 }
 

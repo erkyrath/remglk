@@ -41,9 +41,15 @@ window_textbuffer_t *win_textbuffer_create(window_t *win)
         return NULL;
 
     dwin->inbuf = NULL;
+    dwin->incurpos = 0;
     dwin->inunicode = FALSE;
     dwin->inecho = FALSE;
     dwin->intermkeys = 0;
+    dwin->inmax = 0;
+    dwin->origstyle = 0;
+    dwin->orighyperlink = 0;
+
+    dwin->inarrayrock.num = 0;
     
     dwin->numruns = 1;
     dwin->runs[0].style = style_Normal;
