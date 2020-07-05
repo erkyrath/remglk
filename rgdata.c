@@ -2124,6 +2124,14 @@ void data_tempbufinfo_free(data_tempbufinfo_t *temp)
     free(temp);
 }
 
+void data_grect_clear(grect_t *box)
+{
+    box->left = 0;
+    box->top = 0;
+    box->right = 0;
+    box->bottom = 0;
+}
+
 void data_grect_print(FILE *file, grect_t *box)
 {
     fprintf(file, "{\"left\":%d, \"top\":%d, \"right\":%d, \"bottom\":%d}",

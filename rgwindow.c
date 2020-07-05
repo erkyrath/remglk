@@ -124,6 +124,7 @@ window_t *gli_new_window(glui32 type, glui32 rock)
     
     win->parent = NULL; /* for now */
     win->data = NULL; /* for now */
+    data_grect_clear(&win->bbox);
     win->inputgen = 0;
     win->char_request = FALSE;
     win->line_request = FALSE;
@@ -166,6 +167,7 @@ window_t *gli_window_alloc_inactive()
     
     win->parent = NULL;
     win->data = NULL;
+    data_grect_clear(&win->bbox);
     win->inputgen = 0;
     win->char_request = FALSE;
     win->line_request = FALSE;
