@@ -187,6 +187,7 @@ extern long (*gli_dispatch_locate_arr)(void *array, glui32 len, char *typecode, 
 extern gidispatch_rock_t (*gli_dispatch_restore_arr)(long bufkey, glui32 len, char *typecode, void **arrayref);
 
 extern int pref_stderr;
+extern int pref_singleinput;
 extern int pref_printversion;
 extern int pref_screenwidth;
 extern int pref_screenheight;
