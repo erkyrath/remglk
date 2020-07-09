@@ -60,7 +60,7 @@ void glk_select(event_t *event)
         if (pref_singleinput && input_count) {
             /* We got our input and processed it; we're done. When the next
                input arrives, we'll autorestore and process that. */
-            glk_exit();
+            gli_fast_exit();
         }
         data_event_t *data = data_event_read();
         input_count++;
