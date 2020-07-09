@@ -64,11 +64,6 @@ void gli_initialize_windows()
     geometry_changed = TRUE;
 }
 
-void gli_initialize_windows_metrics(data_metrics_t *newmetrics)
-{
-    metrics = *newmetrics;
-}
-
 /* Get out fast. This is used by the ctrl-C interrupt handler, under Unix. 
     It doesn't pause and wait for a keypress, and it calls the Glk interrupt
     handler. Otherwise it's the same as glk_exit(). */
@@ -372,6 +367,7 @@ int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin,
     
     gli_rootwin = rootwin;
     generation = gen;
+    geometry_changed = FALSE;
 
     return TRUE;
 }
@@ -1232,7 +1228,7 @@ data_metrics_t *gli_windows_get_metrics()
     return &metrics;
 }
 
-/* Only used during autorestore. Does not take ownership of newmetrics. */
+/* Only used during startup and autorestore. Does not take ownership of newmetrics. */
 void gli_windows_update_metrics(data_metrics_t *newmetrics)
 {
     metrics = *newmetrics;

@@ -292,7 +292,7 @@ int main(int argc, char *argv[])
             data_event_free(data);
         }
 
-        gli_initialize_windows_metrics(metrics);
+        gli_windows_update_metrics(metrics);
         
         data_metrics_free(metrics);
     }
