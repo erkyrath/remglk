@@ -45,7 +45,7 @@ void (*gli_interrupt_handler)(void) = NULL;
 static void compute_content_box(grect_t *box);
 
 /* Set up the window system. This is called from main(). */
-void gli_initialize_windows(data_metrics_t *newmetrics)
+void gli_initialize_windows()
 {
     int ix;
 
@@ -59,9 +59,14 @@ void gli_initialize_windows(data_metrics_t *newmetrics)
         spacebuffer[ix] = ' ';
     spacebuffer[NUMSPACES] = '\0';
     
-    metrics = *newmetrics;
+    memset(&metrics, 0, sizeof(metrics));
 
     geometry_changed = TRUE;
+}
+
+void gli_initialize_windows_metrics(data_metrics_t *newmetrics)
+{
+    metrics = *newmetrics;
 }
 
 /* Get out fast. This is used by the ctrl-C interrupt handler, under Unix. 

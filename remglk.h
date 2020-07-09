@@ -227,7 +227,8 @@ extern void gli_set_last_event_type(glui32 type);
 extern int gli_timer_need_update(glui32 *msec);
 extern glui32 gli_timer_get_timing_msec(void);
 
-extern void gli_initialize_windows(data_metrics_t *metrics);
+extern void gli_initialize_windows(void);
+extern void gli_initialize_windows_metrics(data_metrics_t *metrics);
 extern void gli_fast_exit(void);
 extern void gli_display_warning(char *msg);
 extern void gli_display_error(char *msg);

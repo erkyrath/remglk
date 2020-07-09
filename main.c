@@ -254,44 +254,48 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    gli_initialize_datainput();
-
-    data_metrics_t *metrics = data_metrics_alloc(pref_screenwidth, pref_screenheight);
-    if (!pref_fixedmetrics) {
-        data_event_t *data = data_event_read();
-        if (data->dtag != dtag_Init)
-            gli_fatal_error("First input event must be 'init'");
-        if (data->supportcaps) {
-            /* Set the support preference flags. (Bit of a layering 
-               violation, but the flags are simple.) */
-            if (data->supportcaps->timer)
-                pref_timersupport = TRUE;
-            if (data->supportcaps->hyperlinks)
-                pref_hyperlinksupport = TRUE;
-            if (data->supportcaps->graphics)
-                pref_graphicssupport = TRUE;
-            if (data->supportcaps->graphicswin)
-                pref_graphicswinsupport = TRUE;
-        }
-        /* Copy the metrics into the permanent structure */
-        *metrics = *data->metrics;
-        data_event_free(data);
-    }
-    
     /* Initialize things. */
+    gli_initialize_datainput();
     gli_initialize_misc();
-    gli_initialize_windows(metrics);
+    gli_initialize_windows();
     gli_initialize_streams();
     gli_initialize_filerefs();
     gli_initialize_events();
-
-    data_metrics_free(metrics);
 
     inittime = TRUE;
     if (!glkunix_startup_code(&startdata)) {
         glk_exit();
     }
     inittime = FALSE;
+
+    if (TRUE) {
+        data_metrics_t *metrics = data_metrics_alloc(pref_screenwidth, pref_screenheight);
+        
+        if (!pref_fixedmetrics) {
+            data_event_t *data = data_event_read();
+            if (data->dtag != dtag_Init)
+                gli_fatal_error("First input event must be 'init'");
+            if (data->supportcaps) {
+                /* Set the support preference flags. (Bit of a layering 
+                   violation, but the flags are simple.) */
+                if (data->supportcaps->timer)
+                    pref_timersupport = TRUE;
+                if (data->supportcaps->hyperlinks)
+                    pref_hyperlinksupport = TRUE;
+                if (data->supportcaps->graphics)
+                    pref_graphicssupport = TRUE;
+                if (data->supportcaps->graphicswin)
+                    pref_graphicswinsupport = TRUE;
+            }
+            /* Copy the metrics into the permanent structure */
+            *metrics = *data->metrics;
+            data_event_free(data);
+        }
+
+        gli_initialize_windows_metrics(metrics);
+        
+        data_metrics_free(metrics);
+    }
 
     if (gli_debugger)
         gidebug_announce_cycle(gidebug_cycle_Start);
