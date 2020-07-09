@@ -194,6 +194,42 @@ void glk_select_poll(event_t *event)
     curevent = NULL;
 }
 
+/* Wait for input, but it has to be a metrics object. Store the result. */
+void gli_select_metrics(data_metrics_t *metrics, data_supportcaps_t *supportcaps)
+{
+    if (pref_singleinput && input_count) {
+        gli_fast_exit();
+    }
+    
+    data_event_t *data = data_event_read();
+    input_count++;
+
+    if (data->dtag != dtag_Init)
+        gli_fatal_error("First input event must be 'init'");
+
+    *metrics = *data->metrics;
+
+    if (data->supportcaps) {
+        *supportcaps = *data->supportcaps;
+    }
+    else {
+        memset(supportcaps, 0, sizeof(data_supportcaps_t));
+    }
+
+    last_event_type = evtype_Arrange;
+
+    data_event_free(data);
+}
+
+/* Increment the input counter. This is used with the fixedmetrics
+   argument, which acts like the library got input.
+*/
+void gli_select_imaginary()
+{
+    input_count++;
+    last_event_type = evtype_Arrange;
+}
+
 /* Convert an array of Unicode chars to (null-terminated) UTF-8.
    The caller should free this after use.
 */

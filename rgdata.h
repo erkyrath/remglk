@@ -40,7 +40,6 @@ typedef struct gen_list_struct {
 } gen_list_t;
 
 typedef struct data_event_struct data_event_t;
-typedef struct data_supportcaps_struct data_supportcaps_t;
 typedef struct data_update_struct data_update_t;
 typedef struct data_window_struct data_window_t;
 typedef struct data_input_struct data_input_t;

@@ -272,24 +272,21 @@ int main(int argc, char *argv[])
         data_metrics_t *metrics = data_metrics_alloc(pref_screenwidth, pref_screenheight);
         
         if (!pref_fixedmetrics) {
-            data_event_t *data = data_event_read();
-            if (data->dtag != dtag_Init)
-                gli_fatal_error("First input event must be 'init'");
-            if (data->supportcaps) {
-                /* Set the support preference flags. (Bit of a layering 
-                   violation, but the flags are simple.) */
-                if (data->supportcaps->timer)
-                    pref_timersupport = TRUE;
-                if (data->supportcaps->hyperlinks)
-                    pref_hyperlinksupport = TRUE;
-                if (data->supportcaps->graphics)
-                    pref_graphicssupport = TRUE;
-                if (data->supportcaps->graphicswin)
-                    pref_graphicswinsupport = TRUE;
-            }
-            /* Copy the metrics into the permanent structure */
-            *metrics = *data->metrics;
-            data_event_free(data);
+            data_supportcaps_t supportcaps;
+            gli_select_metrics(metrics, &supportcaps);
+            /* Set the support preference flags. (Bit of a layering 
+               violation, but the flags are simple.) */
+            if (supportcaps.timer)
+                pref_timersupport = TRUE;
+            if (supportcaps.hyperlinks)
+                pref_hyperlinksupport = TRUE;
+            if (supportcaps.graphics)
+                pref_graphicssupport = TRUE;
+            if (supportcaps.graphicswin)
+                pref_graphicswinsupport = TRUE;
+        }
+        else {
+            gli_select_imaginary();
         }
 
         gli_windows_update_metrics(metrics);
