@@ -51,7 +51,8 @@ void glk_select(event_t *event)
        including at startup, but *not* if we just autorestored. */
     if (last_event_type != 0xFFFFFFFE) {
         gli_windows_update(NULL, TRUE);
-        if (pref_singleinput) {
+        if (pref_singleturn) {
+            /* Singleton mode mode means that we exit after every output. */
             gli_fast_exit();
         }
     }
@@ -71,7 +72,7 @@ void glk_select(event_t *event)
                    a (real) event. */
                 gli_windows_refresh(data->gen);
                 gli_windows_update(NULL, FALSE);
-                if (pref_singleinput) {
+                if (pref_singleturn) {
                     gli_fast_exit();
                 }
                 break;

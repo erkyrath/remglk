@@ -18,7 +18,7 @@
 int pref_printversion = FALSE;
 int pref_stderr = FALSE;
 int pref_fixedmetrics = FALSE;
-int pref_singleinput = FALSE;
+int pref_singleturn = FALSE;
 int pref_screenwidth = 80;
 int pref_screenheight = 50;
 int pref_timersupport = FALSE;
@@ -172,10 +172,10 @@ int main(int argc, char *argv[])
             pref_screenheight = val;
         else if (extract_value(argc, argv, "h", ex_Int, &ix, &val, 50))
             pref_screenheight = val;
-        else if (extract_value(argc, argv, "singleinput", ex_Bool, &ix, &val, FALSE))
-            pref_singleinput = val;
-        else if (extract_value(argc, argv, "si", ex_Bool, &ix, &val, FALSE))
-            pref_singleinput = val;
+        else if (extract_value(argc, argv, "singleturn", ex_Bool, &ix, &val, FALSE))
+            pref_singleturn = val;
+        else if (extract_value(argc, argv, "st", ex_Bool, &ix, &val, FALSE))
+            pref_singleturn = val;
         else if (extract_value(argc, argv, "stderr", ex_Bool, &ix, &val, FALSE))
             pref_stderr = val;
         else if (extract_value(argc, argv, "support", ex_Str, &ix, &val, FALSE)) {
@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
         printf("  -support [timer, hyperlinks, graphics, graphicswin]: declare support for various input features\n");
         printf("  -resourceurl STR: URL base for image/sound files\n");
         printf("  -resourcedir STR: path to image/sound files (used to create file: URLs)\n");
-        printf("  -singleinput BOOL: exit the process after handling one input (default 'no')\n");
+        printf("  -singleturn BOOL: exit the process after responding to one input (default 'no')\n");
         printf("  -stderr BOOL: send errors to stderr rather than stdout (default 'no')\n");
 #if GIDEBUG_LIBRARY_SUPPORT
         printf("  -D: turn on debug console\n");

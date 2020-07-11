@@ -65,7 +65,7 @@ void gli_initialize_windows()
 }
 
 /* Get out fast. This is used by the ctrl-C interrupt handler, under Unix. 
-    Also singleinput mode, after processing the single input.
+    Also singleturn mode, after processing the single input.
     It doesn't pause and wait for a keypress, and it calls the Glk interrupt
     handler. Otherwise it's the same as glk_exit(). */
 void gli_fast_exit()
