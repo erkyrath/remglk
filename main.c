@@ -18,6 +18,7 @@
 int pref_printversion = FALSE;
 int pref_stderr = FALSE;
 int pref_fixedmetrics = FALSE;
+int pref_autometrics = FALSE;
 int pref_singleturn = FALSE;
 int pref_screenwidth = 80;
 int pref_screenheight = 50;
@@ -164,6 +165,10 @@ int main(int argc, char *argv[])
             pref_fixedmetrics = val;
         else if (extract_value(argc, argv, "fm", ex_Bool, &ix, &val, FALSE))
             pref_fixedmetrics = val;
+        else if (extract_value(argc, argv, "autometrics", ex_Bool, &ix, &val, FALSE))
+            pref_autometrics = val;
+        else if (extract_value(argc, argv, "am", ex_Bool, &ix, &val, FALSE))
+            pref_autometrics = val;
         else if (extract_value(argc, argv, "width", ex_Int, &ix, &val, 80))
             pref_screenwidth = val;
         else if (extract_value(argc, argv, "w", ex_Int, &ix, &val, 80))
@@ -232,6 +237,7 @@ int main(int argc, char *argv[])
         }
         printf("library options:\n");
         printf("  -fixmetrics BOOL: define screen size manually (default 'no')\n");
+        printf("  -autometrics BOOL: allow screen size to be set during autorestore (default 'no')\n");
         printf("  -width NUM: manual screen width (default 80)\n");
         printf("  -height NUM: manual screen height (default 50)\n");
         printf("  -support [timer, hyperlinks, graphics, graphicswin]: declare support for various input features\n");
@@ -268,7 +274,7 @@ int main(int argc, char *argv[])
     }
     inittime = FALSE;
 
-    if (TRUE) {
+    if (!pref_autometrics) {
         data_metrics_t *metrics = data_metrics_alloc(pref_screenwidth, pref_screenheight);
         
         if (!pref_fixedmetrics) {
