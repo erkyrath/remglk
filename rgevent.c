@@ -19,8 +19,6 @@ static event_t *curevent = NULL;
 
 /* The autosave code needs to peek at this. */
 static glui32 last_event_type;
-/* Number of input objects read. */
-static glui32 input_count;
 
 /* The current timed-event request, exactly as passed to
    glk_request_timer_events(). */
@@ -36,7 +34,6 @@ static char *alloc_utf_buffer(glui32 *ustr, int ulen);
 /* Set up the input system. This is called from main(). */
 void gli_initialize_events()
 {
-    input_count = 0;
     timing_msec = 0;
     last_timing_msec = 0;
     last_event_type = 0xFFFFFFFF;
@@ -54,16 +51,13 @@ void glk_select(event_t *event)
        including at startup, but *not* if we just autorestored. */
     if (last_event_type != 0xFFFFFFFE) {
         gli_windows_update(NULL, TRUE);
+        if (pref_singleinput) {
+            gli_fast_exit();
+        }
     }
     
     while (curevent->type == evtype_None) {
-        if (pref_singleinput && input_count) {
-            /* We got our input and processed it; we're done. When the next
-               input arrives, we'll autorestore and process that. */
-            gli_fast_exit();
-        }
         data_event_t *data = data_event_read();
-        input_count++;
         
         window_t *win = NULL;
         glui32 val;
@@ -77,6 +71,9 @@ void glk_select(event_t *event)
                    a (real) event. */
                 gli_windows_refresh(data->gen);
                 gli_windows_update(NULL, FALSE);
+                if (pref_singleinput) {
+                    gli_fast_exit();
+                }
                 break;
 
             case dtag_Arrange:
@@ -197,12 +194,7 @@ void glk_select_poll(event_t *event)
 /* Wait for input, but it has to be a metrics object. Store the result. */
 void gli_select_metrics(data_metrics_t *metrics, data_supportcaps_t *supportcaps)
 {
-    if (pref_singleinput && input_count) {
-        gli_fast_exit();
-    }
-    
     data_event_t *data = data_event_read();
-    input_count++;
 
     if (data->dtag != dtag_Init)
         gli_fatal_error("First input event must be 'init'");
@@ -226,7 +218,6 @@ void gli_select_metrics(data_metrics_t *metrics, data_supportcaps_t *supportcaps
 */
 void gli_select_imaginary()
 {
-    input_count++;
     last_event_type = evtype_Arrange;
 }
 
