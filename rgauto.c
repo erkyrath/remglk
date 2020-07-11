@@ -683,7 +683,7 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
 
     entry = NULL;
     
-    printf("### Gen = %d; found %d windows, %d streams, %d filerefs\n", state->generation, state->windowcount, state->streamcount, state->filerefcount);
+    fprintf(stderr, "### Gen = %d; found %d windows, %d streams, %d filerefs\n", state->generation, state->windowcount, state->streamcount, state->filerefcount);
 
     glkunix_unserialize_uint32(&ctx, "timerinterval", &state->timerinterval);
 
