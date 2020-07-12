@@ -112,7 +112,8 @@ void glkunix_save_library_state(strid_t file, strid_t omitstream, glkunix_serial
     fprintf(fl, ",\n\"metrics\":");
     data_metrics_print(fl, gli_windows_get_metrics());
 
-    //### supportcaps!
+    fprintf(fl, ",\n\"supportcaps\":");
+    data_supportcaps_print(fl, &gli_supportcaps);
 
     /* We don't use data_window_print (etc) here because we need a complete state dump for the autosave. It's way beyond the documented RemGlk/GlkOte JSON API. */
     

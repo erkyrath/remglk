@@ -216,7 +216,7 @@ extern data_supportcaps_t *data_supportcaps_alloc(void);
 extern void data_supportcaps_clear(data_supportcaps_t *supportcaps);
 extern void data_supportcaps_merge(data_supportcaps_t *supportcaps, data_supportcaps_t *other);
 extern void data_supportcaps_free(data_supportcaps_t *supportcaps);
-extern void data_supportcaps_print(data_supportcaps_t *supportcaps);
+extern void data_supportcaps_print(FILE *fl, data_supportcaps_t *supportcaps);
 
 extern data_event_t *data_event_read(void);
 extern void data_event_free(data_event_t *data);

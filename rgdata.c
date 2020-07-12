@@ -1120,17 +1120,37 @@ static data_supportcaps_t *data_supportcaps_parse(data_raw_t *rawdata)
     return supportcaps;
 }
 
-void data_supportcaps_print(data_supportcaps_t *supportcaps)
+void data_supportcaps_print(FILE *fl, data_supportcaps_t *supportcaps)
 {
-    /* This displays very verbosely, and not in JSON-readable format. */
-
-    printf("{\n");   
-    printf("  timer: %d\n", supportcaps->timer);
-    printf("  hyperlinks: %d\n", supportcaps->hyperlinks);
-    printf("  graphics: %d\n", supportcaps->graphics);
-    printf("  graphicswin: %d\n", supportcaps->graphicswin);
-    printf("  sound: %d\n", supportcaps->sound);
-    printf("}\n");   
+    int any = FALSE;
+    
+    fprintf(fl, "[");
+    if (supportcaps->timer) {
+        if (any) fprintf(fl, ", ");
+        fprintf(fl, "\"timer\"");
+        any = TRUE;
+    }
+    if (supportcaps->hyperlinks) {
+        if (any) fprintf(fl, ", ");
+        fprintf(fl, "\"hyperlinks\"");
+        any = TRUE;
+    }
+    if (supportcaps->graphics) {
+        if (any) fprintf(fl, ", ");
+        fprintf(fl, "\"graphics\"");
+        any = TRUE;
+    }
+    if (supportcaps->graphicswin) {
+        if (any) fprintf(fl, ", ");
+        fprintf(fl, "\"graphicswin\"");
+        any = TRUE;
+    }
+    if (supportcaps->sound) {
+        if (any) fprintf(fl, ", ");
+        fprintf(fl, "\"sound\"");
+        any = TRUE;
+    }
+    fprintf(fl, "]\n");   
 }
 
 void data_event_free(data_event_t *data)
@@ -1160,7 +1180,7 @@ void data_event_print(data_event_t *data)
             data_metrics_print(stdout, data->metrics);
             if (data->supportcaps) {
                 printf(", \"support\":\n");
-                data_supportcaps_print(data->supportcaps);
+                data_supportcaps_print(stdout, data->supportcaps);
             }
             printf("}\n");
             break;
