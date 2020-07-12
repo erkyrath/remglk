@@ -112,6 +112,8 @@ void glkunix_save_library_state(strid_t file, strid_t omitstream, glkunix_serial
     fprintf(fl, ",\n\"metrics\":");
     data_metrics_print(fl, gli_windows_get_metrics());
 
+    //### supportcaps!
+
     /* We don't use data_window_print (etc) here because we need a complete state dump for the autosave. It's way beyond the documented RemGlk/GlkOte JSON API. */
     
     fprintf(fl, ",\n\"windows\": [\n");
@@ -795,10 +797,14 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
         glui32 *buf;
         long bufcount;
         if (glkunix_unserialize_len_unicode(entry, "buf_chars", &buf, &bufcount)) {
-            free(dwin->chars); /* replace original malloced array */
-            dwin->chars = buf;
+            if (bufcount > dwin->charssize) {
+                dwin->charssize = bufcount;
+                dwin->chars = (glui32 *)realloc(dwin->chars, dwin->charssize * sizeof(glui32));
+            }
+            for (ix=0; ix<bufcount; ix++)
+                dwin->chars[ix] = buf[ix];
             dwin->numchars = bufcount;
-            dwin->charssize = bufcount;
+            free(buf);
         }
         
         if (glkunix_unserialize_list(entry, "buf_runs", &array, &count)) {
