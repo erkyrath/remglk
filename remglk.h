@@ -189,9 +189,6 @@ extern gidispatch_rock_t (*gli_dispatch_restore_arr)(long bufkey, glui32 len, ch
 
 extern int pref_stderr;
 extern int pref_singleturn;
-extern int pref_printversion;
-extern int pref_screenwidth;
-extern int pref_screenheight;
 extern int pref_timersupport;
 extern int pref_hyperlinksupport;
 extern int pref_graphicssupport;

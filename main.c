@@ -15,13 +15,13 @@
 #include "glkstart.h"
 
 /* Declarations of preferences flags. */
-int pref_printversion = FALSE;
+static int pref_printversion = FALSE;
 int pref_stderr = FALSE;
 int pref_fixedmetrics = FALSE;
 int pref_autometrics = FALSE;
 int pref_singleturn = FALSE;
-int pref_screenwidth = 80;
-int pref_screenheight = 50;
+static int pref_screenwidth = 80;
+static int pref_screenheight = 50;
 int pref_timersupport = FALSE;
 int pref_hyperlinksupport = FALSE;
 int pref_graphicssupport = FALSE;
