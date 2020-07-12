@@ -66,6 +66,7 @@ glui32 glkunix_update_from_library_state(glkunix_library_state_t state)
     /* Begin updating the library. */
     
     gli_windows_update_metrics(state->metrics);
+    gli_supportcaps = *state->supportcaps;
     
     /* Transfer in all the data objects. They are already correctly linked to each other (e.g., each win->str refers to a stream object in the state) so we just have to shove the chains into place. */
 
@@ -612,6 +613,9 @@ glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unseria
 
     if (glkunix_unserialize_struct(&ctx, "metrics", &dat)) {
         state->metrics = data_metrics_parse(dat->dat);
+    }
+    if (glkunix_unserialize_list(&ctx, "supportcaps", &dat, &count)) {
+        state->supportcaps = data_supportcaps_parse(dat->dat);
     }
 
     /* First we create blank Glk object structures, filling in only the updatetags. (We have to do this before dealing with the object data, because objects can refer to each other.) */

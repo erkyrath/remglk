@@ -20,6 +20,7 @@ struct glkunix_unserialize_context_struct {
 struct glkunix_library_state_struct {
     glui32 generation;
     data_metrics_t *metrics;
+    data_supportcaps_t *supportcaps;
 
     window_t **windowlist;
     int windowcount;

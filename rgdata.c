@@ -1095,7 +1095,7 @@ void data_supportcaps_free(data_supportcaps_t *supportcaps)
     free(supportcaps);
 }
 
-static data_supportcaps_t *data_supportcaps_parse(data_raw_t *rawdata)
+data_supportcaps_t *data_supportcaps_parse(data_raw_t *rawdata)
 {
     data_supportcaps_t *supportcaps = data_supportcaps_alloc();
 
@@ -2210,6 +2210,7 @@ glkunix_library_state_t glkunix_library_state_alloc()
     memset(state, 0, sizeof(struct glkunix_library_state_struct));
 
     state->metrics = NULL;
+    state->supportcaps = NULL;
     state->windowlist = NULL;
     state->streamlist = NULL;
     state->filereflist = NULL;
@@ -2227,6 +2228,11 @@ void glkunix_library_state_free(glkunix_library_state_t state)
     if (state->metrics) {
         data_metrics_free(state->metrics);
         state->metrics = NULL;
+    }
+
+    if (state->supportcaps) {
+        data_supportcaps_free(state->supportcaps);
+        state->supportcaps = NULL;
     }
 
     if (state->windowlist) {
