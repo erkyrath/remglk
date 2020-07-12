@@ -2354,7 +2354,7 @@ int glkunix_unserialize_long(glkunix_unserialize_context_t ctx, char *key, long 
     return TRUE;
 }
 
-/* Returned string is malloced */
+/* Returned (null-terminated) string is malloced */
 int glkunix_unserialize_latin1_string(glkunix_unserialize_context_t ctx, char *key, char **res)
 {
     data_raw_t *dat = data_raw_struct_field(ctx->dat, key);
@@ -2405,6 +2405,7 @@ int glkunix_unserialize_len_bytes(glkunix_unserialize_context_t ctx, char *key, 
     return TRUE;
 }
 
+/* Returned unicode-string is malloced */
 int glkunix_unserialize_len_unicode(glkunix_unserialize_context_t ctx, char *key, glui32 **res, long *reslen)
 {
     data_raw_t *dat = data_raw_struct_field(ctx->dat, key);
