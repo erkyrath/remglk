@@ -11,6 +11,8 @@
 #include "remglk.h"
 #include "rgdata.h"
 
+data_supportcaps_t gli_supportcaps;
+
 static unsigned char char_tolower_table[256];
 static unsigned char char_toupper_table[256];
 
@@ -24,10 +26,12 @@ long (*gli_dispatch_locate_arr)(void *array, glui32 len, char *typecode, gidispa
 gidispatch_rock_t (*gli_dispatch_restore_arr)(long bufkey, glui32 len, char *typecode, void **arrayref) = NULL;
         
 /* Set up things. This is called from main(). */
-void gli_initialize_misc()
+void gli_initialize_misc(data_supportcaps_t *supportcaps)
 {
     int ix;
     int res;
+
+    gli_supportcaps = *supportcaps;
     
     /* Initialize the to-uppercase and to-lowercase tables. These should
         *not* be localized to a platform-native character set! They are

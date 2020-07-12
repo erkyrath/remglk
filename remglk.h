@@ -159,6 +159,7 @@ struct glk_fileref_struct {
 
 /* A few global variables */
 
+extern data_supportcaps_t gli_supportcaps;
 extern window_t *gli_rootwin;
 extern window_t *gli_focuswin;
 extern stream_t *gli_currentstr;
@@ -189,10 +190,6 @@ extern gidispatch_rock_t (*gli_dispatch_restore_arr)(long bufkey, glui32 len, ch
 
 extern int pref_stderr;
 extern int pref_singleturn;
-extern int pref_timersupport;
-extern int pref_hyperlinksupport;
-extern int pref_graphicssupport;
-extern int pref_graphicswinsupport;
 extern char *pref_resourceurl;
 
 #if GIDEBUG_LIBRARY_SUPPORT
@@ -204,7 +201,7 @@ extern int gli_debugger;
 
 /* Declarations of library internal functions. */
 
-extern void gli_initialize_misc(void);
+extern void gli_initialize_misc(data_supportcaps_t *supportcaps);
 
 extern void gli_msgline_warning(char *msg);
 extern void gli_msgline_error(char *msg);

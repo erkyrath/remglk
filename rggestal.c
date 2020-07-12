@@ -9,6 +9,7 @@
 #include <string.h>
 #include "glk.h"
 #include "remglk.h"
+#include "rgdata.h"
 
 glui32 glk_gestalt(glui32 id, glui32 val)
 {
@@ -64,20 +65,20 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
             return FALSE;
             
         case gestalt_Timer: 
-            return pref_timersupport;
+            return gli_supportcaps.timer;
 
         case gestalt_Graphics:
         case gestalt_GraphicsTransparency:
-            return pref_graphicssupport;
+            return gli_supportcaps.graphics;
 
         case gestalt_GraphicsCharInput:
             return FALSE;
             
         case gestalt_DrawImage:
-            if (pref_graphicssupport) {
+            if (gli_supportcaps.graphics) {
                 if (val == wintype_TextBuffer)
                     return TRUE;
-                if (val == wintype_Graphics && pref_graphicswinsupport)
+                if (val == wintype_Graphics && gli_supportcaps.graphicswin)
                     return TRUE;
             }
             return FALSE;
@@ -96,7 +97,7 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
 
         case gestalt_Hyperlinks: 
         case gestalt_HyperlinkInput:
-            return pref_hyperlinksupport;
+            return gli_supportcaps.hyperlinks;
  
         case gestalt_LineInputEcho:
             return TRUE;

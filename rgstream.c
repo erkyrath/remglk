@@ -1107,7 +1107,7 @@ static void gli_set_hyperlink(stream_t *str, glui32 linkval)
     if (!str || !str->writable)
         return;
 
-    if (!pref_hyperlinksupport)
+    if (!gli_supportcaps.hyperlinks)
         return;
     
     switch (str->type) {

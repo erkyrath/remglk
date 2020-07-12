@@ -421,7 +421,7 @@ winid_t glk_window_open(winid_t splitwin, glui32 method, glui32 size,
     
     }
 
-    if (wintype == wintype_Graphics && !pref_graphicswinsupport) {
+    if (wintype == wintype_Graphics && !gli_supportcaps.graphicswin) {
         /* Graphics windows not supported; silently return null */
         return 0;
     }
@@ -1556,7 +1556,7 @@ void glk_set_terminators_line_event(window_t *win, glui32 *keycodes,
 
 glui32 glk_image_draw(winid_t win, glui32 image, glsi32 val1, glsi32 val2)
 {
-    if (!pref_graphicssupport) {
+    if (!gli_supportcaps.graphics) {
         gli_strict_warning("image_draw: graphics not supported.");
         return FALSE;
     }
@@ -1601,7 +1601,7 @@ glui32 glk_image_draw(winid_t win, glui32 image, glsi32 val1, glsi32 val2)
 glui32 glk_image_draw_scaled(winid_t win, glui32 image, 
     glsi32 val1, glsi32 val2, glui32 width, glui32 height)
 {
-    if (!pref_graphicssupport) {
+    if (!gli_supportcaps.graphics) {
         gli_strict_warning("image_draw_scaled: graphics not supported.");
         return FALSE;
     }
@@ -1754,7 +1754,7 @@ void glk_request_hyperlink_event(winid_t win)
         return;
     }
 
-    if (!pref_hyperlinksupport)
+    if (!gli_supportcaps.hyperlinks)
         return;
 
     switch (win->type) {
@@ -1775,7 +1775,7 @@ void glk_cancel_hyperlink_event(winid_t win)
         return;
     }
 
-    if (!pref_hyperlinksupport)
+    if (!gli_supportcaps.hyperlinks)
         return;
 
     switch (win->type) {

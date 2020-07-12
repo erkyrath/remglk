@@ -1067,6 +1067,29 @@ data_supportcaps_t *data_supportcaps_alloc()
     return supportcaps;
 }
 
+void data_supportcaps_clear(data_supportcaps_t *supportcaps)
+{
+    supportcaps->timer = FALSE;
+    supportcaps->hyperlinks = FALSE;
+    supportcaps->graphics = FALSE;
+    supportcaps->graphicswin = FALSE;
+    supportcaps->sound = FALSE;
+}
+
+void data_supportcaps_merge(data_supportcaps_t *supportcaps, data_supportcaps_t *other)
+{
+    if (other->timer)
+        supportcaps->timer = TRUE;
+    if (other->hyperlinks)
+        supportcaps->hyperlinks = TRUE;
+    if (other->graphics)
+        supportcaps->graphics = TRUE;
+    if (other->graphicswin)
+        supportcaps->graphicswin = TRUE;
+    if (other->sound)
+        supportcaps->sound = TRUE;
+}
+
 void data_supportcaps_free(data_supportcaps_t *supportcaps)
 {
     free(supportcaps);

@@ -206,7 +206,7 @@ void gli_select_metrics(data_metrics_t *metrics, data_supportcaps_t *supportcaps
         *supportcaps = *data->supportcaps;
     }
     else {
-        memset(supportcaps, 0, sizeof(data_supportcaps_t));
+        data_supportcaps_clear(supportcaps);
     }
 
     last_event_type = evtype_Arrange;
@@ -317,7 +317,7 @@ void gli_set_last_event_type(glui32 type)
 
 void glk_request_timer_events(glui32 millisecs)
 {
-    if (!pref_timersupport)
+    if (!gli_supportcaps.timer)
         return;
     timing_msec = millisecs;
     gettimeofday(&timing_start, NULL);
@@ -349,7 +349,7 @@ static glsi32 gli_timer_request_since_start()
 {
     struct timeval tv;
 
-    if (!pref_timersupport)
+    if (!gli_supportcaps.timer)
         return -1;
     if (!timing_msec)
         return -1;

@@ -213,6 +213,8 @@ extern void data_metrics_print(FILE *fl, data_metrics_t *metrics);
 extern data_metrics_t *data_metrics_parse(data_raw_t *rawdata);
 
 extern data_supportcaps_t *data_supportcaps_alloc(void);
+extern void data_supportcaps_clear(data_supportcaps_t *supportcaps);
+extern void data_supportcaps_merge(data_supportcaps_t *supportcaps, data_supportcaps_t *other);
 extern void data_supportcaps_free(data_supportcaps_t *supportcaps);
 extern void data_supportcaps_print(data_supportcaps_t *supportcaps);
 

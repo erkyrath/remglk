@@ -22,10 +22,7 @@ int pref_autometrics = FALSE;
 int pref_singleturn = FALSE;
 static int pref_screenwidth = 80;
 static int pref_screenheight = 50;
-int pref_timersupport = FALSE;
-int pref_hyperlinksupport = FALSE;
-int pref_graphicssupport = FALSE;
-int pref_graphicswinsupport = FALSE;
+static data_supportcaps_t pref_supportcaps;
 char *pref_resourceurl = NULL;
 #if GIDEBUG_LIBRARY_SUPPORT
 int gli_debugger = FALSE;
@@ -63,6 +60,8 @@ int main(int argc, char *argv[])
         printf("Compile-time error: glui32 is not unsigned. Please fix glk.h.\n");
         return 1;
     }
+
+    data_supportcaps_clear(&pref_supportcaps);
     
     /* Now some argument-parsing. This is probably going to hurt. */
     startdata.argc = 0;
@@ -185,13 +184,13 @@ int main(int argc, char *argv[])
             pref_stderr = val;
         else if (extract_value(argc, argv, "support", ex_Str, &ix, &val, FALSE)) {
             if (!strcmp(extracted_string, "timer") || !strcmp(extracted_string, "timers"))
-                pref_timersupport = TRUE;
+                pref_supportcaps.timer = TRUE;
             else if (!strcmp(extracted_string, "hyperlink") || !strcmp(extracted_string, "hyperlinks"))
-                pref_hyperlinksupport = TRUE;
+                pref_supportcaps.hyperlinks = TRUE;
             else if (!strcmp(extracted_string, "graphics"))
-                pref_graphicssupport = TRUE;
+                pref_supportcaps.graphics = TRUE;
             else if (!strcmp(extracted_string, "graphicswin"))
-                pref_graphicswinsupport = TRUE;
+                pref_supportcaps.graphicswin = TRUE;
             else {
                 printf("%s: -support value not recognized: %s\n", argv[0], extracted_string);
                 errflag = TRUE;
@@ -262,7 +261,7 @@ int main(int argc, char *argv[])
 
     /* Initialize things. */
     gli_initialize_datainput();
-    gli_initialize_misc();
+    gli_initialize_misc(&pref_supportcaps);
     gli_initialize_windows();
     gli_initialize_streams();
     gli_initialize_filerefs();
@@ -278,18 +277,9 @@ int main(int argc, char *argv[])
         data_metrics_t *metrics = data_metrics_alloc(pref_screenwidth, pref_screenheight);
         
         if (!pref_fixedmetrics) {
-            data_supportcaps_t supportcaps;
-            gli_select_metrics(metrics, &supportcaps);
-            /* Set the support preference flags. (Bit of a layering 
-               violation, but the flags are simple.) */
-            if (supportcaps.timer)
-                pref_timersupport = TRUE;
-            if (supportcaps.hyperlinks)
-                pref_hyperlinksupport = TRUE;
-            if (supportcaps.graphics)
-                pref_graphicssupport = TRUE;
-            if (supportcaps.graphicswin)
-                pref_graphicswinsupport = TRUE;
+            data_supportcaps_t newcaps;
+            gli_select_metrics(metrics, &newcaps);
+            data_supportcaps_merge(&gli_supportcaps, &newcaps);
         }
         else {
             gli_select_imaginary();
