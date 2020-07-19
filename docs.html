@@ -107,15 +107,15 @@ dt {
 
 <h1>RemGlk: remote-procedure-call implementation of the Glk IF API</h1>
 
-<em>RemGlk version 0.2.6</em><br>
+<em>RemGlk version 0.3.0###</em><br>
 
 <em>Designed by Andrew Plotkin (erkyrath@eblong.com)<br>
 <a href="http://eblong.com/zarf/glk/index.html">(Glk home page)</a></em>
 <p>
 
-The RemGlk library is copyright 2012-17 by Andrew Plotkin. The
+The RemGlk library is copyright 2012-20 by Andrew Plotkin. The
 GiDispa, and GiBlorb libraries, as well as the glk.h header file, are
-copyright 1998-2017 by Andrew Plotkin. They are distributed under the
+copyright 1998-2020 by Andrew Plotkin. They are distributed under the
 <a href="LICENSE">MIT license</a>.
 <p>
 
@@ -356,6 +356,8 @@ When generating output, a complete update JSON update will be followed by a blan
 
 <h3>Autosave/autorestore</h3>
 
+Autosave and autorestore are available as of version 0.3.0###.
+
 If the interpreter implements autosave, it will use RemGlk's facilities to store a library serialization dump every turn (before each <code>glk_select()</code> call). This state dump is JSON, but it does <em>not</em> follow the GlkOte format specification. It contains more detailed information, including the "live" state of every window and stream.
 <p>
 
@@ -363,7 +365,7 @@ The autosave format is deliberately not documented; it is specific to the implem
 <p>
 
 <hr>
-Last updated February 13, 2017.
+Last updated July 19, 2020.
 <p>
 
 <em><a href="http://eblong.com/zarf/glk/index.html">Glk home page</a></em>
