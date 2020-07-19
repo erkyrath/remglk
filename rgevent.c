@@ -222,8 +222,15 @@ int gli_select_specialrequest(data_specialreq_t *special, char **resbuf)
     char *buf = NULL;
     int val = 0;
     
-    gli_windows_update(special, TRUE);
-    //### if pref_singleturn: gli_fast_exit()?
+    /* Send an update stanza to stdout. We do this before every
+       get_by_prompt, but *not* if we just autorestored. */
+    if (last_event_type != 0xFFFFFFFE) {
+        gli_windows_update(special, TRUE);
+        if (pref_singleturn) {
+            /* Singleton mode mode means that we exit after every output. */
+            gli_fast_exit();
+        }
+    }
 
     while (TRUE) {
         data_event_t *data = data_event_read();
@@ -253,6 +260,9 @@ int gli_select_specialrequest(data_specialreq_t *special, char **resbuf)
         break;
     }
 
+    /* This wasn't an event, but we want to nudge last_event_type. */
+    last_event_type = evtype_None;
+    
     *resbuf = buf;
     return val;
 }
