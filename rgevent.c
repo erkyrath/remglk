@@ -214,13 +214,13 @@ void gli_select_metrics(data_metrics_t *metrics, data_supportcaps_t *supportcaps
     data_event_free(data);
 }
 
-/* Wait for input, but it has to be a special-input response.
-   Returns a malloced text buffer and number of characters, or NULL.
+/* Wait for input, but it has to be a special-input response. (Currently
+   this means a filename prompt.)
+   Returns a malloced text string or NULL.
 */
-int gli_select_specialrequest(data_specialreq_t *special, char **resbuf)
+char *gli_select_specialrequest(data_specialreq_t *special)
 {
     char *buf = NULL;
-    int val = 0;
     
     /* Send an update stanza to stdout. We do this before every
        get_by_prompt, but *not* if we just autorestored. */
@@ -244,16 +244,18 @@ int gli_select_specialrequest(data_specialreq_t *special, char **resbuf)
         }
         
         if (data->linelen && data->linevalue) {
-            buf = malloc(data->linelen);
+            int val;
+            buf = malloc(data->linelen + 1);
             for (val=0; val<data->linelen; val++) {
                 glui32 ch = data->linevalue[val];
                 if (ch < 0x20 || ch > 0xFF)
                     ch = '-';
                 buf[val] = ch;
             }
+            buf[data->linelen] = '\0';
         }
         else {
-            val = 0;
+            buf = NULL;
         };
 
         data_event_free(data);
@@ -263,8 +265,7 @@ int gli_select_specialrequest(data_specialreq_t *special, char **resbuf)
     /* This wasn't an event, but we want to nudge last_event_type. */
     last_event_type = evtype_None;
     
-    *resbuf = buf;
-    return val;
+    return buf;
 }
 
 /* Increment the input counter. This is used with the fixedmetrics

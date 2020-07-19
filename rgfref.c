@@ -284,7 +284,6 @@ frefid_t glk_fileref_create_by_name(glui32 usage, char *name,
 frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
     glui32 rock)
 {
-    fprintf(stderr, "### create_by_prompt(%d, %d, %d)\n", usage, fmode, rock); //###
     fileref_t *fref;
     char *buf;
     char *newbuf;
@@ -304,15 +303,15 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
 
     /* This will look a lot like glk_select(), but we're waiting only for
        a special-input response. */
-    val = gli_select_specialrequest(special, &buf);
+    buf = gli_select_specialrequest(special);
     
-    if (!val || !buf) {
+    if (!buf) {
         /* The player cancelled input. */
         return NULL;
     }
     
     /* Trim whitespace from end and beginning. */
-    buf[val] = '\0';
+    val = strlen(buf);
     while (val 
         && (buf[val-1] == '\n' 
             || buf[val-1] == '\r' 
