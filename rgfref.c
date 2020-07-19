@@ -235,7 +235,7 @@ frefid_t glk_fileref_create_by_name(glui32 usage, char *name,
 {
     fileref_t *fref;
     char buf[BUFLEN];
-    char buf2[2*BUFLEN+10];
+    char buf2[2*BUFLEN+4+MAX_SUFFIX_LENGTH];
     int len;
     char *cx;
     char *suffix;
