@@ -214,6 +214,49 @@ void gli_select_metrics(data_metrics_t *metrics, data_supportcaps_t *supportcaps
     data_event_free(data);
 }
 
+/* Wait for input, but it has to be a special-input response.
+   Returns a malloced text buffer and number of characters, or NULL.
+*/
+int gli_select_specialrequest(data_specialreq_t *special, char **resbuf)
+{
+    char *buf = NULL;
+    int val = 0;
+    
+    gli_windows_update(special, TRUE);
+    //### if pref_singleturn: gli_fast_exit()?
+
+    while (TRUE) {
+        data_event_t *data = data_event_read();
+
+        if (data->gen != gli_window_current_generation())
+            gli_fatal_error("Input generation number does not match.");
+
+        if (data->dtag != dtag_SpecialResponse) {
+            data_event_free(data);
+            continue;
+        }
+        
+        if (data->linelen && data->linevalue) {
+            buf = malloc(data->linelen);
+            for (val=0; val<data->linelen; val++) {
+                glui32 ch = data->linevalue[val];
+                if (ch < 0x20 || ch > 0xFF)
+                    ch = '-';
+                buf[val] = ch;
+            }
+        }
+        else {
+            val = 0;
+        };
+
+        data_event_free(data);
+        break;
+    }
+
+    *resbuf = buf;
+    return val;
+}
+
 /* Increment the input counter. This is used with the fixedmetrics
    argument, which acts like the library got input.
 */

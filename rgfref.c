@@ -177,6 +177,8 @@ void glk_fileref_destroy(fileref_t *fref)
     gli_delete_fileref(fref);
 }
 
+#define MAX_SUFFIX_LENGTH (8)
+
 static char *gli_suffix_for_usage(glui32 usage)
 {
     switch (usage & fileusage_TypeMask) {
@@ -282,12 +284,12 @@ frefid_t glk_fileref_create_by_name(glui32 usage, char *name,
 frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
     glui32 rock)
 {
+    fprintf(stderr, "### create_by_prompt(%d, %d, %d)\n", usage, fmode, rock); //###
     fileref_t *fref;
-    char buf[BUFLEN];
-    char newbuf[2*BUFLEN+10];
+    char *buf;
+    char *newbuf;
     char *cx;
     int val, gotdot;
-    int gotresp;
 
     /* Set up special request. */
     data_specialreq_t *special = data_specialreq_alloc(fmode, (usage & fileusage_TypeMask));
@@ -299,37 +301,12 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
         special->gameid = strdup(cx);
     }
 #endif /* GI_DISPA_GAME_ID_AVAILABLE */
-    
+
     /* This will look a lot like glk_select(), but we're waiting only for
        a special-input response. */
-    gli_windows_update(special, TRUE);
-    //### if pref_singleturn: gli_fast_exit()?
-
-    gotresp = FALSE;
-    val = 0; /* length of buf */
-
-    while (!gotresp) {
-        data_event_t *data = data_event_read();
-
-        if (data->gen != gli_window_current_generation())
-            gli_fatal_error("Input generation number does not match.");
-
-        if (data->dtag == dtag_SpecialResponse) {
-            gotresp = TRUE;
-            if (data->linelen && data->linevalue) {
-                for (val=0; val<data->linelen && val<BUFLEN; val++) {
-                    glui32 ch = data->linevalue[val];
-                    if (ch > 0xFF)
-                        ch = '-';
-                    buf[val] = ch;
-                }
-            }
-        }
-
-        data_event_free(data);
-    }
+    val = gli_select_specialrequest(special, &buf);
     
-    if (!val) {
+    if (!val || !buf) {
         /* The player cancelled input. */
         return NULL;
     }
@@ -348,19 +325,26 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
     val = strlen(cx);
     if (!val) {
         /* The player just hit return. */
+        free(buf);
         return NULL;
     }
 
+    newbuf = malloc(val + strlen(workingdir) + 4 + MAX_SUFFIX_LENGTH);
+    
     if (cx[0] == '/')
         strcpy(newbuf, cx);
     else
         sprintf(newbuf, "%s/%s", workingdir, cx);
+
+    free(buf);
+    buf = NULL;
+    cx = NULL;
     
     /* If there is no dot-suffix, add a standard one. */
     val = strlen(newbuf);
     gotdot = FALSE;
-    while (val && (buf[val-1] != '/')) {
-        if (buf[val-1] == '.') {
+    while (val && (newbuf[val-1] != '/')) {
+        if (newbuf[val-1] == '.') {
             gotdot = TRUE;
             break;
         }
@@ -377,9 +361,11 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
     fref = gli_new_fileref(newbuf, usage, rock);
     if (!fref) {
         gli_strict_warning("fileref_create_by_prompt: unable to create fileref.");
+        free(newbuf);
         return NULL;
     }
-    
+
+    free(newbuf);
     return fref;
 }
 
