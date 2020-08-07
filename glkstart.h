@@ -79,8 +79,10 @@ extern int glkunix_unserialize_object_list_entries(glkunix_unserialize_context_t
 
 #ifdef GLKUNIX_AUTOSAVE_FEATURES
 
+/* glkunix_library_state_struct is defined in rgdata_int.h. */
 typedef struct glkunix_library_state_struct *glkunix_library_state_t;
-typedef union glk_objrock_union glk_objrock_u; /* alias for gidispatch_rock_t */
+/* glk_objrock_union is defined in gi_dispa.h. gidispatch_rock_t is another alias for this union; but I don't want this header to be dependent on that one, so we use glk_objrock_u below. */
+typedef union glk_objrock_union glk_objrock_u;
 
 extern void glkunix_save_library_state(strid_t file, strid_t omitstream, glkunix_serialize_object_f extra_state_func, void *extra_state_rock);
 extern glkunix_library_state_t glkunix_load_library_state(strid_t file, glkunix_unserialize_object_f extra_state_func, void *extra_state_rock);
