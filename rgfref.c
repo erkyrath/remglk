@@ -357,6 +357,14 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
     /* We don't do an overwrite check, because that would be another
        interchange. */
 
+    if (fmode == filemode_Read) {
+        /* According to recent spec discussion, we must silently return NULL if no such file exists. */
+        if (access(newbuf, R_OK)) {
+            free(newbuf);
+            return NULL;
+        }
+    }
+
     fref = gli_new_fileref(newbuf, usage, rock);
     if (!fref) {
         gli_strict_warning("fileref_create_by_prompt: unable to create fileref.");
