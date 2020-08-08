@@ -486,7 +486,9 @@ strid_t glk_stream_open_file(fileref_t *fref, glui32 fmode,
         
     fl = fopen(fref->filename, modestr);
     if (!fl) {
-        gli_strict_warning("stream_open_file: unable to open file.");
+        if (fmode != filemode_Read) {
+            gli_strict_warning("stream_open_file: unable to open file.");
+        }
         return 0;
     }
     
