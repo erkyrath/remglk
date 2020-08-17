@@ -9,7 +9,7 @@
 
 # Pick a C compiler.
 #CC = cc
-CC = gcc -ansi
+CC = gcc
 
 OPTIONS = -g -Wall
 
