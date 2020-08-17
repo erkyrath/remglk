@@ -8,8 +8,8 @@
 # and glk.h, glkstart.h, and Make.remglk in the include directory.
 
 # Pick a C compiler.
-#CC = cc
-CC = gcc
+CC = cc
+#CC = gcc
 
 OPTIONS = -g -Wall -Wno-unused
 
