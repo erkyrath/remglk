@@ -11,7 +11,7 @@
 #CC = cc
 CC = gcc
 
-OPTIONS = -g -Wall
+OPTIONS = -g -Wall -Wno-unused
 
 CFLAGS = $(OPTIONS) $(INCLUDEDIRS)
 
