@@ -31,6 +31,7 @@ typedef int32_t glsi32;
 #define GLK_MODULE_HYPERLINKS
 #define GLK_MODULE_DATETIME
 #define GLK_MODULE_RESOURCE_STREAM
+#define GLK_MODULE_FILEREF_GET_NAME
 
 /* Define a macro for a function attribute that indicates a function that
     never returns. (E.g., glk_exit().) We try to do this only in C compilers
@@ -445,5 +446,11 @@ extern strid_t glk_stream_open_resource(glui32 filenum, glui32 rock);
 extern strid_t glk_stream_open_resource_uni(glui32 filenum, glui32 rock);
 
 #endif /* GLK_MODULE_RESOURCE_STREAM */
+
+#ifdef GLK_MODULE_FILEREF_GET_NAME
+
+extern char* garglk_fileref_get_name(frefid_t fref);
+
+#endif /* GLK_MODULE_FILEREF_GET_NAME */
 
 #endif /* GLK_H */

@@ -461,3 +461,8 @@ void glkunix_set_base_file(char *filename)
     }
 }
 
+/* Garglk extension to return a file name, needed by by the Glk ports of TADS etc. */
+char *garglk_fileref_get_name(fileref_t *fref)
+{
+    return fref->filename;
+}
