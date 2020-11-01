@@ -1349,10 +1349,20 @@ data_event_t *data_event_read()
         if (!data_raw_string_is(dat, "fileref_prompt"))
             gli_fatal_error("data: Special input struct has unknown response type");
 
+        /* This "value" field will be a string if we are connected
+           to RegTest, but a dialog.js fileref object if we are connected
+           to GlkOte. */
         dat = data_raw_struct_field(rawdata, "value");
         if (dat && dat->type == rawtyp_Str) {
             input->linevalue = data_raw_str_dup(dat);
             input->linelen = dat->count;
+        }
+        else if (dat && dat->type == rawtyp_Struct) {
+            data_raw_t *subdat = data_raw_struct_field(dat, "filename");
+            if (subdat && subdat->type == rawtyp_Str) {
+                input->linevalue = data_raw_str_dup(subdat);
+                input->linelen = subdat->count;
+            }
         }
     }
     else if (data_raw_string_is(dat, "debuginput")) {
