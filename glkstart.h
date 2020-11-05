@@ -57,6 +57,7 @@ extern strid_t glkunix_stream_open_pathname_gen(char *pathname,
     glui32 writemode, glui32 textmode, glui32 rock);
 extern strid_t glkunix_stream_open_pathname(char *pathname, glui32 textmode, 
     glui32 rock);
+extern char *glkunix_fileref_get_filename(fileref_t *fref);
 
 typedef struct glkunix_serialize_context_struct *glkunix_serialize_context_t;
 typedef struct glkunix_unserialize_context_struct *glkunix_unserialize_context_t;
