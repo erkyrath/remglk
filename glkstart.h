@@ -52,12 +52,18 @@ extern glkunix_argumentlist_t glkunix_arguments[];
 /* defined in unixstrt.c */
 extern int glkunix_startup_code(glkunix_startup_t *data);
 
+/* This library offers the glkunix_fileref_get_filename() API
+   (used by some VMs originally built for GarGlk). */
+#define GLKUNIX_FILEREF_GET_FILENAME (1)
+
 extern void glkunix_set_base_file(char *filename);
 extern strid_t glkunix_stream_open_pathname_gen(char *pathname, 
     glui32 writemode, glui32 textmode, glui32 rock);
 extern strid_t glkunix_stream_open_pathname(char *pathname, glui32 textmode, 
     glui32 rock);
+#ifdef GLKUNIX_FILEREF_GET_FILENAME
 extern char *glkunix_fileref_get_filename(fileref_t *fref);
+#endif /* GLKUNIX_FILEREF_GET_FILENAME */
 
 typedef struct glkunix_serialize_context_struct *glkunix_serialize_context_t;
 typedef struct glkunix_unserialize_context_struct *glkunix_unserialize_context_t;
