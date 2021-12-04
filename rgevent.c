@@ -26,7 +26,7 @@ static glui32 timing_msec;
 /* The last timing value that was sent out. (0 means null was sent.) */
 static glui32 last_timing_msec;
 /* When the current timer started or last fired. */
-static struct timeval timing_start; 
+static struct timespec timing_start; 
 
 static glsi32 gli_timer_request_since_start(void);
 static char *alloc_utf_buffer(glui32 *ustr, int ulen);
@@ -130,7 +130,7 @@ void glk_select(event_t *event)
                 break;
 
             case dtag_Timer:
-                gettimeofday(&timing_start, NULL);
+                timespec_get(&timing_start, TIME_UTC);
                 gli_event_store(evtype_Timer, NULL, 0, 0);
                 break;
 
@@ -181,7 +181,7 @@ void glk_select_poll(event_t *event)
     if (timing_msec) {
         glsi32 time = gli_timer_request_since_start();
         if (time >= 0 && time >= timing_msec) {
-            gettimeofday(&timing_start, NULL);
+            timespec_get(&timing_start, TIME_UTC);
             /* Resend timer request at next update. */
             last_timing_msec = 0;
             /* Call it a timer event. */
@@ -374,7 +374,7 @@ void glk_request_timer_events(glui32 millisecs)
     if (!gli_supportcaps.timer)
         return;
     timing_msec = millisecs;
-    gettimeofday(&timing_start, NULL);
+    timespec_get(&timing_start, TIME_UTC);
 }
 
 /* Return whether the timer request has changed since the last call.
@@ -401,26 +401,26 @@ glui32 gli_timer_get_timing_msec()
    If there is no timer, returns -1. */
 static glsi32 gli_timer_request_since_start()
 {
-    struct timeval tv;
+    struct timespec ts;
 
     if (!gli_supportcaps.timer)
         return -1;
     if (!timing_msec)
         return -1;
 
-    gettimeofday(&tv, NULL);
+    timespec_get(&ts, TIME_UTC);
 
-    if (tv.tv_sec < timing_start.tv_sec) {
+    if (ts.tv_sec < timing_start.tv_sec) {
         return 0;
     }
-    else if (tv.tv_sec == timing_start.tv_sec) {
-        if (tv.tv_usec < timing_start.tv_usec)
+    else if (ts.tv_sec == timing_start.tv_sec) {
+        if (ts.tv_nsec < timing_start.tv_nsec)
             return 0;
-        return (tv.tv_usec - timing_start.tv_usec) / 1000;
+        return (ts.tv_nsec - timing_start.tv_nsec) / 1000000;
     }
     else {
-        glsi32 res = (tv.tv_sec - timing_start.tv_sec) * 1000;
-        res += ((tv.tv_usec - timing_start.tv_usec) / 1000);
+        glsi32 res = (ts.tv_sec - timing_start.tv_sec) * 1000;
+        res += ((ts.tv_nsec - timing_start.tv_nsec) / 1000000);
         return res;
     }
 }
