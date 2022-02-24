@@ -7,9 +7,11 @@
 # When you install remglk, you must put libremglk.a in the lib directory,
 # and glk.h, glkstart.h, and Make.remglk in the include directory.
 
-# Pick a C compiler.
-CC = cc
-#CC = gcc
+# Pick a C compiler if CC is not defined
+ifndef CC
+  CC = cc
+  #CC = gcc
+endif
 
 OPTIONS = -g -Wall -Wno-unused
 
