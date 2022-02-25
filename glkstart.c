@@ -10,6 +10,7 @@
     *not* be compiled into the Glk library itself.
 */
 
+#include "stddef.h"
 #include "glk.h"
 #include "glkstart.h"
 
