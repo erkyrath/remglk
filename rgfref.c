@@ -462,8 +462,10 @@ void glkunix_set_base_file(char *filename)
 }
 
 /* The emglken interpreters need to reach in and get this info. They
-   were build for the garglk port, which has an accessor called
-   garglk_fileref_get_name(). */
+   were built for the garglk port, which has an accessor called
+   garglk_fileref_get_name().
+   (Note that the garglk codebase uses "const", even though remglk
+   generally doesn't.) */
 const char *glkunix_fileref_get_filename(frefid_t fref)
 {
     return fref->filename;
