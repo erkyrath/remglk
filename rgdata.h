@@ -49,14 +49,14 @@ typedef struct data_specialspan_struct data_specialspan_t;
 
 /* data_metrics_t: Defines the display metrics. */
 struct data_metrics_struct {
-    glui32 width, height;
-    glui32 outspacingx, outspacingy;
-    glui32 inspacingx, inspacingy;
+    double width, height;
+    double outspacingx, outspacingy;
+    double inspacingx, inspacingy;
     double gridcharwidth, gridcharheight;
-    glui32 gridmarginx, gridmarginy;
+    double gridmarginx, gridmarginy;
     double buffercharwidth, buffercharheight;
-    glui32 buffermarginx, buffermarginy;
-    glui32 graphicsmarginx, graphicsmarginy;
+    double buffermarginx, buffermarginy;
+    double graphicsmarginx, graphicsmarginy;
 };
 
 /* data_supportcaps_t: List of I/O capabilities of the client. */

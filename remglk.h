@@ -36,8 +36,8 @@
 /* Some useful type declarations. */
 
 typedef struct grect_struct {
-    int left, top;
-    int right, bottom;
+    double left, top;
+    double right, bottom;
 } grect_t;
 
 #define grect_set_from_size(boxref, wid, hgt)   \

@@ -881,11 +881,11 @@ data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
     dat = data_raw_struct_field(rawdata, "width");
     if (!dat)
         gli_fatal_error("data: Metrics require width");
-    metrics->width = data_raw_int_value(dat);
+    metrics->width = data_raw_real_value(dat);
     dat = data_raw_struct_field(rawdata, "height");
     if (!dat)
         gli_fatal_error("data: Metrics require height");
-    metrics->height = data_raw_int_value(dat);
+    metrics->height = data_raw_real_value(dat);
 
     /* charwidth/charheight aren't spec, but we accept them as a shortcut.
        (Don't send both charwidth and gridcharwidth, e.g., because the
@@ -918,7 +918,7 @@ data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
 
     dat = data_raw_struct_field(rawdata, "margin");
     if (dat) {
-        glsi32 val = data_raw_int_value(dat);
+        double val = data_raw_real_value(dat);
         metrics->gridmarginx = val;
         metrics->gridmarginy = val;
         metrics->buffermarginx = val;
@@ -929,28 +929,28 @@ data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
 
     dat = data_raw_struct_field(rawdata, "gridmargin");
     if (dat) {
-        glsi32 val = data_raw_int_value(dat);
+        double val = data_raw_real_value(dat);
         metrics->gridmarginx = val;
         metrics->gridmarginy = val;
     }
 
     dat = data_raw_struct_field(rawdata, "buffermargin");
     if (dat) {
-        glsi32 val = data_raw_int_value(dat);
+        double val = data_raw_real_value(dat);
         metrics->buffermarginx = val;
         metrics->buffermarginy = val;
     }
 
     dat = data_raw_struct_field(rawdata, "graphicsmargin");
     if (dat) {
-        glsi32 val = data_raw_int_value(dat);
+        double val = data_raw_real_value(dat);
         metrics->graphicsmarginx = val;
         metrics->graphicsmarginy = val;
     }
 
     dat = data_raw_struct_field(rawdata, "marginx");
     if (dat) {
-        glsi32 val = data_raw_int_value(dat);
+        double val = data_raw_real_value(dat);
         metrics->gridmarginx = val;
         metrics->buffermarginx = val;
         metrics->graphicsmarginx = val;
@@ -958,7 +958,7 @@ data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
 
     dat = data_raw_struct_field(rawdata, "marginy");
     if (dat) {
-        glsi32 val = data_raw_int_value(dat);
+        double val = data_raw_real_value(dat);
         metrics->gridmarginy = val;
         metrics->buffermarginy = val;
         metrics->graphicsmarginy = val;
@@ -966,26 +966,26 @@ data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
 
     dat = data_raw_struct_field(rawdata, "gridmarginx");
     if (dat) 
-        metrics->gridmarginx = data_raw_int_value(dat);
+        metrics->gridmarginx = data_raw_real_value(dat);
     dat = data_raw_struct_field(rawdata, "gridmarginy");
     if (dat) 
-        metrics->gridmarginy = data_raw_int_value(dat);
+        metrics->gridmarginy = data_raw_real_value(dat);
     dat = data_raw_struct_field(rawdata, "buffermarginx");
     if (dat) 
-        metrics->buffermarginx = data_raw_int_value(dat);
+        metrics->buffermarginx = data_raw_real_value(dat);
     dat = data_raw_struct_field(rawdata, "buffermarginy");
     if (dat) 
-        metrics->buffermarginy = data_raw_int_value(dat);
+        metrics->buffermarginy = data_raw_real_value(dat);
     dat = data_raw_struct_field(rawdata, "graphicsmarginx");
     if (dat) 
-        metrics->graphicsmarginx = data_raw_int_value(dat);
+        metrics->graphicsmarginx = data_raw_real_value(dat);
     dat = data_raw_struct_field(rawdata, "graphicsmarginy");
     if (dat) 
-        metrics->graphicsmarginy = data_raw_int_value(dat);
+        metrics->graphicsmarginy = data_raw_real_value(dat);
 
     dat = data_raw_struct_field(rawdata, "spacing");
     if (dat) {
-        glsi32 val = data_raw_int_value(dat);
+        double val = data_raw_real_value(dat);
         metrics->inspacingx = val;
         metrics->inspacingy = val;
         metrics->outspacingx = val;
@@ -994,44 +994,44 @@ data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
 
     dat = data_raw_struct_field(rawdata, "inspacing");
     if (dat) {
-        glsi32 val = data_raw_int_value(dat);
+        double val = data_raw_real_value(dat);
         metrics->inspacingx = val;
         metrics->inspacingy = val;
     }
 
     dat = data_raw_struct_field(rawdata, "outspacing");
     if (dat) {
-        glsi32 val = data_raw_int_value(dat);
+        double val = data_raw_real_value(dat);
         metrics->outspacingx = val;
         metrics->outspacingy = val;
     }
 
     dat = data_raw_struct_field(rawdata, "spacingx");
     if (dat) {
-        glsi32 val = data_raw_int_value(dat);
+        double val = data_raw_real_value(dat);
         metrics->inspacingx = val;
         metrics->outspacingx = val;
     }
 
     dat = data_raw_struct_field(rawdata, "spacingy");
     if (dat) {
-        glsi32 val = data_raw_int_value(dat);
+        double val = data_raw_real_value(dat);
         metrics->inspacingy = val;
         metrics->outspacingy = val;
     }
 
     dat = data_raw_struct_field(rawdata, "inspacingx");
     if (dat)
-        metrics->inspacingx = data_raw_int_value(dat);
+        metrics->inspacingx = data_raw_real_value(dat);
     dat = data_raw_struct_field(rawdata, "inspacingy");
     if (dat)
-        metrics->inspacingy = data_raw_int_value(dat);
+        metrics->inspacingy = data_raw_real_value(dat);
     dat = data_raw_struct_field(rawdata, "outspacingx");
     if (dat)
-        metrics->outspacingx = data_raw_int_value(dat);
+        metrics->outspacingx = data_raw_real_value(dat);
     dat = data_raw_struct_field(rawdata, "outspacingy");
     if (dat)
-        metrics->outspacingy = data_raw_int_value(dat);
+        metrics->outspacingy = data_raw_real_value(dat);
 
     if (metrics->gridcharwidth <= 0 || metrics->gridcharheight <= 0
         || metrics->buffercharwidth <= 0 || metrics->buffercharheight <= 0)
@@ -1043,14 +1043,14 @@ data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
 void data_metrics_print(FILE *fl, data_metrics_t *metrics)
 {
     fprintf(fl, "{\n");   
-    fprintf(fl, "  \"width\": %ld, \"height\": %ld,\n", (long)metrics->width, (long)metrics->height);
-    fprintf(fl, "  \"outspacingx\": %ld, \"outspacingy\": %ld,\n", (long)metrics->outspacingx, (long)metrics->outspacingy);
-    fprintf(fl, "  \"inspacingx\": %ld, \"inspacingy\": %ld,\n", (long)metrics->inspacingx, (long)metrics->inspacingy);
+    fprintf(fl, "  \"width\": %.1f, \"height\": %.1f,\n", metrics->width, metrics->height);
+    fprintf(fl, "  \"outspacingx\": %.1f, \"outspacingy\": %.1f,\n", metrics->outspacingx, metrics->outspacingy);
+    fprintf(fl, "  \"inspacingx\": %.1f, \"inspacingy\": %.1f,\n", metrics->inspacingx, metrics->inspacingy);
     fprintf(fl, "  \"gridcharwidth\": %.1f, \"gridcharheight\": %.1f,\n", metrics->gridcharwidth, metrics->gridcharheight);
-    fprintf(fl, "  \"gridmarginx\": %ld, \"gridmarginy\": %ld,\n", (long)metrics->gridmarginx, (long)metrics->gridmarginy);
+    fprintf(fl, "  \"gridmarginx\": %.1f, \"gridmarginy\": %.1f,\n", metrics->gridmarginx, metrics->gridmarginy);
     fprintf(fl, "  \"buffercharwidth\": %.1f, \"buffercharheight\": %.1f,\n", metrics->buffercharwidth, metrics->buffercharheight);
-    fprintf(fl, "  \"buffermarginx\": %ld, \"buffermarginy\": %ld,\n", (long)metrics->buffermarginx, (long)metrics->buffermarginy);
-    fprintf(fl, "  \"graphicsmarginx\": %ld, \"graphicsmarginy\": %ld\n", (long)metrics->graphicsmarginx, (long)metrics->graphicsmarginy);
+    fprintf(fl, "  \"buffermarginx\": %.1f, \"buffermarginy\": %.1f,\n", metrics->buffermarginx, metrics->buffermarginy);
+    fprintf(fl, "  \"graphicsmarginx\": %.1f, \"graphicsmarginy\": %.1f\n", metrics->graphicsmarginx, metrics->graphicsmarginy);
     fprintf(fl, "}\n");   
 }
 
@@ -1568,7 +1568,7 @@ void data_window_print(data_window_t *dat)
         printf("   \"gridwidth\":%d, \"gridheight\":%d,\n", dat->gridwidth, dat->gridheight);
     if (dat->type == wintype_Graphics)
         printf("   \"graphwidth\":%d, \"graphheight\":%d,\n", dat->gridwidth, dat->gridheight);
-    printf("   \"left\":%d, \"top\":%d, \"width\":%d, \"height\":%d }",
+    printf("   \"left\":%.1f, \"top\":%.1f, \"width\":%.1f, \"height\":%.1f }",
         dat->size.left, dat->size.top, dat->size.right-dat->size.left, dat->size.bottom-dat->size.top);
 }
 
@@ -2187,7 +2187,7 @@ void data_grect_clear(grect_t *box)
 
 void data_grect_print(FILE *file, grect_t *box)
 {
-    fprintf(file, "{\"left\":%d, \"top\":%d, \"right\":%d, \"bottom\":%d}",
+    fprintf(file, "{\"left\":%.1f, \"top\":%.1f, \"right\":%.1f, \"bottom\":%.1f}",
         box->left, box->top, box->right, box->bottom);
 }
 

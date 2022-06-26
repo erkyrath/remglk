@@ -23,7 +23,7 @@ typedef struct window_textbuffer_struct {
     long numspecials;
     long specialssize;
     
-    int width, height;
+    double width, height;
     
     long updatemark;
     int startclear;

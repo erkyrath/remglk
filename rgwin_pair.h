@@ -8,7 +8,7 @@ typedef struct window_pair_struct {
     window_t *owner;
 
     window_t *child1, *child2; 
-    int splitpos; /* The split center. To be picky, this is the position
+    double splitpos; /* The split center. To be picky, this is the position
         of the top of the border, or the top of the bottom window if the
         border is zero-width. (If vertical is true, rotate this comment
         90 degrees.) */

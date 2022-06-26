@@ -88,8 +88,8 @@ void win_textgrid_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics
     window_textgrid_t *dwin = win->data;
     dwin->owner->bbox = *box;
     
-    newwid = (((box->right - box->left) - metrics->gridmarginx) / metrics->gridcharwidth);
-    newhgt = (((box->bottom - box->top) - metrics->gridmarginy) / metrics->gridcharheight);
+    newwid = (int)(((box->right - box->left) - metrics->gridmarginx) / metrics->gridcharwidth);
+    newhgt = (int)(((box->bottom - box->top) - metrics->gridmarginy) / metrics->gridcharheight);
     
     if (dwin->lines == NULL) {
         dwin->linessize = (newhgt+1);
