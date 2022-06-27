@@ -101,12 +101,8 @@ void win_textbuffer_destroy(window_textbuffer_t *dwin)
 
 void win_textbuffer_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
 {
-    //int oldwid, oldhgt;
     window_textbuffer_t *dwin = win->data;
     dwin->owner->bbox = *box;
-
-    //oldwid = dwin->width;
-    //oldhgt = dwin->height;
 
     dwin->width = box->right - box->left;
     dwin->height = box->bottom - box->top;
