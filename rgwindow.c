@@ -883,24 +883,24 @@ void glk_window_get_size(window_t *win, glui32 *width, glui32 *height)
         case wintype_TextGrid:
             boxwidth = win->bbox.right - win->bbox.left;
             boxheight = win->bbox.bottom - win->bbox.top;
-            val = (int) floor((boxwidth-metrics.gridmarginx) / metrics.gridcharwidth);
+            val = (int) ceil((boxwidth-metrics.gridmarginx) / metrics.gridcharwidth);
             wid = ((val >= 0) ? val : 0);
-            val = (int) floor((boxheight-metrics.gridmarginy) / metrics.gridcharheight);
+            val = (int) ceil((boxheight-metrics.gridmarginy) / metrics.gridcharheight);
             hgt = ((val >= 0) ? val : 0);
             break;
         case wintype_TextBuffer:
             boxwidth = win->bbox.right - win->bbox.left;
             boxheight = win->bbox.bottom - win->bbox.top;
-            val = (int) floor((boxwidth-metrics.buffermarginx) / metrics.buffercharwidth);
+            val = (int) ceil((boxwidth-metrics.buffermarginx) / metrics.buffercharwidth);
             wid = ((val >= 0) ? val : 0);
-            val = (int) floor((boxheight-metrics.buffermarginy) / metrics.buffercharheight);
+            val = (int) ceil((boxheight-metrics.buffermarginy) / metrics.buffercharheight);
             hgt = ((val >= 0) ? val : 0);
             break;
         case wintype_Graphics:
             boxwidth = win->bbox.right - win->bbox.left;
             boxheight = win->bbox.bottom - win->bbox.top;
-            wid = (int) (boxwidth - metrics.graphicsmarginx);
-            hgt = (int) (boxheight - metrics.graphicsmarginy);
+            wid = (int) round(boxwidth - metrics.graphicsmarginx);
+            hgt = (int) round(boxheight - metrics.graphicsmarginy);
             break;
     }
 
