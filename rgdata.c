@@ -2413,6 +2413,16 @@ int glkunix_unserialize_long(glkunix_unserialize_context_t ctx, char *key, long 
     return TRUE;
 }
 
+int glkunix_unserialize_real(glkunix_unserialize_context_t ctx, char *key, double *res)
+{
+    data_raw_t *dat = data_raw_struct_field(ctx->dat, key);
+    if (!dat)
+        return FALSE;
+    
+    *res = data_raw_real_value(dat);
+    return TRUE;
+}
+
 /* Returned (null-terminated) string is malloced */
 int glkunix_unserialize_latin1_string(glkunix_unserialize_context_t ctx, char *key, char **res)
 {
