@@ -235,7 +235,7 @@ static void window_state_print(FILE *fl, winid_t win)
         
     case wintype_TextBuffer: {
         window_textbuffer_t *dwin = win->data;
-        fprintf(fl, ",\n\"buf_width\":%.1f, \"buf_height\":%.1f", dwin->width, dwin->height);
+        fprintf(fl, ",\n\"buf_width\":%.2f, \"buf_height\":%.2f", dwin->width, dwin->height);
         
         /* We don't save the updatemark/startclear. */
         

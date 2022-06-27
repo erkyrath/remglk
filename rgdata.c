@@ -1043,14 +1043,14 @@ data_metrics_t *data_metrics_parse(data_raw_t *rawdata)
 void data_metrics_print(FILE *fl, data_metrics_t *metrics)
 {
     fprintf(fl, "{\n");   
-    fprintf(fl, "  \"width\": %.1f, \"height\": %.1f,\n", metrics->width, metrics->height);
-    fprintf(fl, "  \"outspacingx\": %.1f, \"outspacingy\": %.1f,\n", metrics->outspacingx, metrics->outspacingy);
-    fprintf(fl, "  \"inspacingx\": %.1f, \"inspacingy\": %.1f,\n", metrics->inspacingx, metrics->inspacingy);
-    fprintf(fl, "  \"gridcharwidth\": %.1f, \"gridcharheight\": %.1f,\n", metrics->gridcharwidth, metrics->gridcharheight);
-    fprintf(fl, "  \"gridmarginx\": %.1f, \"gridmarginy\": %.1f,\n", metrics->gridmarginx, metrics->gridmarginy);
-    fprintf(fl, "  \"buffercharwidth\": %.1f, \"buffercharheight\": %.1f,\n", metrics->buffercharwidth, metrics->buffercharheight);
-    fprintf(fl, "  \"buffermarginx\": %.1f, \"buffermarginy\": %.1f,\n", metrics->buffermarginx, metrics->buffermarginy);
-    fprintf(fl, "  \"graphicsmarginx\": %.1f, \"graphicsmarginy\": %.1f\n", metrics->graphicsmarginx, metrics->graphicsmarginy);
+    fprintf(fl, "  \"width\": %.2f, \"height\": %.2f,\n", metrics->width, metrics->height);
+    fprintf(fl, "  \"outspacingx\": %.2f, \"outspacingy\": %.2f,\n", metrics->outspacingx, metrics->outspacingy);
+    fprintf(fl, "  \"inspacingx\": %.2f, \"inspacingy\": %.2f,\n", metrics->inspacingx, metrics->inspacingy);
+    fprintf(fl, "  \"gridcharwidth\": %.2f, \"gridcharheight\": %.2f,\n", metrics->gridcharwidth, metrics->gridcharheight);
+    fprintf(fl, "  \"gridmarginx\": %.2f, \"gridmarginy\": %.2f,\n", metrics->gridmarginx, metrics->gridmarginy);
+    fprintf(fl, "  \"buffercharwidth\": %.2f, \"buffercharheight\": %.2f,\n", metrics->buffercharwidth, metrics->buffercharheight);
+    fprintf(fl, "  \"buffermarginx\": %.2f, \"buffermarginy\": %.2f,\n", metrics->buffermarginx, metrics->buffermarginy);
+    fprintf(fl, "  \"graphicsmarginx\": %.2f, \"graphicsmarginy\": %.2f\n", metrics->graphicsmarginx, metrics->graphicsmarginy);
     fprintf(fl, "}\n");   
 }
 
@@ -1568,7 +1568,7 @@ void data_window_print(data_window_t *dat)
         printf("   \"gridwidth\":%d, \"gridheight\":%d,\n", dat->gridwidth, dat->gridheight);
     if (dat->type == wintype_Graphics)
         printf("   \"graphwidth\":%d, \"graphheight\":%d,\n", dat->gridwidth, dat->gridheight);
-    printf("   \"left\":%.1f, \"top\":%.1f, \"width\":%.1f, \"height\":%.1f }",
+    printf("   \"left\":%.2f, \"top\":%.2f, \"width\":%.2f, \"height\":%.2f }",
         dat->size.left, dat->size.top, dat->size.right-dat->size.left, dat->size.bottom-dat->size.top);
 }
 
@@ -2187,7 +2187,7 @@ void data_grect_clear(grect_t *box)
 
 void data_grect_print(FILE *file, grect_t *box)
 {
-    fprintf(file, "{\"left\":%.1f, \"top\":%.1f, \"right\":%.1f, \"bottom\":%.1f}",
+    fprintf(file, "{\"left\":%.2f, \"top\":%.2f, \"right\":%.2f, \"bottom\":%.2f}",
         box->left, box->top, box->right, box->bottom);
 }
 
