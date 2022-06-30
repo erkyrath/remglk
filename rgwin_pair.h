@@ -12,7 +12,7 @@ typedef struct window_pair_struct {
         of the top of the border, or the top of the bottom window if the
         border is zero-width. (If vertical is true, rotate this comment
         90 degrees.) */
-    int splitwidth; /* The width of the border. Zero or one. */
+    double splitwidth; /* The width of the border. Zero or one. */
     
     /* split info... */
     glui32 dir; /* winmethod_Left, Right, Above, or Below */

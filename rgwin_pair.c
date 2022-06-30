@@ -135,7 +135,7 @@ void win_pair_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
 
     if (dwin->vertical) {
         dwin->splitpos = split;
-        dwin->splitwidth = (int) splitwid;
+        dwin->splitwidth = splitwid;
         box1.left = win->bbox.left;
         box1.right = dwin->splitpos;
         box2.left = box1.right + dwin->splitwidth;
@@ -155,7 +155,7 @@ void win_pair_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
     }
     else {
         dwin->splitpos = split;
-        dwin->splitwidth = (int) splitwid;
+        dwin->splitwidth = splitwid;
         box1.top = win->bbox.top;
         box1.bottom = dwin->splitpos;
         box2.top = box1.bottom + dwin->splitwidth;

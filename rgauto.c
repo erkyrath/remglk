@@ -219,7 +219,7 @@ static void window_state_print(FILE *fl, winid_t win)
             fprintf(fl, ",\n\"pair_child2tag\":%ld", (long)dwin->child2->updatetag);
 
         fprintf(fl, ",\n\"pair_splitpos\":%d", (int)round(dwin->splitpos));
-        fprintf(fl, ",\n\"pair_splitwidth\":%d", dwin->splitwidth);
+        fprintf(fl, ",\n\"pair_splitwidth\":%d", (int)dwin->splitwidth);
 
         fprintf(fl, ",\n\"pair_dir\":%ld", (long)dwin->dir);
         fprintf(fl, ",\n\"pair_vertical\":%d", dwin->vertical);
@@ -781,7 +781,7 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
         }
         
         glkunix_unserialize_real(entry, "pair_splitpos", &dwin->splitpos);
-        glkunix_unserialize_int(entry, "pair_splitwidth", &dwin->splitwidth);
+        glkunix_unserialize_real(entry, "pair_splitwidth", &dwin->splitwidth);
         glkunix_unserialize_uint32(entry, "pair_dir", &dwin->dir);
         glkunix_unserialize_int(entry, "pair_vertical", &dwin->vertical);
         glkunix_unserialize_int(entry, "pair_backward", &dwin->backward);
