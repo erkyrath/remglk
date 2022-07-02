@@ -8,11 +8,11 @@ typedef struct window_pair_struct {
     window_t *owner;
 
     window_t *child1, *child2; 
-    double splitpos; /* The split center. To be picky, this is the position
+    int splitpos; /* The split center. To be picky, this is the position
         of the top of the border, or the top of the bottom window if the
         border is zero-width. (If vertical is true, rotate this comment
         90 degrees.) */
-    double splitwidth; /* The width of the border. */
+    int splitwidth; /* The width of the border. */
     
     /* split info... */
     glui32 dir; /* winmethod_Left, Right, Above, or Below */
