@@ -7,7 +7,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 #include "glk.h"
 #include "remglk.h"
@@ -218,8 +217,8 @@ static void window_state_print(FILE *fl, winid_t win)
         if (dwin->child2)
             fprintf(fl, ",\n\"pair_child2tag\":%ld", (long)dwin->child2->updatetag);
 
-        fprintf(fl, ",\n\"pair_splitpos\":%d", (int)round(dwin->splitpos));
-        fprintf(fl, ",\n\"pair_splitwidth\":%d", (int)dwin->splitwidth);
+        fprintf(fl, ",\n\"pair_splitpos\":%d", dwin->splitpos);
+        fprintf(fl, ",\n\"pair_splitwidth\":%d", dwin->splitwidth);
 
         fprintf(fl, ",\n\"pair_dir\":%ld", (long)dwin->dir);
         fprintf(fl, ",\n\"pair_vertical\":%d", dwin->vertical);
