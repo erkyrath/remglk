@@ -899,8 +899,8 @@ void glk_window_get_size(window_t *win, glui32 *width, glui32 *height)
         case wintype_Graphics:
             boxwidth = win->bbox.right - win->bbox.left;
             boxheight = win->bbox.bottom - win->bbox.top;
-            wid = (int) round(boxwidth - metrics.graphicsmarginx);
-            hgt = (int) round(boxheight - metrics.graphicsmarginy);
+            wid = (int) floor(boxwidth - metrics.graphicsmarginx);
+            hgt = (int) floor(boxheight - metrics.graphicsmarginy);
             break;
     }
 
