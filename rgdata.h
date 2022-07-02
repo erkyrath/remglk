@@ -50,7 +50,7 @@ typedef struct data_specialspan_struct data_specialspan_t;
 /* data_metrics_t: Defines the display metrics.
    We have to support real values for all of these fields.
    (GlkOte is famous for sending noninteger metrics when the browser zoom
-   changes.)
+   changes.) */
 struct data_metrics_struct {
     double width, height;
     double outspacingx, outspacingy;
