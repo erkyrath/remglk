@@ -236,7 +236,7 @@ static void window_state_print(FILE *fl, winid_t win)
         
     case wintype_TextBuffer: {
         window_textbuffer_t *dwin = win->data;
-        fprintf(fl, ",\n\"buf_width\":%.2f, \"buf_height\":%.2f", dwin->width, dwin->height);
+        fprintf(fl, ",\n\"buf_width\":%d, \"buf_height\":%d", dwin->width, dwin->height);
         
         /* We don't save the updatemark/startclear. */
         
@@ -780,8 +780,8 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
             dwin->key = libstate_window_find_by_updatetag(state, tag);
         }
         
-        glkunix_unserialize_real(entry, "pair_splitpos", &dwin->splitpos);
-        glkunix_unserialize_real(entry, "pair_splitwidth", &dwin->splitwidth);
+        glkunix_unserialize_int(entry, "pair_splitpos", &dwin->splitpos);
+        glkunix_unserialize_int(entry, "pair_splitwidth", &dwin->splitwidth);
         glkunix_unserialize_uint32(entry, "pair_dir", &dwin->dir);
         glkunix_unserialize_int(entry, "pair_vertical", &dwin->vertical);
         glkunix_unserialize_int(entry, "pair_backward", &dwin->backward);
@@ -795,8 +795,8 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
         window_textbuffer_t *dwin = win_textbuffer_create(win);
         win->data = dwin;
 
-        glkunix_unserialize_real(entry, "buf_width", &dwin->width);
-        glkunix_unserialize_real(entry, "buf_height", &dwin->height);
+        glkunix_unserialize_int(entry, "buf_width", &dwin->width);
+        glkunix_unserialize_int(entry, "buf_height", &dwin->height);
 
         glui32 *buf;
         long bufcount;
