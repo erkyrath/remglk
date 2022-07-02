@@ -1568,7 +1568,7 @@ void data_window_print(data_window_t *dat)
         printf("   \"gridwidth\":%d, \"gridheight\":%d,\n", dat->gridwidth, dat->gridheight);
     if (dat->type == wintype_Graphics)
         printf("   \"graphwidth\":%d, \"graphheight\":%d,\n", dat->gridwidth, dat->gridheight);
-    printf("   \"left\":%.2f, \"top\":%.2f, \"width\":%.2f, \"height\":%.2f }",
+    printf("   \"left\":%d, \"top\":%d, \"width\":%d, \"height\":%d }",
         dat->size.left, dat->size.top, dat->size.right-dat->size.left, dat->size.bottom-dat->size.top);
 }
 
@@ -2187,7 +2187,7 @@ void data_grect_clear(grect_t *box)
 
 void data_grect_print(FILE *file, grect_t *box)
 {
-    fprintf(file, "{\"left\":%.2f, \"top\":%.2f, \"right\":%.2f, \"bottom\":%.2f}",
+    fprintf(file, "{\"left\":%d, \"top\":%d, \"right\":%d, \"bottom\":%d}",
         box->left, box->top, box->right, box->bottom);
 }
 
