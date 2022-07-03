@@ -6,6 +6,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
+
 #include "glk.h"
 #include "remglk.h"
 #include "rgdata.h"
@@ -48,7 +50,7 @@ void win_pair_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
 {
     window_pair_t *dwin = win->data;
     grect_t box1, box2;
-    double min, diff, split, splitwid, max;
+    int min, diff, split, splitwid, max;
     window_t *key;
     window_t *ch1, *ch2;
 
@@ -68,9 +70,9 @@ void win_pair_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
     /* We now figure split. */
     if (dwin->hasborder) {
         if (dwin->vertical)
-            splitwid = metrics->inspacingx;
+            splitwid = (int) ceil(metrics->inspacingx);
         else
-            splitwid = metrics->inspacingy;
+            splitwid = (int) ceil(metrics->inspacingy);
     }
     else {
         splitwid = 0;
@@ -89,21 +91,21 @@ void win_pair_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
                 switch (key->type) {
                     case wintype_TextBuffer:
                         if (dwin->vertical)
-                            split = dwin->size * metrics->buffercharwidth + metrics->buffermarginx;
+                            split = (int) ceil(dwin->size * metrics->buffercharwidth + metrics->buffermarginx);
                         else
-                            split = dwin->size * metrics->buffercharheight + metrics->buffermarginy;
+                            split = (int) ceil(dwin->size * metrics->buffercharheight + metrics->buffermarginy);
                         break;
                     case wintype_TextGrid:
                         if (dwin->vertical)
-                            split = dwin->size * metrics->gridcharwidth + metrics->gridmarginx;
+                            split = (int) ceil(dwin->size * metrics->gridcharwidth + metrics->gridmarginx);
                         else
-                            split = dwin->size * metrics->gridcharheight + metrics->gridmarginy;
+                            split = (int) ceil(dwin->size * metrics->gridcharheight + metrics->gridmarginy);
                         break;
                     case wintype_Graphics:
                         if (dwin->vertical)
-                            split = dwin->size + metrics->graphicsmarginx;
+                            split = (int) ceil(dwin->size + metrics->graphicsmarginx);
                         else
-                            split = dwin->size + metrics->graphicsmarginy;
+                            split = (int) ceil(dwin->size + metrics->graphicsmarginy);
                         break;
                     default:
                         split = 0;
