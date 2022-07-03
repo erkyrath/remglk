@@ -868,7 +868,7 @@ void glk_window_get_size(window_t *win, glui32 *width, glui32 *height)
     glui32 wid = 0;
     glui32 hgt = 0;
     int val;
-    double boxwidth, boxheight;
+    int boxwidth, boxheight;
     
     if (!win) {
         gli_strict_warning("window_get_size: invalid ref");
