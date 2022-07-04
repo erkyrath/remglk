@@ -82,8 +82,8 @@ static void compute_content_box(grect_t *box)
 {
     box->left = (int) ceil(metrics.outspacingx);
     box->top = (int) ceil(metrics.outspacingy);
-    box->right = metrics.width - (int) ceil(metrics.outspacingx);
-    box->bottom = metrics.height - (int) ceil(metrics.outspacingy);
+    box->right = (int) floor(metrics.width - metrics.outspacingx);
+    box->bottom = (int) floor(metrics.height - metrics.outspacingy);
 }
 
 glui32 gli_window_current_generation()
