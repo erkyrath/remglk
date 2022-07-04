@@ -28,6 +28,6 @@ copyright 1998-2022 by Andrew Plotkin. The GiDebug library is copyright
 see the "LICENSE" file.
 
 The RemGlk documentation is licensed under a Creative Commons
-Attribution-Noncommercial-Share Alike 3.0 Unported License.
-See <http://creativecommons.org/licenses/by-nc-sa/3.0>
+Attribution-Noncommercial-ShareAlike 4.0 International License.
+See <http://creativecommons.org/licenses/by-nc-sa/4.0>
 
