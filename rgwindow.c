@@ -80,10 +80,10 @@ void gli_fast_exit()
 
 static void compute_content_box(grect_t *box)
 {
-    box->left = metrics.outspacingx;
-    box->top = metrics.outspacingy;
-    box->right = metrics.width - metrics.outspacingx;
-    box->bottom = metrics.height - metrics.outspacingy;
+    box->left = (int) ceil(metrics.outspacingx);
+    box->top = (int) ceil(metrics.outspacingy);
+    box->right = metrics.width - (int) ceil(metrics.outspacingx);
+    box->bottom = metrics.height - (int) ceil(metrics.outspacingy);
 }
 
 glui32 gli_window_current_generation()
