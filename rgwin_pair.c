@@ -80,7 +80,7 @@ void win_pair_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics)
     
     switch (dwin->division) {
         case winmethod_Proportional:
-            split = (diff * dwin->size) / 100;
+            split = (int) round(((double)diff * dwin->size) / 100.0);
             break;
         case winmethod_Fixed:
             key = dwin->key;
