@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <math.h>
 
 #include "glk.h"
 #include "remglk.h"
@@ -585,25 +586,36 @@ static data_raw_t *data_raw_blockread_sub(FILE *file, char *termchar)
             minus = TRUE;
             ch = getc(file);
         }
-        
+
+        /* We accept "01" here, which is technically outside the spec. */
         while (ch >= '0' && ch <= '9') {
             dat->number = 10 * dat->number + (ch-'0');
             ch = getc(file);
         }
 
-        if (ch == '.') {
-            /* We have to think about real numbers. */
-            ch = getc(file);
-            long numer = 0;
-            long denom = 1;
-            while (ch >= '0' && ch <= '9') {
-                numer = 10 * numer + (ch-'0');
-                denom *= 10;
+        if (ch == '.' || ch == 'e' || ch == 'E') {
+            /* We have to think about real numbers. And scientific notation, for json's sake. */
+            double fval = dat->number;
+            if (ch == '.') {
                 ch = getc(file);
+                long numer = 0;
+                long numerlen = 0;
+                /* We accept "1." here, which is outside the spec. */
+                while (ch >= '0' && ch <= '9') {
+                    numer = 10 * numer + (ch-'0');
+                    numerlen++;
+                    ch = getc(file);
+                }
+                if (numerlen) {
+                    fval += numer * pow(10, -numerlen);
+                }
             }
-            dat->realnumber = (double)dat->number + (double)numer / (double)denom;
+                
+            dat->realnumber = fval;
+            dat->number = round(fval);
         }
         else {
+            /* Just digits; it's an integer. */
             dat->realnumber = (double)dat->number;
         }
 
