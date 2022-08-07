@@ -610,18 +610,43 @@ static data_raw_t *data_raw_blockread_sub(FILE *file, char *termchar)
                     fval += numer * pow(10, -numerlen);
                 }
             }
-                
+
+            if (ch == 'e' || ch == 'E') {
+                ch = getc(file);
+                int expminus = FALSE;
+                /* We accept "1e", "1e+", and "1-e" here. Again, non-spec. */
+                if (ch == '-') {
+                    expminus = TRUE;
+                    ch = getc(file);
+                }
+                else if (ch == '+') {
+                    expminus = FALSE;
+                    ch = getc(file);
+                }
+                int expnum = 0;
+                while (ch >= '0' && ch <= '9') {
+                    expnum = 10 * expnum + (ch-'0');
+                    ch = getc(file);
+                }
+                if (expminus) {
+                    expnum = -expnum;
+                }
+                fval = fval * pow(10, expnum);
+            }
+
+            if (minus) {
+                fval = -fval;
+            }
+
             dat->realnumber = fval;
             dat->number = round(fval);
         }
         else {
             /* Just digits; it's an integer. */
+            if (minus) {
+                dat->number = -dat->number;
+            }
             dat->realnumber = (double)dat->number;
-        }
-
-        if (minus) {
-            dat->realnumber = -dat->realnumber;
-            dat->number = -dat->number;
         }
 
         if (ch != EOF)
