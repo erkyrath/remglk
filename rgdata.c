@@ -577,11 +577,15 @@ static data_raw_t *data_raw_blockread_sub(FILE *file, char *termchar)
         return NULL;
     }
 
-    if (ch >= '0' && ch <= '9') {
-        /* This accepts "01", which it really shouldn't, but whatever.
-           We also ignore the decimal part if found, which means we're
-           rounding towards zero. */
+    if ((ch >= '0' && ch <= '9') || ch == '-') {
         data_raw_t *dat = data_raw_alloc(rawtyp_Number);
+        int minus = FALSE;
+        
+        if (ch == '-') {
+            minus = TRUE;
+            ch = getc(file);
+        }
+        
         while (ch >= '0' && ch <= '9') {
             dat->number = 10 * dat->number + (ch-'0');
             ch = getc(file);
@@ -603,37 +607,9 @@ static data_raw_t *data_raw_blockread_sub(FILE *file, char *termchar)
             dat->realnumber = (double)dat->number;
         }
 
-        if (ch != EOF)
-            ungetc(ch, file);
-        return dat;
-    }
-
-    if (ch == '-') {
-        data_raw_t *dat = data_raw_alloc(rawtyp_Number);
-        ch = getc(file);
-        if (!(ch >= '0' && ch <= '9'))
-            gli_fatal_error("data: minus must be followed by number");
-
-        while (ch >= '0' && ch <= '9') {
-            dat->number = 10 * dat->number + (ch-'0');
-            ch = getc(file);
-        }
-        dat->number = -dat->number;
-
-        if (ch == '.') {
-            /* We have to think about real numbers. */
-            ch = getc(file);
-            long numer = 0;
-            long denom = 1;
-            while (ch >= '0' && ch <= '9') {
-                numer = 10 * numer + (ch-'0');
-                denom *= 10;
-                ch = getc(file);
-            }
-            dat->realnumber = (double)dat->number - (double)numer / (double)denom;
-        }
-        else {
-            dat->realnumber = (double)dat->number;
+        if (minus) {
+            dat->realnumber = -dat->realnumber;
+            dat->number = -dat->number;
         }
 
         if (ch != EOF)
