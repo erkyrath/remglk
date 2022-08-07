@@ -348,6 +348,9 @@ As of version 0.2.6, the library accepts <code>debuginput</code> events. They ar
 As of version 0.3.0, the library accepts noninteger values in the <code>metrics</code> object. (GlkOte can send fractional values when the browser zoom is changed.) Window positioning will always be in integers, rounded so that everything fits properly.
 <p>
 
+As of version 0.3.1, the library accepts exponential notation for numerical values. If an integer is expected (i.e., everywhere except the <code>metrics</code> object), noninteger values are rounded to the nearest integer. Note that the library does not <em>send</em> exponential notation in its JSON output.
+<p>
+
 A note on <a href="http://json.org/">JSON</a>: this is a strict (in both senses) subset of Javascript's data literal format. The biggest differences are: you always use double quotes, never single quotes; strings are always quoted, but numbers never are; an object (dictionary) always has quotes around its keys.
 <p>
 
