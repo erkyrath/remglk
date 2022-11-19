@@ -192,6 +192,8 @@ extern int pref_stderr;
 extern int pref_singleturn;
 extern char *pref_resourceurl;
 
+extern int gli_get_dataresource_info(int num, void **ptr, glui32 *len, int *isbinary);
+
 #if GIDEBUG_LIBRARY_SUPPORT
 /* Has the user requested debug support? */
 extern int gli_debugger;
