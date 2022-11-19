@@ -28,6 +28,16 @@ char *pref_resourceurl = NULL;
 int gli_debugger = FALSE;
 #endif /* GIDEBUG_LIBRARY_SUPPORT */
 
+typedef struct dataresource_struct {
+    int num;
+    int isbinary;
+    char *pathname;
+    int len;
+    void *ptr;
+} dataresource_t;
+static dataresource_t *dataresources = NULL;
+static int numdataresources = 0, dataresource_size = 0;
+
 /* Some constants for my wacky little command-line option parser. */
 #define ex_Void (0)
 #define ex_Int (1)
@@ -41,6 +51,7 @@ static int extract_value(int argc, char *argv[], char *optname, int type,
     int *argnum, int *result, int defval);
 static int string_to_bool(char *str);
 static char *construct_resourceurl(char *str, int ispath);
+static int add_dataresource(char *progname, char *str, int isbinary);
 
 #define STRBUFLEN (512)
 static char extracted_string[STRBUFLEN];
@@ -204,6 +215,18 @@ int main(int argc, char *argv[])
             pref_resourceurl = construct_resourceurl(extracted_string, FALSE);
         else if (extract_value(argc, argv, "ru", ex_Str, &ix, &val, FALSE)) 
             pref_resourceurl = construct_resourceurl(extracted_string, FALSE);
+        else if (extract_value(argc, argv, "dataresource", ex_Str, &ix, &val, FALSE)) {
+            if (!add_dataresource(argv[0], extracted_string, TRUE))
+                errflag = TRUE;
+        }
+        else if (extract_value(argc, argv, "dataresourcebin", ex_Str, &ix, &val, FALSE)) {
+            if (!add_dataresource(argv[0], extracted_string, TRUE))
+                errflag = TRUE;
+        }
+        else if (extract_value(argc, argv, "dataresourcetext", ex_Str, &ix, &val, FALSE)) {
+            if (!add_dataresource(argv[0], extracted_string, FALSE))
+                errflag = TRUE;
+        }
 #if GIDEBUG_LIBRARY_SUPPORT
         else if (extract_value(argc, argv, "D", ex_Void, &ix, &val, FALSE))
             gli_debugger = val;
@@ -242,6 +265,8 @@ int main(int argc, char *argv[])
         printf("  -support [timer, hyperlinks, graphics, graphicswin]: declare support for various input features\n");
         printf("  -resourceurl STR: URL base for image/sound files\n");
         printf("  -resourcedir STR: path to image/sound files (used to create file: URLs)\n");
+        printf("  -dataresource NUM:PATHNAME, -dataresourcebin NUM:PATHNAME, -dataresourcetext NUM:PATHNAME: tell where the data resource file with the given number can be read (default: search blorb if available)\n");
+        printf("     (file is considered binary by default, or text if -dataresourcetext is used)\n");
         printf("  -singleturn BOOL: exit the process after responding to one input (default 'no')\n");
         printf("  -stderr BOOL: send errors to stderr rather than stdout (default 'no')\n");
 #if GIDEBUG_LIBRARY_SUPPORT
@@ -419,6 +444,39 @@ static int string_to_bool(char *str)
         return FALSE;
         
     return -1;
+}
+
+/* Given an argument NUM:PATHNAME from the command line, add an entry
+   to the dataresources array. */
+static int add_dataresource(char *progname, char *str, int isbinary)
+{
+    if (!strlen(str)) {
+        printf("%s: -dataresource option requires NUM:PATHNAME\n\n", progname);
+        return FALSE;
+    }
+    char *sep = strchr(str, ':');
+    if (!sep || sep == str || *(sep+1) == '\0') {
+        printf("%s: -dataresource option requires NUM:PATHNAME\n\n", progname);
+        return FALSE;
+    }
+    *sep = '\0';
+    sep++;
+    int val = atoi(str);
+    if (!dataresources || dataresource_size == 0) {
+        dataresource_size = 4;
+        dataresources = (dataresource_t *)malloc(dataresource_size * sizeof(dataresource_t));
+    }
+    else if (numdataresources >= dataresource_size) {
+        dataresource_size *= 2;
+        dataresources = (dataresource_t *)realloc(dataresources, dataresource_size * sizeof(dataresource_t));
+    }
+    dataresources[numdataresources].num = val;
+    dataresources[numdataresources].isbinary = isbinary;
+    dataresources[numdataresources].pathname = strdup(sep);
+    dataresources[numdataresources].ptr = NULL;
+    dataresources[numdataresources].len = 0;
+    numdataresources++;
+    return TRUE;
 }
 
 /* Given a path or URL (taken from the resourcedir/resourceurl argument),
