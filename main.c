@@ -215,16 +215,16 @@ int main(int argc, char *argv[])
             pref_resourceurl = construct_resourceurl(extracted_string, FALSE);
         else if (extract_value(argc, argv, "ru", ex_Str, &ix, &val, FALSE)) 
             pref_resourceurl = construct_resourceurl(extracted_string, FALSE);
-        else if (extract_value(argc, argv, "dataresource", ex_Str, &ix, &val, FALSE)) {
-            if (!add_dataresource(argv[0], extracted_string, TRUE))
-                errflag = TRUE;
-        }
         else if (extract_value(argc, argv, "dataresourcebin", ex_Str, &ix, &val, FALSE)) {
             if (!add_dataresource(argv[0], extracted_string, TRUE))
                 errflag = TRUE;
         }
         else if (extract_value(argc, argv, "dataresourcetext", ex_Str, &ix, &val, FALSE)) {
             if (!add_dataresource(argv[0], extracted_string, FALSE))
+                errflag = TRUE;
+        }
+        else if (extract_value(argc, argv, "dataresource", ex_Str, &ix, &val, FALSE)) {
+            if (!add_dataresource(argv[0], extracted_string, TRUE))
                 errflag = TRUE;
         }
 #if GIDEBUG_LIBRARY_SUPPORT
