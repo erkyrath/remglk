@@ -304,7 +304,7 @@ A human types "go east" into some user interface, which then passes the followin
 The library accepts this, mulls it, and generates a new output update. So it goes.
 <p>
 
-<h3>Referring to resources</h3>
+<h3>Referring to image resources</h3>
 
 RemGlk supports Blorb-packaged games which include images. (Sound support is on the to-do list.) However, it does not try to encode the image data in the JSON output. Instead, it assumes that the display library (GlkOte) has access to the same images. When the game draws an image, RemGlk sends a JSON stanza which includes the image number and size. (See the <a href="http://eblong.com/zarf/glk/glkote/docs.html">GlkOte documentation</a>.) The display library is then responsible for finding the image with that number.
 <p>
@@ -329,6 +329,22 @@ glulxe -rd path/dir game.gblorb
 <p>
 
 RemGlk will convert the pathname to a <code>file:</code> URL and send it as above.
+<p>
+
+<h3>Referring to data resources</h3>
+
+RemGlk also supports data resources (read using the glk_stream_open_resource() function).
+<p>
+
+Data resources in a Blorb-packaged game are no problem; the game can always access these. However, if the game <em>isn't</em> Blorbed, you must supply the filename for each (numbered) resource.
+<p>
+
+<pre class="Sample">
+glulxe -dataresource 3:path/dir game.gblorb
+</pre>
+<p>
+
+Use <code>-dataresource</code> or <code>-dataresourcebin</code> for a binary file; <code>-dataresourcetext</code> for a text file. (In a Blorb, the chunk type says whether it's binary or text. Outside of a Blorb, it's too dark to read, so you have to specify. Note that the default is binary.)
 <p>
 
 <h2>The Data Format</h2>
