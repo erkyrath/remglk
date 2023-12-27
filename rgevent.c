@@ -130,6 +130,16 @@ void glk_select(event_t *event)
                 gli_event_store(evtype_Hyperlink, win, data->linkvalue, 0);
                 break;
 
+            case dtag_Mouse:
+                win = glkunix_window_find_by_updatetag(data->window);
+                if (!win)
+                    break;
+                if (!win->mouse_request)
+                    break;
+                win->mouse_request = FALSE;
+                gli_event_store(evtype_MouseInput, win, data->mousex, data->mousey);
+                break;
+
             case dtag_Timer:
                 timespec_get(&timing_start, TIME_UTC);
                 gli_event_store(evtype_Timer, NULL, 0, 0);
