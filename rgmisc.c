@@ -161,16 +161,7 @@ unsigned char glk_char_to_upper(unsigned char ch)
 
 void gli_display_warning(char *msg)
 {
-    if (pref_stderr) {
-        fprintf(stderr, "Glk library error: %s\n", msg);
-    }
-    else {
-        printf("{\"type\":\"error\", \"message\":");
-        print_string_json(msg, stdout);
-        printf("}\n");
-    }
-    printf("\n"); /* blank line after stanza */
-    fflush(stdout);
+    fprintf(stderr, "Glk library warning: %s\n", msg);
 }
 
 void gli_display_error(char *msg)
