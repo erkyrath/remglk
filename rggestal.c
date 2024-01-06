@@ -62,7 +62,7 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
             }
             
         case gestalt_MouseInput: 
-            return FALSE;
+            return TRUE;
             
         case gestalt_Timer: 
             return gli_supportcaps.timer;

@@ -132,6 +132,7 @@ window_t *gli_new_window(glui32 type, glui32 rock)
     win->line_request_uni = FALSE;
     win->char_request_uni = FALSE;
     win->hyperlink_request = FALSE;
+    win->mouse_request = FALSE;
     win->echo_line_input = TRUE;
     win->terminate_line_input = 0;
     win->style = style_Normal;
@@ -175,6 +176,7 @@ window_t *gli_window_alloc_inactive()
     win->line_request_uni = FALSE;
     win->char_request_uni = FALSE;
     win->hyperlink_request = FALSE;
+    win->mouse_request = FALSE;
     win->echo_line_input = TRUE;
     win->terminate_line_input = 0;
     win->style = style_Normal;
@@ -1109,6 +1111,12 @@ void gli_windows_update(data_specialreq_t *special, int newgeneration)
             dat->hyperlink = TRUE;
         }
 
+        if (win->mouse_request) {
+            if (!dat)
+                dat = data_input_alloc(win->updatetag, evtype_None);
+            dat->mouse = TRUE;
+        }
+
         if (dat) {
             gen_list_append(&update->inputs, dat);
         }
@@ -1380,9 +1388,17 @@ void glk_request_mouse_event(window_t *win)
         gli_strict_warning("request_mouse_event: invalid ref");
         return;
     }
-    
-    /* But, in fact, we can't do much about this. */
-    
+
+    switch (win->type) {
+        case wintype_Graphics:
+            win->mouse_request = TRUE;
+            win->inputgen = generation+1;
+            break;
+        default:
+            gli_strict_warning("request_line_event: window does not support mouse input");
+            break;
+    }
+
     return;
 }
 
@@ -1445,9 +1461,17 @@ void glk_cancel_mouse_event(window_t *win)
         gli_strict_warning("cancel_mouse_event: invalid ref");
         return;
     }
-    
-    /* But, in fact, we can't do much about this. */
-    
+
+    switch (win->type) {
+        case wintype_Graphics:
+            win->mouse_request = FALSE;
+            win->inputgen = 0;
+            break;
+        default:
+            /* do nothing */
+            break;
+    }
+
     return;
 }
 
