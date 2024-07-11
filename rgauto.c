@@ -193,6 +193,7 @@ static void window_state_print(FILE *fl, winid_t win)
     fprintf(fl, ",\n\"char_request\":%d", win->char_request);
     fprintf(fl, ",\n\"char_request_uni\":%d", win->char_request_uni);
     fprintf(fl, ",\n\"hyperlink_request\":%d", win->hyperlink_request);
+    fprintf(fl, ",\n\"mouse_request\":%d", win->mouse_request);
 
     /* The input buffer is handled below */
 
@@ -758,6 +759,7 @@ static int window_state_parse(glkunix_library_state_t state, glkunix_unserialize
     glkunix_unserialize_int(entry, "char_request", &win->char_request);
     glkunix_unserialize_int(entry, "char_request_uni", &win->char_request_uni);
     glkunix_unserialize_int(entry, "hyperlink_request", &win->hyperlink_request);
+    glkunix_unserialize_int(entry, "mouse_request", &win->mouse_request);
     glkunix_unserialize_int(entry, "echo_line_input", &win->echo_line_input);
     glkunix_unserialize_uint32(entry, "terminate_line_input", &win->terminate_line_input);
     glkunix_unserialize_uint32(entry, "style", &win->style);

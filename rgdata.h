@@ -27,6 +27,7 @@ typedef enum DTag_enum {
     dtag_Timer = 8,
     dtag_SpecialResponse = 9,
     dtag_DebugInput = 10,
+    dtag_Mouse = 11,
 } DTag;
 
 /* gen_list_t: A boring little structure which holds a dynamic list of
@@ -82,6 +83,8 @@ struct data_event_struct {
     glui32 linelen;
     glui32 terminator;
     glui32 linkvalue;
+    glui32 mousex;
+    glui32 mousey;
     data_metrics_t *metrics;
     data_supportcaps_t *supportcaps;
 };
@@ -123,6 +126,7 @@ struct data_input_struct {
     int cursorpos; /* only for grids */
     glsi32 xpos, ypos; /* only if cursorpos */
     int hyperlink;
+    int mouse;
 };
 
 /* data_content_t: Represents the output changes of one window (text
