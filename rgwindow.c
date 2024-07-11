@@ -1390,6 +1390,7 @@ void glk_request_mouse_event(window_t *win)
     }
 
     switch (win->type) {
+        case wintype_TextGrid:
         case wintype_Graphics:
             win->mouse_request = TRUE;
             win->inputgen = generation+1;
@@ -1463,6 +1464,7 @@ void glk_cancel_mouse_event(window_t *win)
     }
 
     switch (win->type) {
+        case wintype_TextGrid:
         case wintype_Graphics:
             win->mouse_request = FALSE;
             win->inputgen = 0;
