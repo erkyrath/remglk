@@ -18,6 +18,8 @@
 #ifndef GT_START_H
 #define GT_START_H
 
+#include <stddef.h>   /* for size_t */
+
 /* We define our own TRUE and FALSE and NULL, because ANSI
     is a strange world. */
 #ifndef TRUE
