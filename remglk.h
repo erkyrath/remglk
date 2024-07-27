@@ -10,7 +10,7 @@
 #include "gi_dispa.h"
 #include "gi_debug.h"
 
-#define LIBRARY_VERSION "0.3.0"
+#define LIBRARY_VERSION "0.3.1"
 
 /* We define our own TRUE and FALSE and NULL, because ANSI
     is a strange world. */

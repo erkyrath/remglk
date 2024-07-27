@@ -1,6 +1,6 @@
 RemGlk: remote-procedure-call implementation of the Glk IF API
 
-RemGlk Library: version 0.3.0.
+RemGlk Library: version 0.3.1.
 Designed by Andrew Plotkin <erkyrath@eblong.com>
 <http://eblong.com/zarf/glk/remglk/docs.html>
 
@@ -21,7 +21,7 @@ to decode the structured output and display it appropriately.
 
 * Permissions
 
-The RemGlk library is copyright 2012-22 by Andrew Plotkin. The
+The RemGlk library is copyright 2012-2024 by Andrew Plotkin. The
 GiDispa and GiBlorb libraries, as well as the glk.h header file, are
 copyright 1998-2022 by Andrew Plotkin. The GiDebug library is copyright
 2014-2022 by Andrew Plotkin. All are distributed under the MIT license;
