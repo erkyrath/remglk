@@ -401,7 +401,7 @@ void win_textgrid_accept_line(window_t *win)
         int ix;
         if (!inunicode) {
             for (ix=0; ix<len; ix++) {
-                glui32 ch = ((char *)inbuf)[ix];
+                glui32 ch = ((unsigned char *)inbuf)[ix];
                 win_textgrid_putchar(win, ch);
             }
         }
@@ -466,7 +466,7 @@ void win_textgrid_cancel_line(window_t *win, event_t *ev)
         int ix;
         if (!inunicode) {
             for (ix=0; ix<len; ix++) {
-                glui32 ch = ((char *)inbuf)[ix];
+                glui32 ch = ((unsigned char *)inbuf)[ix];
                 win_textgrid_putchar(win, ch);
             }
         }
