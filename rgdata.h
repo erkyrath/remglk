@@ -180,7 +180,7 @@ struct data_specialspan_struct {
     glui32 xpos; /* (Fill, Image in graphicswin) */
     glui32 ypos; /* (Fill, Image in graphicswin) */
     glui32 width; /* (Fill, Image) */
-    glui32 height /* (Fill, Image) */;
+    glui32 height; /* (Fill, Image) */
     glui32 alignment; /* (Image in bufferwin) */
     glui32 hyperlink; /* (Image in bufferwin) */
     char *alttext; /* (Image) Reference to existing data. */
