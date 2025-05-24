@@ -69,6 +69,7 @@ struct data_supportcaps_struct {
     int hyperlinks;
     int graphics;
     int graphicswin;
+    int graphicsext;
     int sound;
 };
 

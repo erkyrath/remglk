@@ -202,6 +202,8 @@ int main(int argc, char *argv[])
                 pref_supportcaps.graphics = TRUE;
             else if (!strcmp(extracted_string, "graphicswin"))
                 pref_supportcaps.graphicswin = TRUE;
+            else if (!strcmp(extracted_string, "graphicsext"))
+                pref_supportcaps.graphicsext = TRUE;
             else {
                 printf("%s: -support value not recognized: %s\n", argv[0], extracted_string);
                 errflag = TRUE;
@@ -262,7 +264,7 @@ int main(int argc, char *argv[])
         printf("  -autometrics BOOL: allow screen size to be set during autorestore (default 'no')\n");
         printf("  -width NUM: manual screen width (default 80)\n");
         printf("  -height NUM: manual screen height (default 50)\n");
-        printf("  -support [timer, hyperlinks, graphics, graphicswin]: declare support for various input features\n");
+        printf("  -support [timer, hyperlinks, graphics, graphicswin, graphicsext]: declare support for various input features\n");
         printf("  -resourceurl STR: URL base for image/sound files\n");
         printf("  -resourcedir STR: path to image/sound files (used to create file: URLs)\n");
         printf("  -dataresource NUM:PATHNAME, -dataresourcebin NUM:PATHNAME, -dataresourcetext NUM:PATHNAME: tell where the data resource file with the given number can be read (default: search blorb if available)\n");

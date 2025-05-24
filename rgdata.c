@@ -1075,6 +1075,7 @@ data_supportcaps_t *data_supportcaps_alloc()
     supportcaps->hyperlinks = FALSE;
     supportcaps->graphics = FALSE;
     supportcaps->graphicswin = FALSE;
+    supportcaps->graphicsext = FALSE;
     supportcaps->sound = FALSE;
 
     return supportcaps;
@@ -1086,6 +1087,7 @@ void data_supportcaps_clear(data_supportcaps_t *supportcaps)
     supportcaps->hyperlinks = FALSE;
     supportcaps->graphics = FALSE;
     supportcaps->graphicswin = FALSE;
+    supportcaps->graphicsext = FALSE;
     supportcaps->sound = FALSE;
 }
 
@@ -1099,6 +1101,8 @@ void data_supportcaps_merge(data_supportcaps_t *supportcaps, data_supportcaps_t 
         supportcaps->graphics = TRUE;
     if (other->graphicswin)
         supportcaps->graphicswin = TRUE;
+    if (other->graphicsext)
+        supportcaps->graphicsext = TRUE;
     if (other->sound)
         supportcaps->sound = TRUE;
 }
@@ -1125,6 +1129,8 @@ data_supportcaps_t *data_supportcaps_parse(data_raw_t *rawdata)
                 supportcaps->graphics = TRUE;
             if (data_raw_string_is(dat, "graphicswin"))
                 supportcaps->graphicswin = TRUE;
+            if (data_raw_string_is(dat, "graphicsext"))
+                supportcaps->graphicsext = TRUE;
             if (data_raw_string_is(dat, "sound"))
                 supportcaps->sound = TRUE;
         }
@@ -1156,6 +1162,11 @@ void data_supportcaps_print(FILE *fl, data_supportcaps_t *supportcaps)
     if (supportcaps->graphicswin) {
         if (any) fprintf(fl, ", ");
         fprintf(fl, "\"graphicswin\"");
+        any = TRUE;
+    }
+    if (supportcaps->graphicsext) {
+        if (any) fprintf(fl, ", ");
+        fprintf(fl, "\"graphicsext\"");
         any = TRUE;
     }
     if (supportcaps->sound) {
