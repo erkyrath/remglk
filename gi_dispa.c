@@ -1,4 +1,4 @@
-/* gi_dispa.c: Dispatch layer for Glk API, version 0.7.5.
+/* gi_dispa.c: Dispatch layer for Glk API, version 0.7.6.
     Designed by Andrew Plotkin <erkyrath@eblong.com>
     http://eblong.com/zarf/glk/
 
@@ -66,6 +66,7 @@ static gidispatch_intconst_t intconstant_table[] = {
     { "gestalt_CharOutput_ExactPrint", (2) },
     { "gestalt_DateTime", (20) },
     { "gestalt_DrawImage", (7) },
+    { "gestalt_DrawImageScale", (24) },
     { "gestalt_Graphics", (6) },
     { "gestalt_GraphicsCharInput", (23) },
     { "gestalt_GraphicsTransparency", (14) },
@@ -89,9 +90,18 @@ static gidispatch_intconst_t intconstant_table[] = {
 
     { "imagealign_InlineCenter",  (0x03) },
     { "imagealign_InlineDown",  (0x02) },
+    { "imagealign_InlineUp",  (0x01) },
     { "imagealign_MarginLeft",  (0x04) },
     { "imagealign_MarginRight",  (0x05) },
-    { "imagealign_InlineUp",  (0x01) },
+
+    { "imagerule_AspectRatio", (0x0C) },
+    { "imagerule_HeightFixed", (0x08) },
+    { "imagerule_HeightMask", (0x0C) },
+    { "imagerule_HeightOrig", (0x04) },
+    { "imagerule_WidthFixed", (0x02) },
+    { "imagerule_WidthMask", (0x03) },
+    { "imagerule_WidthOrig", (0x01) },
+    { "imagerule_WidthRatio", (0x03) },
 
     { "keycode_Delete",   (0xfffffff9) },
     { "keycode_Down",     (0xfffffffb) },
@@ -251,6 +261,9 @@ static gidispatch_function_t function_table[] = {
     { 0x00E9, glk_window_erase_rect, "window_erase_rect" },
     { 0x00EA, glk_window_fill_rect, "window_fill_rect" },
     { 0x00EB, glk_window_set_background_color, "window_set_background_color" },
+  #ifdef GLK_MODULE_IMAGE2
+    { 0x00EC, glk_image_draw_scaled_ext, "image_draw_scaled_ext" },
+  #endif /* GLK_MODULE_IMAGE2 */
 #endif /* GLK_MODULE_IMAGE */
 #ifdef GLK_MODULE_SOUND
     { 0x00F0, glk_schannel_iterate, "schannel_iterate" },
@@ -537,6 +550,10 @@ char *gidispatch_prototype(glui32 funcnum)
             return "6QaIuIsIsIuIu:";
         case 0x00EB: /* window_set_background_color */
             return "2QaIu:";
+#ifdef GLK_MODULE_IMAGE2
+        case 0x00EC: /* image_draw_scaled_ext */
+            return "9QaIuIsIsIuIuIuIu:Iu";
+#endif /* GLK_MODULE_IMAGE2 */
 #endif /* GLK_MODULE_IMAGE */
 
 #ifdef GLK_MODULE_SOUND
@@ -1085,6 +1102,17 @@ void gidispatch_call(glui32 funcnum, glui32 numargs, gluniversal_t *arglist)
         case 0x00EB: /* window_set_background_color */
             glk_window_set_background_color(arglist[0].opaqueref, arglist[1].uint);
             break;
+
+#ifdef GLK_MODULE_IMAGE2
+        case 0x00EC: /* image_draw_scaled_ext */
+            arglist[9].uint = glk_image_draw_scaled_ext(arglist[0].opaqueref, 
+                arglist[1].uint,
+                arglist[2].sint, arglist[3].sint,
+                arglist[4].uint, arglist[5].uint,
+                arglist[6].uint, arglist[7].uint);
+            break;
+#endif /* GLK_MODULE_IMAGE2 */
+
 #endif /* GLK_MODULE_IMAGE */
 
 #ifdef GLK_MODULE_SOUND
