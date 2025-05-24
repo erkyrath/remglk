@@ -1924,10 +1924,14 @@ data_specialspan_t *data_specialspan_alloc(SpecialType type)
     dat->chunktype = 0;
     dat->image = 0;
     dat->hasdimensions = FALSE;
-    dat->width = 0;
-    dat->height = 0;
     dat->xpos = 0;
     dat->ypos = 0;
+    dat->width = 0;
+    dat->height = 0;
+    dat->widthratio = 0;
+    dat->aspectwidth = 0;
+    dat->aspectheight = 0;
+    dat->winmaxwidth = 0;
     dat->alignment = 0;
     dat->hyperlink = 0;
     dat->alttext = NULL;
@@ -1952,9 +1956,26 @@ void data_specialspan_print(data_specialspan_t *dat, glui32 wintype)
     switch (dat->type) {
 
     case specialtype_Image:
-        printf("{\"special\":\"image\", \"image\":%d, \"width\":%d, \"height\":%d", dat->image, dat->width, dat->height);
-        if (wintype == wintype_Graphics)
+        printf("{\"special\":\"image\", \"image\":%d", dat->image);
+        
+        if (wintype == wintype_Graphics) {
+            printf(", \"width\":%d, \"height\":%d", dat->width, dat->height);
             printf(", \"x\":%d, \"y\":%d", dat->xpos, dat->ypos);
+        }
+        else {
+            if (dat->width)
+                printf(", \"width\":%d", dat->width);
+            if (dat->height)
+                printf(", \"height\":%d", dat->height);
+            if (dat->widthratio)
+                printf(", \"widthratio\":%d", dat->widthratio);
+            if (dat->aspectwidth)
+                printf(", \"aspectwidth\":%d", dat->aspectwidth);
+            if (dat->aspectheight)
+                printf(", \"aspectheight\":%d", dat->aspectheight);
+            if (dat->winmaxwidth)
+                printf(", \"winmaxwidth\":%d", dat->winmaxwidth);
+        }
 
         if (pref_resourceurl) {
             char *suffix = "";
@@ -2042,6 +2063,7 @@ void data_specialspan_auto_print(FILE *file, data_specialspan_t *dat)
         fprintf(file, ", \"xpos\":%ld, \"ypos\":%ld", (long)dat->xpos, (long)dat->ypos);
     if (dat->width || dat->height)
         fprintf(file, ", \"width\":%ld, \"height\":%ld", (long)dat->width, (long)dat->height);
+    //###
     if (dat->alignment)
         fprintf(file, ", \"alignment\":%ld", (long)dat->alignment);
     if (dat->hyperlink)
@@ -2097,6 +2119,7 @@ data_specialspan_t *data_specialspan_auto_parse(data_raw_t *rawdata)
     if (dat)
         special->width = data_raw_int_value(dat);
     dat = data_raw_struct_field(rawdata, "height");
+    //###
     if (dat)
         special->height = data_raw_int_value(dat);
     dat = data_raw_struct_field(rawdata, "alignment");
