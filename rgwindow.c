@@ -1752,7 +1752,26 @@ glui32 glk_image_draw_scaled_ext(winid_t win, glui32 image,
         gli_fatal_error("glk_image_draw_scaled_ext: invalid heightrule");
     }
     
-    //###
+    if (maxwidth == 0) {
+        /* We always wind up here for graphics windows. */
+        special->winmaxwidth = 0.0;
+    }
+    else {
+        double maxwidthf = ((double)maxwidth / (double)0x10000);
+        special->winmaxwidth = maxwidthf;
+        
+        if (widthrule == imagerule_WidthRatio) {
+            /* The width is already scaled to the window width, so maxwidth
+               is irrelevant. Drop it. But if our width is *wider* than the
+               window width, scale down proportionally. */
+            if (special->widthratio > special->winmaxwidth) {
+                if (special->height != 0)
+                    special->height = (double)special->height * (special->winmaxwidth / special->widthratio);
+                special->widthratio = special->winmaxwidth;
+            }
+            special->winmaxwidth = 0.0;
+        }
+    }
 
     if (win->type == wintype_TextBuffer) {
         special->alignment = val1;
