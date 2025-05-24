@@ -1721,6 +1721,37 @@ glui32 glk_image_draw_scaled_ext(winid_t win, glui32 image,
     special->chunktype = info.chunktype;
     special->alttext = info.alttext;
     
+    switch (widthrule) {
+    case imagerule_WidthOrig:
+        special->width = info.width;
+        break;
+    case imagerule_WidthFixed:
+        special->width = width; /* passed in */
+        break;
+    case imagerule_WidthRatio:
+        special->widthratio = ((double)width / (double)0x10000); /* passed in, 16.16 */
+        break;
+    default:
+        gli_fatal_error("glk_image_draw_scaled_ext: invalid widthrule");
+    }
+
+    switch (heightrule) {
+    case imagerule_HeightOrig:
+        special->height = info.height;
+        break;
+    case imagerule_HeightFixed:
+        special->height = height; /* passed in */
+        break;
+    case imagerule_AspectRatio: {
+        double aspectratio = ((double)height / (double)0x10000); /* passed in, 16.16 */
+        special->aspectwidth = (double)info.width;
+        special->aspectheight = (double)info.height * aspectratio;
+        }
+        break;
+    default:
+        gli_fatal_error("glk_image_draw_scaled_ext: invalid heightrule");
+    }
+    
     //###
 
     if (win->type == wintype_TextBuffer) {
