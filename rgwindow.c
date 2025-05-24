@@ -1715,8 +1715,26 @@ glui32 glk_image_draw_scaled_ext(winid_t win, glui32 image,
         }
         maxwidth = 0;
     }
+
+    data_specialspan_t *special = data_specialspan_alloc(specialtype_Image);
+    special->image = image;
+    special->chunktype = info.chunktype;
+    special->alttext = info.alttext;
     
     //###
+
+    if (win->type == wintype_TextBuffer) {
+        special->alignment = val1;
+        special->hyperlink = win->hyperlink;
+        win_textbuffer_putspecial(win, special);
+        return TRUE;
+    }
+    else if (win->type == wintype_Graphics) {
+        special->xpos = val1;
+        special->ypos = val2;
+        win_graphics_putspecial(win, special);
+        return TRUE;
+    }
     
     return FALSE;
 }
