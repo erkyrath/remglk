@@ -1672,6 +1672,17 @@ glui32 glk_image_draw_scaled(winid_t win, glui32 image,
     return FALSE;
 }
 
+#ifdef GLK_MODULE_IMAGE2
+
+glui32 glk_image_draw_scaled_ext(winid_t win, glui32 image, 
+    glsi32 val1, glsi32 val2, glui32 width, glui32 height,
+    glui32 imagerule, glui32 maxwidth)
+{
+    return FALSE; //###
+}
+
+#endif /* GLK_MODULE_IMAGE2 */
+
 glui32 glk_image_get_info(glui32 image, glui32 *width, glui32 *height)
 {
     if (width)

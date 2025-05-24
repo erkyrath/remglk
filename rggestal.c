@@ -83,6 +83,15 @@ glui32 glk_gestalt_ext(glui32 id, glui32 val, glui32 *arr, glui32 arrlen)
             }
             return FALSE;
             
+        case gestalt_DrawImageScale:
+            if (gli_supportcaps.graphics && gli_supportcaps.graphicsext) {
+                if (val == wintype_TextBuffer)
+                    return TRUE;
+                if (val == wintype_Graphics && gli_supportcaps.graphicswin)
+                    return TRUE;
+            }
+            return FALSE;
+            
         case gestalt_Unicode:
             return TRUE;
             
