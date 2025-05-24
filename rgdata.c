@@ -1973,8 +1973,12 @@ void data_specialspan_print(data_specialspan_t *dat, glui32 wintype)
                 printf(", \"aspectwidth\":%.2f", dat->aspectwidth);
             if (dat->aspectheight)
                 printf(", \"aspectheight\":%.2f", dat->aspectheight);
-            if (dat->winmaxwidth)
-                printf(", \"winmaxwidth\":%.4f", dat->winmaxwidth);
+            if (dat->winmaxwidth) {
+                if (dat->winmaxwidth < 0.0)
+                    printf(", \"winmaxwidth\":null");
+                else
+                    printf(", \"winmaxwidth\":%.4f", dat->winmaxwidth);
+            }
         }
 
         if (pref_resourceurl) {

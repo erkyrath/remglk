@@ -1633,9 +1633,10 @@ glui32 glk_image_draw_scaled(winid_t win, glui32 image,
         return FALSE;
     }
 
-    /* Same as above, except we use the passed-in width and height values.
-       Note that by omitting winmaxwidth, we will implicitly
-       limit maxwidth to the window width (in buffer windows). */
+    /* Same as above, except we use the passed-in width and height
+       values. Note that by leaving winmaxwidth as 0.0, we will omit
+       the field from the JSON, thus implicitly limiting maxwidth to
+       the window width (in buffer windows). */
 
     giblorb_map_t *map = giblorb_get_resource_map();
     if (!map)
@@ -1754,7 +1755,7 @@ glui32 glk_image_draw_scaled_ext(winid_t win, glui32 image,
     
     if (maxwidth == 0) {
         /* We always wind up here for graphics windows. */
-        special->winmaxwidth = 0.0;
+        special->winmaxwidth = -1.0; /* explicit null */
     }
     else {
         double maxwidthf = ((double)maxwidth / (double)0x10000);
@@ -1769,7 +1770,7 @@ glui32 glk_image_draw_scaled_ext(winid_t win, glui32 image,
                     special->height = (double)special->height * (special->winmaxwidth / special->widthratio);
                 special->widthratio = special->winmaxwidth;
             }
-            special->winmaxwidth = 0.0;
+            special->winmaxwidth = -1.0; /* explicit null */
         }
     }
 

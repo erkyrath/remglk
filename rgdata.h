@@ -184,7 +184,7 @@ struct data_specialspan_struct {
     double widthratio; /* (Image in bufferwin) */
     double aspectwidth; /* (Image in bufferwin) */
     double aspectheight; /* (Image in bufferwin) */
-    double winmaxwidth; /* (Image in bufferwin) */
+    double winmaxwidth; /* (Image in bufferwin) 0.0 will omit this from the JSON; a negative value means an explicit null. */
     glui32 alignment; /* (Image in bufferwin) */
     glui32 hyperlink; /* (Image in bufferwin) */
     char *alttext; /* (Image) Reference to existing data. */
