@@ -198,9 +198,9 @@ The support field is a list of strings. Currently the recognized values are:
 <ul class="WrapIndent">
 <li><code>"timer"</code>: gestalt_Timer will be set; the library will support glk_request_timer_events().
 <li><code>"hyperlinks"</code>: gestalt_Hyperlinks and gestalt_HyperlinkInput will be set; the library will support glk_set_hyperlink() and glk_request_hyperlink_event().
-<li><code>"graphics"</code>: gestalt_Graphics and gestalt_GraphicsTransparency will be set. (Support for transparent PNGs is taken for granted.) gestalt_DrawImage will return true for text-buffer windows. The library will support all image functions.
+<li><code>"graphics"</code>: gestalt_Graphics and gestalt_GraphicsTransparency will be set. (Support for transparent PNGs is taken for granted.) gestalt_DrawImage will return true for text-buffer windows. The library will support all image functions (except glk_image_draw_scaled_ext(); see below).
 <li><code>"graphicswin"</code>: graphics windows can be opened; gestalt_DrawImage will return true for graphics windows.
-<li><code>"graphicsext"</code>: ###.
+<li><code>"graphicsext"</code>: The library will support glk_image_draw_scaled_ext(). gestalt_DrawImageScale will return true for buffer windows and (with <code>"graphicswin"</code>) graphics windows as well.
 </ul>
 
 <h3>Starting up with no init event</h3>
