@@ -1633,7 +1633,9 @@ glui32 glk_image_draw_scaled(winid_t win, glui32 image,
         return FALSE;
     }
 
-    /* Same as above, except we use the passed-in width and height values */
+    /* Same as above, except we use the passed-in width and height values.
+       Note that by omitting winmaxwidth, we will implicitly
+       limit maxwidth to the window width (in buffer windows). */
 
     giblorb_map_t *map = giblorb_get_resource_map();
     if (!map)
@@ -1678,7 +1680,45 @@ glui32 glk_image_draw_scaled_ext(winid_t win, glui32 image,
     glsi32 val1, glsi32 val2, glui32 width, glui32 height,
     glui32 imagerule, glui32 maxwidth)
 {
-    return FALSE; //###
+    if (!gli_supportcaps.graphics) {
+        gli_strict_warning("image_draw_scaled: graphics not supported.");
+        return FALSE;
+    }
+
+    /* Same as above, except we have more ways to calculate the width and
+       height. */
+
+    glui32 widthrule = (imagerule & imagerule_WidthMask);
+    glui32 heightrule = (imagerule & imagerule_HeightMask);
+    
+    giblorb_map_t *map = giblorb_get_resource_map();
+    if (!map)
+        return FALSE; /* Not running from a blorb file */
+
+    giblorb_image_info_t info;
+    giblorb_err_t err = giblorb_load_image_info(map, image, &info);
+    if (err)
+        return FALSE;
+
+    if (win->type == wintype_Graphics) {
+        /* For graphics windows, we can (and should) calculate ratios
+           now. We ignore maxwidth. */
+        window_graphics_t *dwin = win->data;
+        if (widthrule == imagerule_WidthRatio) {
+            widthrule = imagerule_WidthFixed;
+            width = (double)dwin->graphwidth * ((double)width / (double)0x10000);
+        }
+        if (heightrule == imagerule_AspectRatio) {
+            heightrule = imagerule_HeightFixed;
+            double aspect = ((double)info.height / (double)info.width);
+            height = (double)width * aspect * ((double)height / (double)0x10000);
+        }
+        maxwidth = 0;
+    }
+    
+    //###
+    
+    return FALSE;
 }
 
 #endif /* GLK_MODULE_IMAGE2 */
