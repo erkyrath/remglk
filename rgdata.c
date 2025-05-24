@@ -1928,10 +1928,10 @@ data_specialspan_t *data_specialspan_alloc(SpecialType type)
     dat->ypos = 0;
     dat->width = 0;
     dat->height = 0;
-    dat->widthratio = 0;
-    dat->aspectwidth = 0;
-    dat->aspectheight = 0;
-    dat->winmaxwidth = 0;
+    dat->widthratio = 0.0;
+    dat->aspectwidth = 0.0;
+    dat->aspectheight = 0.0;
+    dat->winmaxwidth = 0.0;
     dat->alignment = 0;
     dat->hyperlink = 0;
     dat->alttext = NULL;
@@ -1968,13 +1968,13 @@ void data_specialspan_print(data_specialspan_t *dat, glui32 wintype)
             if (dat->height)
                 printf(", \"height\":%d", dat->height);
             if (dat->widthratio)
-                printf(", \"widthratio\":%d", dat->widthratio);
+                printf(", \"widthratio\":%.2f", dat->widthratio);
             if (dat->aspectwidth)
-                printf(", \"aspectwidth\":%d", dat->aspectwidth);
+                printf(", \"aspectwidth\":%.2f", dat->aspectwidth);
             if (dat->aspectheight)
-                printf(", \"aspectheight\":%d", dat->aspectheight);
+                printf(", \"aspectheight\":%.2f", dat->aspectheight);
             if (dat->winmaxwidth)
-                printf(", \"winmaxwidth\":%d", dat->winmaxwidth);
+                printf(", \"winmaxwidth\":%.2f", dat->winmaxwidth);
         }
 
         if (pref_resourceurl) {
