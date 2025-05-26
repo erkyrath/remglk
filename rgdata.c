@@ -2131,9 +2131,20 @@ data_specialspan_t *data_specialspan_auto_parse(data_raw_t *rawdata)
     if (dat)
         special->width = data_raw_int_value(dat);
     dat = data_raw_struct_field(rawdata, "height");
-    //###
     if (dat)
         special->height = data_raw_int_value(dat);
+    dat = data_raw_struct_field(rawdata, "widthratio");
+    if (dat)
+        special->widthratio = data_raw_real_value(dat);
+    dat = data_raw_struct_field(rawdata, "aspectwidth");
+    if (dat)
+        special->aspectwidth = data_raw_real_value(dat);
+    dat = data_raw_struct_field(rawdata, "aspectheight");
+    if (dat)
+        special->aspectheight = data_raw_real_value(dat);
+    dat = data_raw_struct_field(rawdata, "winmaxwidth");
+    if (dat)
+        special->winmaxwidth = data_raw_real_value(dat);
     dat = data_raw_struct_field(rawdata, "alignment");
     if (dat)
         special->alignment = data_raw_int_value(dat);
