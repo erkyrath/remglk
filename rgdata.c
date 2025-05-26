@@ -2067,7 +2067,15 @@ void data_specialspan_auto_print(FILE *file, data_specialspan_t *dat)
         fprintf(file, ", \"xpos\":%ld, \"ypos\":%ld", (long)dat->xpos, (long)dat->ypos);
     if (dat->width || dat->height)
         fprintf(file, ", \"width\":%ld, \"height\":%ld", (long)dat->width, (long)dat->height);
-    //###
+    if (dat->widthratio)
+        fprintf(file, ", \"widthratio\":%.4f", dat->widthratio);
+    if (dat->aspectwidth)
+        fprintf(file, ", \"aspectwidth\":%.4f", dat->aspectwidth);
+    if (dat->aspectheight)
+        fprintf(file, ", \"aspectheight\":%.4f", dat->aspectheight);
+    /* negative winmaxwidth is stored as-is, not as "null" */
+    if (dat->winmaxwidth)
+        fprintf(file, ", \"winmaxwidth\":%.4f", dat->winmaxwidth);
     if (dat->alignment)
         fprintf(file, ", \"alignment\":%ld", (long)dat->alignment);
     if (dat->hyperlink)
