@@ -61,8 +61,9 @@ void gli_initialize_misc(data_supportcaps_t *supportcaps)
 }
 
 void glk_exit()
-{   
-    gli_windows_update(NULL, TRUE);
+{
+    //### glk_request_timer_events(0)?
+    gli_windows_update(NULL, TRUE, TRUE);
     gli_streams_close_all();
 
     if (gli_debugger)

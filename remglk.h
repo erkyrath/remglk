@@ -241,7 +241,7 @@ extern void gli_delete_window(window_t *win);
 extern int gli_windows_update_from_state(window_t **list, int count, window_t *rootwin, glui32 gen);
 extern window_t *gli_window_iterate_treeorder(window_t *win);
 extern void gli_window_rearrange(window_t *win, grect_t *box, data_metrics_t *metrics);
-extern void gli_windows_update(data_specialreq_t *special, int newgeneration);
+extern void gli_windows_update(data_specialreq_t *special, int newgeneration, int gameover);
 extern void gli_windows_refresh(glui32 fromgen);
 extern void gli_windows_metrics_change(data_metrics_t *newmetrics);
 extern data_metrics_t *gli_windows_get_metrics(void);

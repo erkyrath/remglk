@@ -51,7 +51,7 @@ void glk_select(event_t *event)
     /* Send an update stanza to stdout. We do this before every glk_select,
        including at startup, but *not* if we just autorestored. */
     if (last_event_type != 0xFFFFFFFE) {
-        gli_windows_update(NULL, TRUE);
+        gli_windows_update(NULL, TRUE, FALSE);
         if (pref_singleturn) {
             /* Singleton mode mode means that we exit after every output. */
             gli_fast_exit();
@@ -72,7 +72,7 @@ void glk_select(event_t *event)
                 /* Repeat the current display state and keep waiting for
                    a (real) event. */
                 gli_windows_refresh(data->gen);
-                gli_windows_update(NULL, FALSE);
+                gli_windows_update(NULL, FALSE, FALSE);
                 if (pref_singleturn) {
                     gli_fast_exit();
                 }
@@ -155,7 +155,7 @@ void glk_select(event_t *event)
                     free(allocbuf);
 
                     gli_event_clearevent(curevent);
-                    gli_windows_update(NULL, TRUE);
+                    gli_windows_update(NULL, TRUE, FALSE);
                     break;
                 }
                 /* ...else fall through to default behavior. */
@@ -236,7 +236,7 @@ char *gli_select_specialrequest(data_specialreq_t *special)
     /* Send an update stanza to stdout. We do this before every
        get_by_prompt, but *not* if we just autorestored. */
     if (last_event_type != 0xFFFFFFFE) {
-        gli_windows_update(special, TRUE);
+        gli_windows_update(special, TRUE, FALSE);
         if (pref_singleturn) {
             /* Singleton mode mode means that we exit after every output. */
             gli_fast_exit();
@@ -329,7 +329,7 @@ void gidebug_pause()
     int unpause = FALSE;
 
     while (!unpause) {
-        gli_windows_update(NULL, TRUE);
+        gli_windows_update(NULL, TRUE, FALSE);
 
         data_event_t *data = data_event_read();
 
