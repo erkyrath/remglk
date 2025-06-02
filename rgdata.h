@@ -104,6 +104,7 @@ struct data_update_struct {
     data_specialreq_t *specialreq;
     gen_list_t debuglines; /* char* (null-terminated UTF8) */
     int disable;
+    int exit;
 };
 
 /* data_window_t: Represents one window, either newly created, resized, or

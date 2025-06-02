@@ -1456,6 +1456,7 @@ data_update_t *data_update_alloc()
     dat->includetimer = FALSE;
     dat->timer = 0;
     dat->disable = FALSE;
+    dat->exit = FALSE;
     dat->specialreq = NULL;
 
     gen_list_init(&dat->windows);
