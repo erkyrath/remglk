@@ -1012,7 +1012,7 @@ void gidebug_output(char *text)
    If special is provided, it goes into the update. It will be freed
    after sending.
 */
-void gli_windows_update(data_specialreq_t *special, int newgeneration)
+void gli_windows_update(data_specialreq_t *special, int newgeneration, int gameover)
 {
     window_t *win;
     int ix;
