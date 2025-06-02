@@ -1558,6 +1558,14 @@ void data_update_print(data_update_t *dat)
             printf("%d", dat->timer);
     }
 
+    if (dat->disable) {
+        printf(",\n \"disable\":true");
+    }
+    
+    if (dat->exit) {
+        printf(",\n \"exit\":true");
+    }
+
     if (dat->debuglines.count) {
         char **debuglist = (char **)(dat->debuglines.list);
         printf(",\n \"debugoutput\":[\n");
