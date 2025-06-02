@@ -368,6 +368,9 @@ As of version 0.3.0, the library accepts noninteger values in the <code>metrics<
 As of version 0.3.1, the library accepts exponential notation for numerical values. If an integer is expected (i.e., everywhere except the <code>metrics</code> object), noninteger values are rounded to the nearest integer. Note that the library does not <em>send</em> exponential notation in its JSON output.
 <p>
 
+As of version 0.3.2, the library adds <code>"exit":true</code> to the update when the game exits.
+<p>
+
 A note on <a href="http://json.org/">JSON</a>: this is a strict (in both senses) subset of Javascript's data literal format. The biggest differences are: you always use double quotes, never single quotes; strings are always quoted, but numbers never are; an object (dictionary) always has quotes around its keys.
 <p>
 
