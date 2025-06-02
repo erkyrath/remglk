@@ -1130,6 +1130,9 @@ void gli_windows_update(data_specialreq_t *special, int newgeneration, int gameo
 
     update->specialreq = special;
 
+    if (gameover)
+        update->exit = TRUE;
+
 #if GIDEBUG_LIBRARY_SUPPORT
     for (ix=0; ix<debug_output_cache.count; ix++) {
         gen_list_append(&update->debuglines, debug_output_cache.list[ix]);
