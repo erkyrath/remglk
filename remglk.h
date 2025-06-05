@@ -229,9 +229,9 @@ extern char *gli_select_specialrequest(data_specialreq_t *special);
 extern void gli_select_imaginary(void);
 
 extern void gli_initialize_windows(void);
-extern void gli_fast_exit(void);
+extern void gli_fast_exit(void) GLK_ATTRIBUTE_NORETURN;
 extern void gli_display_warning(char *msg);
-extern void gli_display_error(char *msg);
+extern void gli_display_error(char *msg) GLK_ATTRIBUTE_NORETURN;
 extern glui32 gli_window_current_generation(void);
 extern winid_t glkunix_window_find_by_updatetag(glui32 tag); /* see glkstart.h */
 extern window_t *gli_new_window(glui32 type, glui32 rock);
