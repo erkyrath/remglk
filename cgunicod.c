@@ -213,6 +213,8 @@ static glui32 gli_buffer_change_case(glui32 *buf, glui32 len,
             dest_spec_rest = CASE_IDENT;
         dest_spec_first = destcase;
         break;
+    default:
+        return 0;
     }
 
     dest_block_rest = dest_spec_rest;
