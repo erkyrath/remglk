@@ -369,7 +369,7 @@ static glui32 *gli_buffer_canon_decompose_uni(glui32 *buf,
     for (ix=0; ix<numchars; ix++) {
         glui32 ch = buf[ix];
         gli_decomp_block_t *block;
-        glui32 count, pos;
+        glui32 count=0, pos=0;
 
         if (combining_class(ch))
             anycombining = TRUE;
