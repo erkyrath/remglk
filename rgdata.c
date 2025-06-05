@@ -1729,7 +1729,7 @@ void data_content_free(data_content_t *dat)
 void data_content_print(data_content_t *dat)
 {
     int ix;
-    char *linelabel;
+    char *linelabel="";
 
     if (dat->type == wintype_TextBuffer) {
         char *isclear = "";
