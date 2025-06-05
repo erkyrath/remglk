@@ -342,13 +342,13 @@ static int extract_value(int argc, char *argv[], char *optname, int type,
     int *argnum, int *result, int defval)
 {
     int optlen, val;
-    char *cx, *origcx, firstch;
+    char *cx, *origcx;
     
     optlen = strlen(optname);
     origcx = argv[*argnum];
     cx = origcx;
     
-    firstch = *cx;
+    /* Skip initial dash */
     cx++;
     
     if (strncmp(cx, optname, optlen))
