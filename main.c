@@ -549,6 +549,11 @@ int gli_get_dataresource_info(int num, void **ptr, glui32 *len, int *isbinary)
                 }
                 fseek(fl, 0, SEEK_END);
                 dataresources[ix].len = ftell(fl);
+                if (dataresources[ix].len < 0) {
+                    gli_strict_warning("stream_open_resource: unable to measure length.");
+                    fclose(fl);
+                    return FALSE;
+                }
                 dataresources[ix].ptr = malloc(dataresources[ix].len+1);
                 fseek(fl, 0, SEEK_SET);
                 int got = fread(dataresources[ix].ptr, 1, dataresources[ix].len, fl);
