@@ -261,11 +261,6 @@ int gli_streams_update_from_state(stream_t **list, int count, stream_t *currents
             data_tempbufinfo_t *info = str->tempbufinfo;
             str->tempbufinfo = NULL;
 
-            if (!gli_dispatch_restore_arr) {
-                data_tempbufinfo_free(info);
-                continue;
-            }
-
             void *voidbuf = NULL;
             
             switch (str->type) {
@@ -292,6 +287,9 @@ int gli_streams_update_from_state(stream_t **list, int count, stream_t *currents
             break;
                 
             case strtype_Memory: {
+                if (!gli_dispatch_restore_arr) {
+                    break;
+                }
                 if (!str->unicode) {
                     str->arrayrock = (*gli_dispatch_restore_arr)(info->bufkey, str->buflen, "&+#!Cn", &voidbuf);
                     if (voidbuf) {
