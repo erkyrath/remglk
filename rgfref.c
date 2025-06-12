@@ -455,10 +455,18 @@ void glk_fileref_delete_file(fileref_t *fref)
 
 /* Set the working directory, based on the directory of the given filename
    (or the directory itself, if it is one).
-   This should only be called from startup code. */
-void glkunix_set_base_file(char *filename)
+   This should only be called from init or startup code. */
+void gli_fileref_set_working_dir(char *filename)
 {
     int ix;
+
+    if (!strcmp(filename, ".")) {
+        /* Process cwd is always valid. */
+        if (workingdir) 
+            free(workingdir);
+        workingdir = strdup(".");
+        return;
+    }
 
     struct stat statbuf;
     if (stat(filename, &statbuf))
@@ -493,6 +501,14 @@ void glkunix_set_base_file(char *filename)
             free(workingdir);
         workingdir = strdup(".");
     }
+}
+
+/* This is called when the interpreter learns the game file pathname
+   (assuming there is one).
+   This should only be called from startup code. */
+void glkunix_set_base_file(char *filename)
+{
+    gli_fileref_set_working_dir(filename);
 }
 
 /* The emglken interpreters need to reach in and get this info. They
