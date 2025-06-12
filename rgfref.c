@@ -34,7 +34,8 @@ void gli_initialize_filerefs()
 {
     tagcounter = (random() % 15) + 48;
 
-    gli_fileref_set_working_dir(".");
+    if (!workingdir)
+        gli_fileref_set_working_dir(".");
 }
 
 fileref_t *glkunix_fileref_find_by_updatetag(glui32 tag)
@@ -506,7 +507,8 @@ void gli_fileref_set_working_dir(char *filename)
    This should only be called from startup code. */
 void glkunix_set_base_file(char *filename)
 {
-    gli_fileref_set_working_dir(filename);
+    if (pref_gamefiledir)
+        gli_fileref_set_working_dir(filename);
 }
 
 /* The emglken interpreters need to reach in and get this info. They
