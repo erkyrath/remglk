@@ -191,6 +191,8 @@ extern gidispatch_rock_t (*gli_dispatch_restore_arr)(long bufkey, glui32 len, ch
 
 extern int pref_stderr;
 extern int pref_singleturn;
+extern int pref_gamefiledir;
+extern int pref_onlyfiledir;
 extern char *pref_resourceurl;
 
 extern int gli_get_dataresource_info(int num, void **ptr, glui32 *len, int *isbinary);

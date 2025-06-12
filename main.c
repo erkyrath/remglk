@@ -19,7 +19,6 @@ static int pref_printversion = FALSE;
 int pref_stderr = FALSE;
 int pref_fixedmetrics = FALSE;
 int pref_autometrics = FALSE;
-char *pref_filedir = NULL;
 int pref_gamefiledir = FALSE;
 int pref_onlyfiledir = FALSE;
 int pref_singleturn = FALSE;
@@ -213,13 +212,13 @@ int main(int argc, char *argv[])
             }
         }
         else if (extract_value(argc, argv, "filedir", ex_Str, &ix, &val, FALSE)) 
-            pref_filedir = strdup(extracted_string);
+            gli_fileref_set_working_dir(extracted_string);
+        else if (extract_value(argc, argv, "fd", ex_Str, &ix, &val, FALSE)) 
+            gli_fileref_set_working_dir(extracted_string);
         else if (extract_value(argc, argv, "gamefiledir", ex_Bool, &ix, &val, FALSE))
             pref_gamefiledir = val;
         else if (extract_value(argc, argv, "onlyfiledir", ex_Bool, &ix, &val, FALSE))
             pref_onlyfiledir = val;
-        else if (extract_value(argc, argv, "fd", ex_Str, &ix, &val, FALSE)) 
-            pref_filedir = strdup(extracted_string);
         else if (extract_value(argc, argv, "resourcedir", ex_Str, &ix, &val, FALSE)) 
             pref_resourceurl = construct_resourceurl(extracted_string, TRUE);
         else if (extract_value(argc, argv, "rd", ex_Str, &ix, &val, FALSE)) 
