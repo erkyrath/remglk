@@ -35,8 +35,7 @@ void gli_initialize_filerefs()
     tagcounter = (random() % 15) + 48;
 
     if (!workingdir) {
-        workingdir = malloc(4);
-        strcpy(workingdir, ".");
+        workingdir = strdup(".");
     }
 }
 
@@ -469,8 +468,7 @@ void glkunix_set_base_file(char *filename)
         /* Use the directory name. */
         if (workingdir) 
             free(workingdir);
-        workingdir = malloc(strlen(filename)+4);
-        strcpy(workingdir, filename);
+        workingdir = strdup(filename);
         return;
     }
 
@@ -493,8 +491,7 @@ void glkunix_set_base_file(char *filename)
         /* No slash, just a filename. Use ".". */
         if (workingdir) 
             free(workingdir);
-        workingdir = malloc(4);
-        strcpy(workingdir, ".");
+        workingdir = strdup(".");
     }
 }
 
