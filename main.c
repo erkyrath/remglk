@@ -276,6 +276,9 @@ int main(int argc, char *argv[])
         printf("  -width NUM: manual screen width (default 80)\n");
         printf("  -height NUM: manual screen height (default 50)\n");
         printf("  -support [timer, hyperlinks, graphics, graphicswin, graphicsext]: declare support for various input features\n");
+        printf("  -filedir STR: default directory for save files\n");
+        printf("  -gamefiledir BOOL: use the game file directory as the default directory for save files\n");
+        printf("  -onlyfiledir BOOL: enforce the default directory for save files\n");
         printf("  -resourceurl STR: URL base for image/sound files\n");
         printf("  -resourcedir STR: path to image/sound files (used to create file: URLs)\n");
         printf("  -dataresource NUM:PATHNAME, -dataresourcebin NUM:PATHNAME, -dataresourcetext NUM:PATHNAME: tell where the data resource file with the given number can be read (default: search blorb if available)\n");
