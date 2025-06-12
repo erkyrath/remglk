@@ -492,7 +492,6 @@ void gli_fileref_set_working_dir(char *filename)
         workingdir = malloc(ix+4);
         strncpy(workingdir, filename, ix);
         workingdir[ix] = '\0';
-        ix++;
     }
     else {
         /* No slash, just a filename. Use ".". */
