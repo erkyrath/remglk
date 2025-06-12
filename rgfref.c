@@ -26,8 +26,6 @@ static glui32 tagcounter = 0;
 /* Linked list of all filerefs */
 static fileref_t *gli_filereflist = NULL; 
 
-#define BUFLEN (256)
-
 static char *workingdir = NULL;
 
 void gli_initialize_filerefs()
@@ -201,7 +199,7 @@ static char *gli_suffix_for_usage(glui32 usage)
 
 frefid_t glk_fileref_create_temp(glui32 usage, glui32 rock)
 {
-    char filename[BUFLEN];
+    char filename[256];
     fileref_t *fref;
     
     sprintf(filename, "/tmp/glktempfref-XXXXXX");
@@ -239,7 +237,7 @@ frefid_t glk_fileref_create_by_name(glui32 usage, char *name,
     glui32 rock)
 {
     fileref_t *fref;
-    char buf[BUFLEN];
+    char *buf;
     char *newbuf;
     int len;
     char *cx;
@@ -250,8 +248,10 @@ frefid_t glk_fileref_create_by_name(glui32 usage, char *name,
        period. Change to "null" if there's nothing left. Then append
        an appropriate suffix: ".glkdata", ".glksave", ".txt".
     */
+
+    buf = malloc(strlen(name) + 8);
     
-    for (cx=name, len=0; (*cx && *cx!='.' && len<BUFLEN-1); cx++) {
+    for (cx=name, len=0; (*cx && *cx!='.'); cx++) {
         switch (*cx) {
             case '"':
             case '\\':
@@ -279,6 +279,9 @@ frefid_t glk_fileref_create_by_name(glui32 usage, char *name,
     
     sprintf(newbuf, "%s/%s%s", workingdir, buf, suffix);
 
+    free(buf);
+    buf = NULL;
+    
     fref = gli_new_fileref(newbuf, usage, rock);
     if (!fref) {
         gli_strict_warning("fileref_create_by_name: unable to create fileref.");
