@@ -344,8 +344,15 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
         /* The player is restricted to workingdir. We will drop slashes
            from the filename, and truncate at the first period. (But we
            permit other punctuation.) */
-        newbuf = malloc(val + 8 + MAX_SUFFIX_LENGTH);
+        newbuf = malloc(val + strlen(workingdir) + 8 + MAX_SUFFIX_LENGTH);
         int len;
+
+        sprintf(newbuf, "%s/", workingdir);
+        char *buf2 = newbuf + strlen(newbuf);
+        
+        /* Ugly even for C code... buf2 is the buffer segment after
+           workingdir, which is guaranteed to have
+           strlen(cx)+8+MAX_SUFFIX_LENGTH available space. */
     
         for (len=0; (*cx && *cx!='.'); cx++) {
             switch (*cx) {
@@ -353,13 +360,13 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
             case '/':
                 break;
             default:
-                newbuf[len++] = *cx;
+                buf2[len++] = *cx;
             }
         }
-        newbuf[len] = '\0';
+        buf2[len] = '\0';
         
-        if (len == 0 || !strcmp(newbuf, ".") || !strcmp(newbuf, "..")) {
-            strcpy(newbuf, "null");
+        if (len == 0 || !strcmp(buf2, ".") || !strcmp(buf2, "..")) {
+            strcpy(buf2, "null");
         }
     }
     else {
