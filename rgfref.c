@@ -420,7 +420,7 @@ glui32 glk_fileref_get_rock(fileref_t *fref)
 
 glui32 glk_fileref_does_file_exist(fileref_t *fref)
 {
-    struct stat buf;
+    struct stat statbuf;
     
     if (!fref) {
         gli_strict_warning("fileref_does_file_exist: invalid ref");
@@ -430,10 +430,10 @@ glui32 glk_fileref_does_file_exist(fileref_t *fref)
     /* This is sort of Unix-specific, but probably any stdio library
         will implement at least this much of stat(). */
     
-    if (stat(fref->filename, &buf))
+    if (stat(fref->filename, &statbuf))
         return 0;
     
-    if (S_ISREG(buf.st_mode))
+    if (S_ISREG(statbuf.st_mode))
         return 1;
     else
         return 0;
@@ -452,24 +452,47 @@ void glk_fileref_delete_file(fileref_t *fref)
     unlink(fref->filename);
 }
 
-/* This should only be called from startup code. */
+/* Set the working directory, based on the directory of the given filename
+   (or the directory itself, if it is one).
+   This should only be called from startup code. */
 void glkunix_set_base_file(char *filename)
 {
     int ix;
+
+    struct stat statbuf;
+    if (stat(filename, &statbuf))
+        return;
+
+    if (S_ISDIR(statbuf.st_mode)) {
+        /* Use the directory name. */
+        if (workingdir) 
+            free(workingdir);
+        workingdir = malloc(strlen(filename)+4);
+        strcpy(workingdir, filename);
+        return;
+    }
+
+    /* Peel off the filename and use the directory part. */
 
     for (ix=strlen(filename)-1; ix >= 0; ix--) 
         if (filename[ix] == '/')
             break;
 
     if (ix >= 0) {
-        /* There is a slash. */
+        /* There is a slash. Copy up to there. */
+        if (workingdir) 
+            free(workingdir);
+        workingdir = malloc(ix+4);
         strncpy(workingdir, filename, ix);
         workingdir[ix] = '\0';
         ix++;
     }
     else {
-        /* No slash, just a filename. */
-        ix = 0;
+        /* No slash, just a filename. Use ".". */
+        if (workingdir) 
+            free(workingdir);
+        workingdir = malloc(4);
+        strcpy(workingdir, ".");
     }
 }
 
