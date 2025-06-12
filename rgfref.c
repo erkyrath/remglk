@@ -26,6 +26,8 @@ static glui32 tagcounter = 0;
 /* Linked list of all filerefs */
 static fileref_t *gli_filereflist = NULL; 
 
+/* The directory used for by_name files, and as the base for by_prompt
+   files. Defaults to ".". */
 static char *workingdir = NULL;
 
 void gli_initialize_filerefs()
