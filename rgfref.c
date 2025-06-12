@@ -269,7 +269,7 @@ frefid_t glk_fileref_create_by_name(glui32 usage, char *name,
     }
     buf[len] = '\0';
 
-    if (len == 0) {
+    if (len == 0 || !strcmp(buf, ".") || !strcmp(buf, "..")) {
         strcpy(buf, "null");
         len = strlen(buf);
     }
@@ -340,13 +340,38 @@ frefid_t glk_fileref_create_by_prompt(glui32 usage, glui32 fmode,
         return NULL;
     }
 
-    newbuf = malloc(val + strlen(workingdir) + 4 + MAX_SUFFIX_LENGTH);
+    if (pref_onlyfiledir) {
+        /* The player is restricted to workingdir. We will drop slashes
+           from the filename, and truncate at the first period. (But we
+           permit other punctuation.) */
+        newbuf = malloc(val + 8 + MAX_SUFFIX_LENGTH);
+        int len;
     
-    if (cx[0] == '/')
-        strcpy(newbuf, cx);
-    else
-        sprintf(newbuf, "%s/%s", workingdir, cx);
-
+        for (len=0; (*cx && *cx!='.'); cx++) {
+            switch (*cx) {
+            case '\\':
+            case '/':
+                break;
+            default:
+                newbuf[len++] = *cx;
+            }
+        }
+        newbuf[len] = '\0';
+        
+        if (len == 0 || !strcmp(newbuf, ".") || !strcmp(newbuf, "..")) {
+            strcpy(newbuf, "null");
+        }
+    }
+    else {
+        /* The player is allowed to pick a relative or absolute directory. */
+        newbuf = malloc(val + strlen(workingdir) + 4 + MAX_SUFFIX_LENGTH);
+        
+        if (cx[0] == '/')
+            strcpy(newbuf, cx);
+        else
+            sprintf(newbuf, "%s/%s", workingdir, cx);
+    }
+        
     free(buf);
     buf = NULL;
     cx = NULL;
