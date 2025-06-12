@@ -28,11 +28,16 @@ static fileref_t *gli_filereflist = NULL;
 
 #define BUFLEN (256)
 
-static char workingdir[BUFLEN] = ".";
+static char *workingdir = NULL;
 
 void gli_initialize_filerefs()
 {
     tagcounter = (random() % 15) + 48;
+
+    if (!workingdir) {
+        workingdir = malloc(4);
+        strcpy(workingdir, ".");
+    }
 }
 
 fileref_t *glkunix_fileref_find_by_updatetag(glui32 tag)
@@ -235,7 +240,7 @@ frefid_t glk_fileref_create_by_name(glui32 usage, char *name,
 {
     fileref_t *fref;
     char buf[BUFLEN];
-    char buf2[2*BUFLEN+4+MAX_SUFFIX_LENGTH];
+    char *newbuf;
     int len;
     char *cx;
     char *suffix;
@@ -270,14 +275,18 @@ frefid_t glk_fileref_create_by_name(glui32 usage, char *name,
     }
     
     suffix = gli_suffix_for_usage(usage);
-    sprintf(buf2, "%s/%s%s", workingdir, buf, suffix);
+    newbuf = malloc(strlen(workingdir) + 1 + strlen(buf) + strlen(suffix) + 4);
+    
+    sprintf(newbuf, "%s/%s%s", workingdir, buf, suffix);
 
-    fref = gli_new_fileref(buf2, usage, rock);
+    fref = gli_new_fileref(newbuf, usage, rock);
     if (!fref) {
         gli_strict_warning("fileref_create_by_name: unable to create fileref.");
+        free(newbuf);
         return NULL;
     }
     
+    free(newbuf);
     return fref;
 }
 
@@ -444,7 +453,7 @@ void glk_fileref_delete_file(fileref_t *fref)
 void glkunix_set_base_file(char *filename)
 {
     int ix;
-  
+
     for (ix=strlen(filename)-1; ix >= 0; ix--) 
         if (filename[ix] == '/')
             break;
