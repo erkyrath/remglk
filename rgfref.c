@@ -34,9 +34,7 @@ void gli_initialize_filerefs()
 {
     tagcounter = (random() % 15) + 48;
 
-    if (!workingdir) {
-        workingdir = strdup(".");
-    }
+    gli_fileref_set_working_dir(".");
 }
 
 fileref_t *glkunix_fileref_find_by_updatetag(glui32 tag)

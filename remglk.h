@@ -274,6 +274,7 @@ extern void gli_stream_echo_line_uni(stream_t *str, glui32 *buf, glui32 len);
 extern void gli_streams_close_all(void);
 
 extern void gli_initialize_filerefs(void);
+extern void gli_fileref_set_working_dir(char *filename);
 extern fileref_t *gli_new_fileref(char *filename, glui32 usage, 
     glui32 rock);
 extern fileref_t *gli_fileref_alloc_inactive(void);
